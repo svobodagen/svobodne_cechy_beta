@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svobodné cechy – Úvod</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+    </a>
+    <div class="user-menu">
+      <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="profil.html">Profil</a>
+        <a href="admin.html" class="admin-only">Administrace</a>
+        <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+      </div>
+    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html" class="active">Úvod</a>
+      <a href="mistri.html">Mistři</a>
+
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-text">
+        <p class="eyebrow" data-cms-key="hero_eyebrow"></p>
+        <h1 data-cms-key="hero_h1"></h1>
+        <p class="lead" data-cms-key="hero_lead"></p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="mistri.html">Vyber si mistra</a>
+          <a class="btn ghost" href="#proc">Proč to funguje</a>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Učení praxí</span>
+          <span class="pill">Moderní cech</span>
+          <span class="pill">Reálné zakázky</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="card-rim">
+          <div class="card-spotlight">
+            <div class="badge">Blueprint</div>
+            <h2 data-cms-key="card_h2"></h2>
+            <p data-cms-key="card_p"></p>
+
+            <div class="stat-grid">
+              <div class="stat">
+                <strong data-cms-key="step1_num"></strong>
+                <span data-cms-key="step1_label"></span>
+              </div>
+              <div class="stat">
+                <strong data-cms-key="step2_num"></strong>
+                <span data-cms-key="step2_label"></span>
+              </div>
+              <div class="stat">
+                <strong data-cms-key="step3_num"></strong>
+                <span data-cms-key="step3_label"></span>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="proc" class="steps">
+      <h2 data-cms-key="steps_h2"></h2>
+
+
+      <div class="steps-grid">
+        <div class="step">
+          <span class="step-num" data-cms-key="step_col1_label"></span>
+          <p data-cms-key="step_col1_text"></p>
+        </div>
+        <div class="step">
+          <span class="step-num" data-cms-key="step_col2_label"></span>
+          <p data-cms-key="step_col2_text"></p>
+        </div>
+        <div class="step">
+          <span class="step-num" data-cms-key="step_col3_label"></span>
+          <p data-cms-key="step_col3_text"></p>
+        </div>
+
+
+      </div>
+    </section>
+
+    <section class="cta-banner">
+      <div>
+        <h2 data-cms-key="cta_h2"></h2>
+        <p data-cms-key="cta_text"></p>
+      </div>
+
+
+      <a class="btn primary" href="mistri.html">Vyber si mistra</a>
+    </section>
+  </main>
+
+  </footer>
+  <script src="app.js?v=202605021140"></script>
+</body>
+
+</html>

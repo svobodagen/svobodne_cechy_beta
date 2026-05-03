@@ -1,0 +1,22 @@
+# AI Coding Instructions for Svobodné Cechy v2
+
+## 1. Versioning & Cache Busting (CRITICAL)
+- Whenever you modify `app.js` or `styles.css`, you MUST update the version query parameter in ALL HTML files that reference them.
+- Format: `src="app.js?v=YYYYMMDDHHMM"` (current timestamp).
+- This is mandatory to prevent caching issues during development.
+- NEVER ask the user to clear their browser cache. Always use versioning instead.
+
+## 2. Git Workflow
+- Commit and push changes to GitHub **immediately** after completing a logical unit of work or a specific task.
+- Do not wait for a "batch" of changes unless explicitly instructed.
+- Use descriptive commit messages in Czech.
+
+## 3. Tech Stack & Style
+- HTML/CSS/JS (Vanilla).
+- No frameworks unless requested.
+- Design: Premium, modern, "Glassmorphism", dark mode aesthetics.
+
+## 4. Specific Behaviors
+- **Login/Auth**: If a user is not logged in, the "Profil" button/link should redirect DIRECTLY to `login.html`.
+- **Navigation**: The "Administrace" link should ONLY appear in the user dropdown menu, never in the main nav bar.
+- **Forms**: After successful submission of forms (like "Najít mistra"), show a visual confirmation overlay and redirect after a short delay (e.g., 1.5s).

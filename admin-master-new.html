@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profily mistrů – Moderní design (admin)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=202605021121" />
+  <style>
+    :root {
+      --primary: hsl(210, 40%, 55%);
+      --accent: hsl(210, 70%, 70%);
+      --bg-glass: rgba(255, 255, 255, 0.12);
+      --text: hsl(210, 10%, 95%);
+      --text-muted: hsl(210, 15%, 70%);
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, hsl(210, 30%, 12%), hsl(210, 35%, 18%));
+      color: var(--text);
+    }
+    .glass-card {
+      backdrop-filter: blur(12px);
+      background: var(--bg-glass);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 4rem auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .profile-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--bg-glass);
+    }
+    .profile-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .profile-info h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+    .profile-info p {
+      margin: 0.3rem 0 0;
+      color: var(--text-muted);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .stat {
+      background: var(--bg-glass);
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .stat span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .stat strong {
+      font-size: 1.1rem;
+    }
+    .admin-only {
+      display: none;
+    }
+  </style>
+</head>
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="admin.html"><img src="LOGO_SC2.svg" alt="Svobodné cechy" /></a>
+  </header>
+
+  <main>
+    <section class="glass-card" id="master-profile">
+      <!-- Admin check -->
+      <script>
+        // Simple client‑side guard – real guard should be on the server
+        const session = JSON.parse(sessionStorage.getItem('session') || '{}');
+        if (session.role !== 'admin') {
+          document.body.innerHTML = '<h2 style="text-align:center;margin-top:4rem;">Přístup odepřen – administrátor only</h2>';
+        }
+      </script>
+
+      <div class="profile-header">
+        <div class="profile-photo" id="profile-photo">
+          <img src="placeholder.jpg" alt="Foto mistra" />
+        </div>
+        <div class="profile-info">
+          <h1 id="master-name">Mistr jméno</h1>
+          <p id="master-craft">Obor</p>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="master-stats">
+        <!-- Example stat blocks -->
+        <div class="stat">
+          <span>Kapacita učedníků</span>
+          <strong>-</strong>
+        </div>
+        <div class="stat">
+          <span>Očekávání</span>
+          <strong>-</strong>
+        </div>
+        <div class="stat">
+          <span>Specialita</span>
+          <strong>-</strong>
+        </div>
+        <div class="stat">
+          <span>Co nás motivuje učit</span>
+          <strong>-</strong>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Svobodné cechy</span>
+    <span>Učednictví pro generaci 12–18</span>
+  </footer>
+
+  <script src="app.js?v=202605021121"></script>
+</body>
+</html>

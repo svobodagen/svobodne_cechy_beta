@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mistři – Svobodné cechy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+    </a>
+    <nav class="nav">
+      <a href="index.html">Úvod</a>
+      <a href="masters.html" class="active">Mistři</a>
+    </nav>
+    <a class="cta" href="#vyber">Vybrat mistra</a>
+  </header>
+
+  <main>
+    <section class="hero" style="margin-bottom: 40px;">
+      <div>
+        <p class="eyebrow">Kolekce mistrů</p>
+        <h1>Vyber si mistra, který tě bude bavit.</h1>
+        <p class="lead">Karty jsou navržené jako herní atlas. Každý mistr má svůj styl, specializace a unikátní bonusy
+          pro učedníky.</p>
+      </div>
+      <div class="hero-card">
+        <div class="card-rim">
+          <div class="card-spotlight">
+            <div class="badge">Legenda cechu</div>
+            <h2>Pokémon-styl karta</h2>
+            <p>Vizuálně hravé, jasné informace a odměny za dovednosti. Karty se proklikem zobrazují v detailu.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="masters-layout">
+      <div>
+        <div class="masters-grid" id="masters-grid"></div>
+      </div>
+      <aside class="master-detail" id="master-detail">
+        <div class="card-header">
+          <div>
+            <span class="badge" id="detail-rank">Mistr</span>
+            <h2 id="detail-name">Vyber si kartu</h2>
+          </div>
+          <span class="chip" id="detail-craft">Řemeslo</span>
+        </div>
+        <p id="detail-desc">Klikni na kartu mistra a zobrazí se detail ve stylu herní karty.</p>
+        <div class="master-stats" id="detail-stats"></div>
+        <div class="master-tags" id="detail-tags"></div>
+        <div class="form-card" id="vyber">
+          <h3>Rychlý výběr mistra</h3>
+          <p class="lead" style="font-size: 14px;">Poprvé vyplníš a příště už jen klikneš. Údaje se uloží do zařízení.
+          </p>
+          <form id="signup-form">
+            <div>
+              <label for="name">Jméno</label>
+              <input id="name" name="name" required />
+            </div>
+            <div>
+              <label for="age">Věk</label>
+              <input id="age" name="age" type="number" min="12" max="18" required />
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required />
+            </div>
+            <div>
+              <label for="phone">Telefon</label>
+              <input id="phone" name="phone" type="tel" required />
+            </div>
+            <div>
+              <label for="message">Zpráva pro mistra</label>
+              <textarea id="message" name="message" required></textarea>
+            </div>
+            <button class="btn primary" type="submit">Odeslat a získat heslo</button>
+            <div class="notice" id="form-notice" style="display:none;"></div>
+          </form>
+        </div>
+        <div class="form-card admin-card" id="admin">
+          <h3>Administrace</h3>
+          <p class="lead" style="font-size: 14px;">Přístup jen pro správce (demo).</p>
+          <form id="admin-login">
+            <div>
+              <label for="admin-name">Jméno</label>
+              <input id="admin-name" name="admin-name" autocomplete="username" required />
+            </div>
+            <div>
+              <label for="admin-pass">Heslo</label>
+              <input id="admin-pass" name="admin-pass" type="password" autocomplete="current-password" required />
+            </div>
+            <button class="btn primary" type="submit">Přihlásit</button>
+            <div class="notice" id="admin-notice" style="display:none;"></div>
+          </form>
+          <form id="admin-editor" style="display:none; margin-top: 16px;">
+            <div>
+              <label for="admin-master">Mistr</label>
+              <select id="admin-master" name="admin-master"></select>
+            </div>
+            <div>
+              <label for="admin-rank">Titul</label>
+              <input id="admin-rank" name="admin-rank" />
+            </div>
+            <div>
+              <label for="admin-desc">Popis</label>
+              <textarea id="admin-desc" name="admin-desc"></textarea>
+            </div>
+            <div>
+              <label for="admin-tags">Tagy (oddělené čárkou)</label>
+              <input id="admin-tags" name="admin-tags" />
+            </div>
+            <div>
+              <label for="admin-photo">Fotka mistra</label>
+              <input id="admin-photo" name="admin-photo" type="file" accept="image/*" />
+            </div>
+            <button class="btn ghost" type="submit">Uložit změny</button>
+            <div class="notice" id="admin-save" style="display:none;"></div>
+          </form>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Svobodné cechy</span>
+    <span>Učednictví pro generaci 12–18</span>
+  </footer>
+
+  <script src="app.js?v=202605020920"></script>
+</body>
+
+</html>

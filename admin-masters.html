@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svobodné cechy – Administrace (Mistři)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+    </a>
+    <div class="user-menu">
+      <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="profil.html">Profil</a>
+        <a href="admin.html" class="admin-only">Administrace</a>
+        <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+      </div>
+    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html">Úvod</a>
+
+      <a href="mistri.html">Mistři</a>
+
+
+    </nav>
+  </header>
+
+  <main>
+    <section class="admin-layout">
+      <div class="form-card" id="admin-guard">
+        <h2>Administrace</h2>
+        <p class="lead" style="font-size: 14px;">Pro vstup se musíš přihlásit jako admin.</p>
+        <a class="btn primary" href="login.html">Přejít na přihlášení</a>
+      </div>
+
+      <div class="form-card" id="masters-admin" style="display:none;">
+        <!-- List View -->
+        <div id="masters-list-view">
+          <div class="row" style="align-items: center; margin-bottom: 20px;">
+            <h2>Správa mistrů</h2>
+            <button class="btn primary" type="button" id="new-master-btn">
+              <i class="bi bi-person-plus"></i>&nbsp; Nový mistr
+            </button>
+          </div>
+          <div class="admin-list" id="master-list"></div>
+        </div>
+
+        <!-- Edit View -->
+        <div id="master-edit-view" hidden>
+          <div class="row" style="align-items: center; margin-bottom: 20px;">
+            <h2 id="edit-view-title">Upravit mistra</h2>
+            <button class="btn ghost" type="button" id="back-to-list-btn">
+              <i class="bi bi-arrow-left"></i>&nbsp; Zpět na seznam
+            </button>
+          </div>
+          <form id="master-form">
+            <div>
+              <label for="master-id">ID (pro nový může být prázdné)</label>
+              <input id="master-id" />
+            </div>
+            <div>
+              <label for="master-name">Jméno</label>
+              <input id="master-name" required />
+            </div>
+            <div>
+              <label for="master-craft">Řemeslo</label>
+              <input id="master-craft" required />
+            </div>
+            <div>
+              <label for="master-location">Lokalita</label>
+              <input id="master-location" required />
+            </div>
+            <div>
+              <label for="master-rank">Titul</label>
+              <input id="master-rank" />
+            </div>
+            <div>
+              <label for="master-aura">Aura</label>
+              <input id="master-aura" />
+            </div>
+            <div>
+              <label for="master-desc">Popis</label>
+              <textarea id="master-desc"></textarea>
+            </div>
+            <div>
+              <label for="master-education">Co tě naučíme</label>
+              <textarea id="master-education" placeholder="Seznam dovedností a znalostí..."></textarea>
+            </div>
+            <div>
+              <label for="master-accommodation">Ubytování</label>
+              <textarea id="master-accommodation" placeholder="Popis možností ubytování..."></textarea>
+            </div>
+            <div>
+              <label for="master-compensation">Formy kompenzace</label>
+              <textarea id="master-compensation" placeholder="Jakým způsobem probíhá vyrovnání (mzda, protislužba, strava...)..."></textarea>
+            </div>
+            <div>
+              <label for="master-recommendations">Doporučení na další vzdělávání</label>
+              <textarea id="master-recommendations" placeholder="Knihy, kurzy, další mistři..."></textarea>
+            </div>
+            <div>
+              <label for="master-requirements">Požadavky na učedníka</label>
+              <textarea id="master-requirements" placeholder="Věk, dovednosti, nářadí..."></textarea>
+            </div>
+            <div>
+              <label for="master-tags">Tagy (oddělené čárkou)</label>
+              <input id="master-tags" />
+            </div>
+            <div>
+              <label for="master-stat-motivation">Co nás motivuje učit</label>
+              <input id="master-stat-motivation" />
+            </div>
+
+            <div>
+              <label for="master-stat-capacity">Kapacita učedníků</label>
+              <input id="master-stat-capacity" />
+            </div>
+            <div>
+              <label for="master-stat-speed">Očekávání</label>
+              <input id="master-stat-speed" />
+            </div>
+            <div>
+              <label for="master-stat-specialty">Specialita</label>
+              <input id="master-stat-specialty" />
+            </div>
+            <div>
+              <label for="master-badges">Badge (oddělené čárkou)</label>
+              <input id="master-badges" />
+            </div>
+            <div class="social-toggles">
+              <span style="font-size: 13px; color: var(--muted); width: 100%;">Zobrazit sítě:</span>
+              <label class="switch-block">
+                <span class="switch">
+                  <input type="checkbox" id="toggle-fb" />
+                  <span class="slider"></span>
+                </span>
+                FB
+              </label>
+              <label class="switch-block">
+                <span class="switch">
+                  <input type="checkbox" id="toggle-ig" />
+                  <span class="slider"></span>
+                </span>
+                IG
+              </label>
+              <label class="switch-block">
+                <span class="switch">
+                  <input type="checkbox" id="toggle-tt" />
+                  <span class="slider"></span>
+                </span>
+                TT
+              </label>
+              <label class="switch-block">
+                <span class="switch">
+                  <input type="checkbox" id="toggle-li" />
+                  <span class="slider"></span>
+                </span>
+                LI
+              </label>
+              <label class="switch-block">
+                <span class="switch">
+                  <input type="checkbox" id="toggle-yt" />
+                  <span class="slider"></span>
+                </span>
+                YT
+              </label>
+              <label class="switch-block">
+                <span class="switch">
+                  <input type="checkbox" id="toggle-yt-sc" />
+                  <span class="slider"></span>
+                </span>
+                YT SC
+              </label>
+            </div>
+            <div class="social-field" data-social="fb">
+              <label for="master-fb">Facebook</label>
+              <input id="master-fb" type="text" />
+            </div>
+            <div class="social-field" data-social="ig">
+              <label for="master-ig">Instagram</label>
+              <input id="master-ig" type="text" />
+            </div>
+            <div class="social-field" data-social="tt">
+              <label for="master-tt">TikTok</label>
+              <input id="master-tt" type="text" />
+            </div>
+            <div class="social-field" data-social="li">
+              <label for="master-li">LinkedIn</label>
+              <input id="master-li" type="text" />
+            </div>
+            <div class="social-field" data-social="yt">
+              <label for="master-yt">YouTube</label>
+              <input id="master-yt" type="text" />
+            </div>
+            <div class="social-field" data-social="yt-sc">
+              <label for="master-yt-sc">YouTube SC</label>
+              <input id="master-yt-sc" type="text" />
+            </div>
+            <div>
+              <label>Fotka mistra</label>
+              <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <button class="btn secondary" type="button" id="master-photo-picker"><i class="bi bi-images"></i>&nbsp;
+                  Vybrat
+                  z knihovny</button>
+                <input id="master-photo" type="file" accept="image/*" hidden />
+                <button class="btn ghost" type="button" onclick="document.getElementById('master-photo').click()"><i
+                    class="bi bi-upload"></i>&nbsp; Nahrát ze souboru</button>
+              </div>
+              <div class="photo-row">
+                <div class="thumb" id="photo-preview" style="max-width: 220px;">
+                  <div class="pill">Náhled fotky</div>
+                </div>
+                <button class="icon-btn" type="button" id="photo-clear" aria-label="Odstranit fotku">
+                  <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 15px;">
+                <div style="flex: 1; min-width: 120px;">
+                  <label for="photo-x" style="font-size: 13px;">Posun X (-50 až 50)</label>
+                  <input id="photo-x" type="range" min="-50" max="50" value="0" />
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                  <label for="photo-y" style="font-size: 13px;">Posun Y (-50 až 50)</label>
+                  <input id="photo-y" type="range" min="-50" max="50" value="0" />
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                  <label for="photo-zoom" style="font-size: 13px;">Zoom (80–160 %)</label>
+                  <input id="photo-zoom" type="range" min="80" max="160" value="100" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <label>Galerie (fotky a videa)</label>
+              <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <button class="btn secondary" type="button" id="master-gallery-picker"><i
+                    class="bi bi-images"></i>&nbsp; Vybrat
+                  z knihovny</button>
+                <input id="master-gallery" type="file" accept="image/*,video/*" multiple hidden />
+                <button class="btn ghost" type="button" onclick="document.getElementById('master-gallery').click()"><i
+                    class="bi bi-upload"></i>&nbsp; Nahrát ze souboru</button>
+              </div>
+              <div id="gallery-preview" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+              <button class="icon-btn" type="button" id="gallery-clear" aria-label="Odstranit galerii"
+                style="margin-top:8px;">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div>
+              <label>Audio zpráva (MP3)</label>
+              <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <button class="btn secondary" type="button" id="master-audio-picker"><i
+                    class="bi bi-music-note-beamed"></i>&nbsp; Vybrat z knihovny</button>
+                <input id="master-audio" type="file" accept="audio/mpeg" hidden />
+                <button class="btn ghost" type="button" onclick="document.getElementById('master-audio').click()"><i
+                    class="bi bi-upload"></i>&nbsp; Nahrát ze souboru</button>
+              </div>
+              <div id="audio-preview" style="font-size: 13px; color: var(--accent-2);"></div>
+              <button class="icon-btn" type="button" id="audio-clear" aria-label="Odstranit audio"
+                style="margin-top:8px;">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <button class="btn primary" type="submit">Uložit mistra</button>
+            <div class="notice" id="master-notice" style="display:none;"></div>
+            <div id="save-log"
+              style="display:none; font-size: 12px; color: var(--muted); margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="confirm-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h3 id="confirm-title">Potvrzení</h3>
+      <p id="confirm-text"></p>
+      <div class="modal-actions">
+        <button class="btn ghost" type="button" id="confirm-cancel">Zrušit</button>
+        <button class="btn primary" type="button" id="confirm-ok">Pokračovat</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span>Svobodné cechy</span>
+    <span>Učednictví pro generaci 12–18</span>
+  </footer>
+
+  <!-- Media Library Picker Modal -->
+  <div class="modal-backdrop" id="media-picker-modal" hidden>
+    <div class="modal-card" style="max-width: 900px; width: 95%;">
+      <h3>Vybrat z médií</h3>
+      <nav class="breadcrumbs" id="picker-breadcrumbs" style="margin-bottom: 20px; font-size: 14px;"></nav>
+      <div class="media-grid" id="picker-grid"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; max-height: 50vh; overflow-y: auto;">
+      </div>
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn ghost" type="button" id="picker-cancel">Zavřít</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=202605020920"></script>
+</body>
+
+</html>

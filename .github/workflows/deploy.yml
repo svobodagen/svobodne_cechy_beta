@@ -1,0 +1,23 @@
+name: 🚀 Nasazení na Active24
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  web-deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Stažení kódu
+      uses: actions/checkout@v3
+
+    - name: 📂 Nahrání na FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: ./bezskoly.cz/web/
+        protocol: ftp
+        port: 21

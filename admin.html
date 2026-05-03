@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svobodné cechy – Administrace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+    </a>
+    <div class="user-menu">
+      <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="profil.html">Profil</a>
+        <a href="admin.html" class="admin-only">Administrace</a>
+        <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+      </div>
+    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html">Úvod</a>
+      <a href="mistri.html">Mistři</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="admin-layout">
+      <div class="form-card" id="admin-guard">
+        <h2>Administrace</h2>
+        <p class="lead" style="font-size: 14px;">Pro vstup se musíš přihlásit jako admin.</p>
+        <a class="btn primary" href="login.html">Přejít na přihlášení</a>
+      </div>
+
+      <div class="form-card admin-hub-card" id="admin-hub">
+        <h2>Rozcestník</h2>
+        <p class="lead" style="font-size: 14px;">Vyber sekci, kterou chceš spravovat.</p>
+        <div class="admin-list">
+          <a class="admin-nav-item" href="admin-roles.html">
+            <div class="admin-nav-text">
+              <strong>Role uživatelů</strong>
+              <small>Nastavení rolí a přístupů.</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+          <a class="admin-nav-item" href="admin-messages.html">
+            <div class="admin-nav-text">
+              <strong>Zprávy</strong>
+              <small>Přehled zpráv od učedníků.</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+          <a class="admin-nav-item" href="admin-masters.html">
+            <div class="admin-nav-text">
+              <strong>Správa mistrů</strong>
+              <small>Přidání, úpravy a fotky.</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+          <a class="admin-nav-item admin-only" href="admin-master-profile.html">
+            <div class="admin-nav-text">
+              <strong>Profil mistra – Draft (Admin)</strong>
+              <small>Konfigurační náhled pro administrátory.</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+          <a class="admin-nav-item admin-only" href="mistr-detail-new.html?id=jiri-pajinek">
+            <div class="admin-nav-text">
+              <strong>Veřejný profil – Návrh (Public)</strong>
+              <small>Funkční náhled nového detailu (Jiří Pajínek).</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+          <a class="admin-nav-item" href="admin-content.html">
+            <div class="admin-nav-text">
+              <strong>Texty webu (CMS)</strong>
+              <small>Editace nadpisů a textů na úvodní stránce.</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+          <a class="admin-nav-item" href="admin-media.html">
+            <div class="admin-nav-text">
+              <strong>Knihovna médií</strong>
+              <small>Správa fotek, videí a audia.</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+          <a class="admin-nav-item" href="admin-requests.html">
+            <div class="admin-nav-text">
+              <strong>Žádosti o mistry</strong>
+              <small>Přehled poptávek od budoucích učedníků.</small>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Svobodné cechy</span>
+    <span>Učednictví pro generaci 12–18</span>
+  </footer>
+
+  <script src="app.js?v=202605021140"></script>
+</body>
+
+</html>

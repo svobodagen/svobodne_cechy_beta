@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svobodné cechy – Přihlášení</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+    </a>
+    <div class="user-menu">
+      <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="profil.html">Profil</a>
+        <a href="admin.html" class="admin-only">Administrace</a>
+        <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+      </div>
+    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html">Úvod</a>
+
+      <a href="mistri.html">Mistři</a>
+
+
+    </nav>
+  </header>
+
+  <main>
+    <section class="auth-grid">
+      <div class="form-card">
+        <h2>Přihlášení</h2>
+        <form id="login-form" autocomplete="on">
+          <div>
+            <label for="login-email">Uživatelské jméno nebo email</label>
+            <input id="login-email" name="username" type="text" autocomplete="email" required />
+          </div>
+          <div>
+            <label for="login-pass">Heslo</label>
+            <input id="login-pass" name="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button class="btn primary" type="submit">Přihlásit</button>
+          <div class="notice" id="login-notice" style="display:none;"></div>
+        </form>
+
+        <form id="change-pass" style="display:none; margin-top: 16px;">
+          <h3>Změna hesla</h3>
+          <div class="notice" id="temp-hint" style="display:none;"></div>
+          <div>
+            <label for="new-pass">Nové heslo</label>
+            <input id="new-pass" name="new-pass" type="password" required />
+          </div>
+          <button class="btn ghost" type="submit">Uložit nové heslo</button>
+          <div class="notice" id="change-notice" style="display:none;"></div>
+        </form>
+      </div>
+
+      <div class="form-card">
+        <h2>Registrace</h2>
+        <p class="lead" style="font-size: 14px;">Můžeš se zaregistrovat hned, nebo se vytvoří účet automaticky po první
+          zprávě mistrovi.</p>
+        <form id="register-form" autocomplete="on">
+          <div>
+            <label for="reg-email">Email (uživatelské jméno)</label>
+            <input id="reg-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <button class="btn ghost" type="submit">Vytvořit účet</button>
+          <div class="notice" id="register-notice" style="display:none;"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Svobodné cechy</span>
+    <span>Učednictví pro generaci 12–18</span>
+  </footer>
+
+  <script src="app.js?v=202605020920"></script>
+</body>
+
+</html>

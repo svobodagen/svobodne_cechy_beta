@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Svobodné cechy – Najít mistra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+    <header class="site-header">
+        <a class="logo" href="index.html">
+            <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+        </a>
+        <div class="user-menu">
+            <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+            <div class="user-dropdown" id="user-dropdown" hidden>
+                <a href="profil.html">Profil</a>
+                <a href="admin.html" class="admin-only">Administrace</a>
+                <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+            </div>
+        </div>
+        <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="nav">
+            <a href="index.html">Úvod</a>
+            <a href="mistri.html">Mistři</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-layout" style="grid-template-columns: 1fr; max-width: 800px; margin: 0 auto;">
+            <div class="form-card">
+                <h1>Najít Mistra</h1>
+                <p class="lead" style="font-size: 16px; margin-bottom: 32px;">Vyplňte, co hledáte, a kluci z cechu se
+                    vám pokusí najít vhodného mistra ve vašem okolí.</p>
+
+                <form id="standalone-request-form" class="auth-grid" style="grid-template-columns: 1fr; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                        <label class="field-label">Vaše jméno</label>
+                        <input type="text" id="req-name" placeholder="Jméno a příjmení" required />
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label class="field-label">Telefon</label>
+                            <input type="tel" id="req-phone" placeholder="+420..." required />
+                        </div>
+                        <div>
+                            <label class="field-label">Email</label>
+                            <input type="email" id="req-email" placeholder="vas@email.cz" required />
+                        </div>
+                        <div>
+                            <label class="field-label">Věk</label>
+                            <input type="number" id="req-age" placeholder="např. 16" min="1" max="120" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="field-label">O jaké řemeslo máte zájem? (můžete vybrat více)</label>
+                        <div id="req-crafts-list" class="multi-select-list">
+                            <div class="loading-small">Načítám obory...</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <input type="text" id="new-craft-name" placeholder="Jiné řemeslo..." style="flex: 1;" />
+                            <button type="button" id="btn-add-craft" class="btn ghost"
+                                style="padding: 10px 16px;">Přidat</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="field-label">V jaké lokalitě hledáte?</label>
+                        <div style="position: relative;">
+                            <input type="text" id="city-search" placeholder="Začněte psát město (např. Brno, Praha...)"
+                                style="width: 100%;" autocomplete="off" />
+                            <div id="city-results" class="autocomplete-results" hidden></div>
+                        </div>
+                        <div id="selected-cities" class="pill-row" style="margin-top: 12px;"></div>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Maximální vzdálenost od vybraných míst: <span id="distance-val"
+                                style="color: var(--accent); float: right;">50 km</span></label>
+                        <input type="range" id="req-distance" min="0" max="200" step="5" value="50"
+                            style="width: 100%; margin-top: 8px;" />
+                    </div>
+
+                    <div>
+                        <label class="field-label">Doplňující informace (nepovinné)</label>
+                        <textarea id="req-note" placeholder="Např. kdy můžete začít, vaše dosavadní zkušenosti atd."
+                            rows="4"
+                            style="width: 100%; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;"></textarea>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn primary" style="width: 100%; padding: 16px;">Odeslat
+                            poptávku</button>
+                    </div>
+                </form>
+                <div id="req-notice"
+                    style="display: none; margin-top: 24px; padding: 16px; border-radius: 12px; text-align: center; font-weight: 600;">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <span>Svobodné cechy</span>
+        <span>Učednictví pro generaci 12–18</span>
+    </footer>
+
+    <script src="app.js?v=202605020920"></script>
+</body>
+
+</html>

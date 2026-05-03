@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svobodné cechy – Administrace (Role)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+    </a>
+    <div class="user-menu">
+      <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="profil.html">Profil</a>
+        <a href="admin.html" class="admin-only">Administrace</a>
+        <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+      </div>
+    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html">Úvod</a>
+      <a href="mistri.html">Mistři</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="admin-layout">
+      <div class="form-card" id="admin-guard">
+        <h2>Administrace</h2>
+        <p class="lead" style="font-size: 14px;">Pro vstup se musíš přihlásit jako admin.</p>
+        <a class="btn primary" href="login.html">Přejít na přihlášení</a>
+      </div>
+
+      <div class="form-card" id="admin-users" style="display:none;">
+        <h2>Uživatelé</h2>
+
+        <!-- Filtr a vyhledávání -->
+        <div class="user-controls">
+          <input id="user-search" type="search" placeholder="Hledat jméno nebo e-mail…" autocomplete="off" />
+          <div class="role-filter-btns">
+            <button class="role-filter-btn active" data-role="">Všichni</button>
+            <button class="role-filter-btn" data-role="admin">Admin</button>
+            <button class="role-filter-btn" data-role="ucednik">Učedník</button>
+            <button class="role-filter-btn" data-role="navstevnik">Návštěvník</button>
+          </div>
+        </div>
+
+        <!-- Seznam uživatelů -->
+        <div class="admin-list" id="user-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal – editace uživatele -->
+  <div class="modal-backdrop" id="user-edit-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="user-edit-title"
+      style="max-width:480px; width:100%;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+        <h3 id="user-edit-title" style="margin:0;">Upravit uživatele</h3>
+        <button class="btn ghost" type="button" id="user-form-cancel" style="padding:6px 14px; font-size:13px;">✕
+          Zavřít</button>
+      </div>
+      <form id="user-form">
+        <div>
+          <label for="user-name">Jméno</label>
+          <input id="user-name" type="text" />
+        </div>
+        <div>
+          <label for="user-email">Email</label>
+          <input id="user-email" type="email" required />
+        </div>
+        <div>
+          <label for="user-phone">Telefon</label>
+          <input id="user-phone" type="tel" />
+        </div>
+        <div>
+          <label for="user-role">Role</label>
+          <select id="user-role">
+            <option value="navstevnik">Návštěvník</option>
+            <option value="ucednik">Učedník</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div>
+          <label for="user-pass">Heslo</label>
+          <input id="user-pass" type="text" />
+        </div>
+        <button class="btn primary" type="submit" style="width:100%; margin-top:4px;">Uložit uživatele</button>
+        <div class="notice" id="user-notice" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="confirm-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h3 id="confirm-title">Potvrzení</h3>
+      <p id="confirm-text"></p>
+      <div class="modal-actions">
+        <button class="btn ghost" type="button" id="confirm-cancel">Zrušit</button>
+        <button class="btn primary" type="button" id="confirm-ok">Pokračovat</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span>Svobodné cechy</span>
+    <span>Učednictví pro generaci 12–18</span>
+  </footer>
+
+  <script src="app.js?v=202605020920"></script>
+</body>
+
+</html>

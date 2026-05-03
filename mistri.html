@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svobodné cechy – Mistři</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+    </a>
+    <div class="user-menu">
+      <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="profil.html">Profil</a>
+        <a href="admin.html" class="admin-only">Administrace</a>
+        <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+      </div>
+    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav">
+      <a href="index.html">Úvod</a>
+
+      <a href="mistri.html" class="active">Mistři</a>
+
+
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" style="margin-bottom: 32px;">
+      <div>
+        <p class="eyebrow">Kolekce mistrů</p>
+        <h1>Vyber si mistra, který tě bude bavit.</h1>
+        <p class="lead">Klikni na kartu a otevřeš detail ve stylu herní karty.</p>
+      </div>
+      <div class="hero-card">
+        <div class="card-rim">
+          <div class="card-spotlight">
+            <div class="badge">Legenda cechu</div>
+            <h2>Karty mistrů</h2>
+            <p>Hravý atlas mistrů s raritou, dovednostmi a stylovými bonusy.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="masters-grid" id="masters-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Svobodné cechy</span>
+    <span>Učednictví pro generaci 12–18</span>
+  </footer>
+
+  <script src="app.js?v=202605020920"></script>
+</body>
+
+</html>

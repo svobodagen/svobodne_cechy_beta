@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="cs">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Svobodné cechy – Správa textů</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=202605020920" />
+</head>
+
+<body class="page">
+    <header class="site-header">
+        <a class="logo" href="index.html">
+            <img src="LOGO_SC2.svg" alt="Svobodné cechy" />
+        </a>
+        <div class="user-menu">
+            <button class="user-link" type="button" id="user-toggle" aria-expanded="false">Profil</button>
+            <div class="user-dropdown" id="user-dropdown" hidden>
+                <a href="profil.html">Profil</a>
+                <a href="admin.html" class="admin-only">Administrace</a>
+                <button type="button" id="user-logout" class="user-logout">Odhlásit</button>
+            </div>
+        </div>
+        <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="nav">
+            <a href="index.html">Úvod</a>
+            <a href="mistri.html">Mistři</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-layout">
+            <div class="form-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Správa textů webu</h2>
+                    <a href="admin.html" class="btn ghost">Zpět</a>
+                </div>
+
+                <p class="lead" style="font-size: 14px; margin-bottom: 24px;">Zde můžete libovolně měnit texty na
+                    úpravní stránce. Změny se projeví okamžitě po uložení.</p>
+
+                <form id="cms-form">
+                    <div id="cms-fields" class="admin-list">
+                        <!-- Fields loaded dynamically -->
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="loader">Načítám texty...</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; position: sticky; bottom: 20px; z-index: 10;">
+                        <button type="submit" class="btn primary"
+                            style="width: 100%; box-shadow: 0 10px 30px rgba(255, 123, 28, 0.4);">Uložit veškeré
+                            změny</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <span>Svobodné cechy</span>
+    </footer>
+
+    <script src="app.js?v=202605020920"></script>
+    <script>
+        // Specific script for admin-content.html
+        document.addEventListener('DOMContentLoaded', async () => {
+            const form = document.getElementById('cms-form');
+            const fieldsContainer = document.getElementById('cms-fields');
+
+            const contentKeys = [
+                { id: 'hero_eyebrow', label: 'Hero - Název brandu (eyebrow)', type: 'text' },
+                { id: 'hero_h1', label: 'Hero - Hlavní nadpis (H1)', type: 'text' },
+                { id: 'hero_lead', label: 'Hero - Úvodní text (lead)', type: 'textarea' },
+                { id: 'steps_h2', label: 'Proč to funguje - Nadpis', type: 'text' },
+                { id: 'step1_label', label: 'Krok 1 - Štítek', type: 'text' },
+                { id: 'step1_text', label: 'Krok 1 - Popis', type: 'textarea' },
+                { id: 'step2_label', label: 'Krok 2 - Štítek', type: 'text' },
+                { id: 'step2_text', label: 'Krok 2 - Popis', type: 'textarea' },
+                { id: 'step3_label', label: 'Krok 3 - Štítek', type: 'text' },
+                { id: 'step3_text', label: 'Krok 3 - Popis', type: 'textarea' },
+                { id: 'cta_h2', label: 'CTA - Nadpis banneru', type: 'text' },
+                { id: 'cta_text', label: 'CTA - Text banneru', type: 'text' },
+            ];
+
+            async function loadCMS() {
+                try {
+                    const res = await fetch('api.php?action=load_site_content');
+                    const data = await res.json();
+
+                    fieldsContainer.innerHTML = '';
+                    contentKeys.forEach(key => {
+                        const val = data[key.id] || document.querySelector(`[data-cms-key="${key.id}"]`)?.innerText || '';
+                        const row = document.createElement('div');
+                        row.className = 'row stack';
+                        row.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                        row.style.padding = '15px 0';
+
+                        const label = document.createElement('label');
+                        label.textContent = key.label;
+                        label.style.display = 'block';
+                        label.style.marginBottom = '8px';
+                        label.style.fontWeight = 'bold';
+
+                        let input;
+                        if (key.type === 'textarea') {
+                            input = document.createElement('textarea');
+                            input.style.minHeight = '80px';
+                        } else {
+                            input = document.createElement('input');
+                            input.type = 'text';
+                        }
+
+                        input.name = key.id;
+                        input.value = val;
+                        input.placeholder = 'Zadejte text...';
+
+                        row.appendChild(label);
+                        row.appendChild(input);
+                        fieldsContainer.appendChild(row);
+                    });
+                } catch (e) {
+                    console.error(e);
+                    fieldsContainer.innerHTML = '<p style="color:red">Chyba při načítání dat.</p>';
+                }
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const payload = {};
+                formData.forEach((value, key) => payload[key] = value);
+
+                try {
+                    const res = await fetch('api.php?action=save_site_content', {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await res.json();
+                    if (result.status === 'success') {
+                        alert('Texty byly úspěšně uloženy!');
+                    }
+                } catch (e) {
+                    alert('Chyba při ukládání: ' + e.message);
+                }
+            });
+
+            // Simple auth check
+            const session = JSON.parse(localStorage.getItem('sc2.session') || 'null');
+            const isAdmin = session && (session.role === 'admin' || session.email === 'svoboda.gen@email.cz');
+
+            if (!isAdmin) {
+                window.location.href = 'admin.html';
+                return;
+            }
+
+            loadCMS();
+        });
+    </script>
+</body>
+
+</html>
