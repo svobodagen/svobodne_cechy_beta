@@ -4,8 +4,24 @@ require_once 'db.php';
 
 function fetchData($action) {
     $url = "https://www.bezskoly.cz/api.php?action=" . $action;
-    $json = file_get_contents($url);
-    return json_decode($json, true);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Pro jistotu, pokud by server měl problém s certifikátem
+    $json = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode !== 200) {
+        echo "⚠️ Varování: API pro '$action' vrátilo kód $httpCode<br>";
+        return null;
+    }
+
+    $data = json_decode($json, true);
+    if ($json && $data === null) {
+        echo "⚠️ Varování: API pro '$action' vrátilo neplatný JSON<br>";
+    }
+    return $data;
 }
 
 try {
