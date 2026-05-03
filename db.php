@@ -1,9 +1,9 @@
 <?php
 // db.php
 $host = 'db.r4.active24.cz';
-$db = 'svobodnecechyDB';
-$user = 'svobodnecechyDB';
-$pass = '21-Asdfgh'; // TODO: Nahraďte skutečným heslem z administrace hostingu
+$db = 'M5wlyXhy';
+$user = 'BETA_SC';
+$pass = '21-BetaSCDB';
 $port = 3306;
 $charset = 'utf8mb4';
 
