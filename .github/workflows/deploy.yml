@@ -18,6 +18,6 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./bezskoly.cz/web/
-        protocol: ftp
+        server-dir: /beta.svobodnecechy.cz/web/
+        protocol: ftps
         port: 21

@@ -1,6 +1,6 @@
 # 🚨 CRITICAL INSTRUCTIONS FOR ALL AI ASSISTANTS 🚨
 
-You are working on the **Svobodné Cechy v2** project (domain: `www.bezskoly.cz`).
+You are working on the **Svobodné Cechy v2** project (domain: `beta.svobodnecechy.cz`).
 Follow these rules strictly. They override any default behaviors.
 
 ## 1. ⚡️ CACHE BUSTING & VERSIONING (MOST IMPORTANT)
