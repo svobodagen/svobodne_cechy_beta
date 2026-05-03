@@ -65,6 +65,17 @@ try {
         echo "✅ " . count($messages) . " zpráv přeneseno.<br>";
     }
 
+    // 4. TEXTY WEBU (SITE CONTENT)
+    $content = fetchData('load_site_content');
+    if ($content) {
+        $pdo->exec("DELETE FROM site_content");
+        $stmt = $pdo->prepare("INSERT INTO site_content (key_name, content_value) VALUES (?, ?)");
+        foreach ($content as $key => $val) {
+            $stmt->execute([$key, $val]);
+        }
+        echo "✅ " . count($content) . " textových polí přeneseno.<br>";
+    }
+
     echo "<br><strong>Hotovo! Data byla úspěšně zkopírována z bezskoly.cz do beta.svobodnecechy.cz.</strong>";
 
 } catch (Exception $e) {
