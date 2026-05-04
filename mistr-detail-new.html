@@ -80,6 +80,24 @@
     }
     .app-logo div { font-family: var(--font-main); font-weight: 800; font-size: 16px; line-height: 1; letter-spacing: 1px; text-transform: uppercase; }
 
+    /* Layout specific overrides to prevent header overlap */
+    .layout-phone .app-header,
+    .layout-tablet .app-header {
+      position: relative;
+      background: var(--bg-black);
+      backdrop-filter: none;
+      padding: 20px;
+    }
+    .layout-phone .hero,
+    .layout-tablet .hero {
+      height: auto;
+      min-height: 60vh;
+      padding-top: 20px;
+    }
+    .layout-phone .app-logo img {
+      height: 48px !important;
+    }
+
     /* Hero Section */
     .hero {
       position: relative;
