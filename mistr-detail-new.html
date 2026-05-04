@@ -744,19 +744,21 @@
 
     /* Header spans full width */
     body.layout-desktop .app-header {
-      grid-column: 1 / -1;
-      position: sticky;
+      position: fixed;
       top: 42px;
-      z-index: 100;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
     }
 
     /* Hero = sticky left photo panel */
     body.layout-desktop .hero {
       grid-column: 1;
       grid-row: 2 / 20;
-      position: sticky;
-      top: 42px;
-      height: calc(100vh - 42px);
+      position: relative;
+      height: 100vh;
       padding: 0 48px 40px 48px;
       display: flex;
       flex-direction: column;
