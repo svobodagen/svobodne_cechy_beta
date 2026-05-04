@@ -740,6 +740,23 @@
           </div>
         </div>
 
+        <!-- Co tě naučíme -->
+        <div class="accordion-item" id="acc-education" style="display: none;">
+          <button class="accordion-trigger">
+            <div class="accordion-icon"><i class="bi bi-mortarboard"></i></div>
+            <div class="accordion-title-box">
+              <span class="accordion-title">Co tě naučíme</span>
+              <span class="accordion-subtitle">Dovednosti a znalosti</span>
+            </div>
+            <i class="bi bi-chevron-down accordion-caret"></i>
+          </button>
+          <div class="accordion-content">
+            <div class="accordion-inner">
+              <div class="description" id="master-education"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Požadavky -->
         <div class="accordion-item" id="acc-requirements" style="display: none;">
           <button class="accordion-trigger">
@@ -981,6 +998,7 @@
           }
         };
 
+        handleAccordion('education', master.education);
         handleAccordion('requirements', master.requirements);
         handleAccordion('motivation', master.stats?.["Co nás motivuje učit"]);
         handleAccordion('accommodation', master.accommodation);
