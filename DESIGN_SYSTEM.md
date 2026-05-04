@@ -16,9 +16,8 @@ Systém využívá silný kontrast mezi temným pozadím a výraznými akcenty.
 | **Text Muted** | `#71717a` | Doplňkové informace, popisky, neaktivní prvky. |
 | **Border** | `rgba(255,255,255,0.1)` | Jemné oddělovače na tmavém pozadí. |
 
-### Návrh na vylepšení barev:
-- **Zlatý gradient:** Pro tlačítka nepoužívat jen plochou barvu, ale gradient `linear-gradient(135deg, #f5b932 0%, #d49a1a 100%)`.
-- **Glassmorphism:** Pro plovoucí prvky používat `rgba(255,255,255,0.05)` s `backdrop-filter: blur(12px)` a tenkým bílým okrajem.
+- **Zlatý gradient:** Pro tlačítka používáme `linear-gradient(135deg, #f5b932 0%, #d49a1a 100%)`.
+- **Glassmorphism:** Pro hlavičku a plovoucí prvky používáme `rgba(0,0,0,0.95)` s `backdrop-filter: blur(10px)`.
 
 ---
 
@@ -26,8 +25,8 @@ Systém využívá silný kontrast mezi temným pozadím a výraznými akcenty.
 
 Používáme moderní bezpatkové písmo s výraznými řezy pro hierarchii.
 
-- **Hlavní font:** `Plus Jakarta Sans` (400, 500, 600, 700, 800)
-- **Nadpisový font (Logo/Display):** `Bungee` (pro specifické brandové prvky)
+- **Hlavní font:** `Plus Jakarta Sans` (400, 500, 600, 700, 800) - Používáme jej i pro logo pro moderní korporátní vzhled.
+- **Doplňkový font:** `Bungee` (pouze pro specifické akcenty a upozornění).
 
 ### Typografické styly:
 - **Hero Nadpis (H1):** `44px`, weight `800`, `line-height: 0.95`, uppercase.
@@ -35,6 +34,16 @@ Používáme moderní bezpatkové písmo s výraznými řezy pro hierarchii.
 - **Název harmoniky:** `15px`, weight `800`, uppercase.
 - **Citát / Motto:** `18px`, italic, vlevo žlutá čára (`3px solid var(--accent)`).
 - **Popisky (Labels):** `11px`, weight `800`, uppercase, letter-spacing `1.5px`.
+
+---
+
+## 3. Navigace a Hlavička
+
+Hlavička je ústředním prvkem identity a musí být konzistentní na všech stránkách.
+
+- **Fixní pozice:** Hlavička je vždy zafixována pod přepínačem zobrazení (top: 42px).
+- **Logo:** Výška 64px (na mobilu 48px), doprovázené názvem "SVOBODNÉ CECHY" (Jakarta Sans 800) a žlutým taglinem "Najdi svého mistra".
+- **Hamburger Menu:** Jediný navigační prvek pro všechna zobrazení. Vysouvá se zprava jako Side Drawer s rozmazaným pozadím.
 
 ---
 
