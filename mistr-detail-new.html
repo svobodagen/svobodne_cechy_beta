@@ -70,7 +70,7 @@
       left: 0;
       width: 100%; 
       z-index: 1000;
-      background: rgba(0,0,0,0.05);
+      background: rgba(0,0,0,0.95);
       backdrop-filter: blur(10px);
     }
     .app-logo { 
@@ -749,17 +749,19 @@
       left: 0;
       width: 100%;
       z-index: 1000;
-      background: rgba(0,0,0,0.05);
+      background: rgba(0,0,0,0.95);
       backdrop-filter: blur(10px);
     }
 
     /* Hero = sticky left photo panel */
     body.layout-desktop .hero {
       grid-column: 1;
-      grid-row: 2 / 20;
-      position: relative;
-      height: 100vh;
+      grid-row: 1 / 20; /* Začínáme od prvního řádku gridu */
+      position: sticky;
+      top: 160px; /* Offset odpovídající paddingu viewportu, aby fotka zůstala viset pod hlavičkou */
+      height: calc(100vh - 160px);
       padding: 0 48px 40px 48px;
+      margin-top: 0; /* Odstraníme jakýkoliv margin */
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
