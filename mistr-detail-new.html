@@ -56,20 +56,26 @@
       background: var(--bg-black);
       min-height: 100vh;
       position: relative;
-      padding-top: 40px;
+      padding-top: 100px; /* Dostatek místa pro fixní hlavičku */
       transition: all 0.3s ease;
     }
 
     /* Header / Logo */
     .app-header {
-      padding: 30px 20px;
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: absolute;
-      top: 0; width: 100%; z-index: 100;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
-      backdrop-filter: blur(8px);
+      position: fixed;
+      top: 0; 
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%; 
+      max-width: 500px; /* Aby lícovala s viewportem */
+      z-index: 1000;
+      background: rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
     }
     .app-logo { 
       text-decoration: none; 
@@ -148,22 +154,17 @@
     }
     .side-menu-overlay.active { display: block; opacity: 1; }
 
-    /* Layout specific overrides to prevent header overlap */
-    .layout-phone .app-header,
-    .layout-tablet .app-header {
-      position: relative;
-      background: var(--bg-black);
-      backdrop-filter: none;
-      padding: 20px;
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .hero {
+        height: auto;
+        min-height: 60vh;
+      }
     }
-    .layout-phone .hero,
-    .layout-tablet .hero {
-      height: auto;
-      min-height: 60vh;
-      padding-top: 20px;
-    }
-    .layout-phone .app-logo img {
-      height: 48px !important;
+    @media (max-width: 768px) {
+      .app-logo img {
+        height: 48px !important;
+      }
     }
 
     /* Hero Section */
