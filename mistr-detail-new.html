@@ -1006,7 +1006,26 @@
         // Stats
         const statStudents = document.getElementById('stat-students');
         if (statStudents) {
-          statStudents.textContent = master.stats?.['Kapacita učedníků'] || 'Individuální';
+          let kapacitaStr = master.stats?.['Kapacita učedníků'];
+          let labelEl = statStudents.nextElementSibling;
+          
+          if (!kapacitaStr) {
+            statStudents.textContent = 'Individuální';
+            if (labelEl) labelEl.textContent = 'kapacita';
+          } else {
+            let num = parseInt(kapacitaStr, 10);
+            if (!isNaN(num) && num.toString() === kapacitaStr.toString().trim()) {
+              statStudents.textContent = num;
+              if (labelEl) {
+                if (num === 1) labelEl.textContent = 'učedník';
+                else if (num >= 2 && num <= 4) labelEl.textContent = 'učedníci';
+                else labelEl.textContent = 'učedníků';
+              }
+            } else {
+              statStudents.textContent = kapacitaStr;
+              if (labelEl) labelEl.textContent = 'kapacita';
+            }
+          }
         }
 
         // --- AUDIO PLAYER ---
