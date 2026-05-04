@@ -228,10 +228,10 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: var(--accent-gradient);
+      background: #000;
       border: none;
       outline: none;
-      color: #000;
+      color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -259,7 +259,6 @@
     .progress-ring__circle {
       transition: stroke-dashoffset 0.1s linear;
       stroke: #ffffff;
-      stroke-width: 3;
     }
 
     .visualizer-canvas {
@@ -687,11 +686,10 @@
         <div class="play-button-wrapper">
           <canvas class="visualizer-canvas" id="audio-visualizer"></canvas>
           <svg class="progress-ring" width="64" height="64" viewBox="0 0 64 64">
-            <!-- Background circle (Gold/Accent) -->
-            <circle stroke="rgba(0,0,0,0.2)" stroke-width="4" fill="none" r="28" cx="32" cy="32" />
-            <circle stroke="var(--accent)" stroke-width="2" fill="none" r="28" cx="32" cy="32" />
-            <!-- Progress circle (White) -->
-            <circle class="progress-ring__circle" fill="transparent" r="28" cx="32" cy="32" 
+            <!-- Static yellow border (Original was orange #ff7b1c) -->
+            <circle stroke="var(--accent)" stroke-width="2" fill="none" r="24" cx="32" cy="32" />
+            <!-- White progress ring -->
+            <circle class="progress-ring__circle" stroke-width="2" fill="transparent" r="28" cx="32" cy="32" 
               style="stroke-dasharray: 175.9; stroke-dashoffset: 175.9;" />
           </svg>
           <button class="play-button" id="btn-audio-play">
@@ -887,7 +885,7 @@
     <div class="lightbox-content" id="lightbox-content"></div>
   </div>
 
-  <script src="app.js?v=202605040842"></script>
+  <script src="app.js?v=202605040957"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
