@@ -205,7 +205,7 @@
       align-items: center;
       justify-content: center;
       gap: 16px;
-      margin: 15px 24px;
+      margin: 20px 0 0 0;
       width: auto;
       position: relative;
       z-index: 20;
@@ -634,17 +634,21 @@
       position: sticky;
       top: 42px;
       height: calc(100vh - 42px);
-      padding: 60px 48px;
+      padding: 0 48px 40px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
     }
-    body.layout-desktop .hero h1 { font-size: 64px; }
-    body.layout-desktop .hero .quote { font-size: 20px; max-width: 85%; }
-    body.layout-desktop .btn { max-width: 360px; }
-
-    /* Right column elements */
+    body.layout-desktop .hero-bg {
+      background-size: cover;
+    }
+    body.layout-desktop .hero h1 { font-size: 52px; }
+    body.layout-desktop .hero .quote { font-size: 17px; max-width: 90%; margin-bottom: 20px; }
+    body.layout-desktop .hero .craft-tag { margin-bottom: 8px; }
+    body.layout-desktop .btn { max-width: 360px; margin-bottom: 8px; }
     body.layout-desktop .audio-player-container {
-      grid-column: 2;
-      margin: 20px 48px;
       justify-content: flex-start;
+      margin: 10px 0 0 0;
     }
     body.layout-desktop .stats-bar {
       grid-column: 2;
@@ -857,28 +861,26 @@
         <button class="btn primary" id="btn-contact-top">
           <i class="bi bi-send-fill"></i> KONTAKTOVAT MISTRA
         </button>
-      </div>
-    </div>
 
-    <!-- Advanced Audio Player (Original logic adapted) -->
-    <div id="audio-player-container" class="audio-player-container" style="display: none;">
-      <div class="audio-label">Reference SC</div>
-      <div class="player-main">
-        <div class="play-button-wrapper">
-          <canvas class="visualizer-canvas" id="audio-visualizer"></canvas>
-          <svg class="progress-ring" width="64" height="64" viewBox="0 0 64 64">
-            <!-- Static yellow border (Original was orange #ff7b1c) -->
-            <circle stroke="var(--accent)" stroke-width="2" fill="none" r="24" cx="32" cy="32" />
-            <!-- White progress ring -->
-            <circle class="progress-ring__circle" stroke-width="2" fill="transparent" r="28" cx="32" cy="32" 
-              style="stroke-dasharray: 175.9; stroke-dashoffset: 175.9;" />
-          </svg>
-          <button class="play-button" id="btn-audio-play">
-            <i class="bi bi-play-fill" style="margin-left: 3px;"></i>
-          </button>
+        <!-- Audio Player (inside hero) -->
+        <div id="audio-player-container" class="audio-player-container" style="display: none;">
+          <div class="audio-label">Reference SC</div>
+          <div class="player-main">
+            <div class="play-button-wrapper">
+              <canvas class="visualizer-canvas" id="audio-visualizer"></canvas>
+              <svg class="progress-ring" width="64" height="64" viewBox="0 0 64 64">
+                <circle stroke="var(--accent)" stroke-width="2" fill="none" r="24" cx="32" cy="32" />
+                <circle class="progress-ring__circle" stroke-width="2" fill="transparent" r="28" cx="32" cy="32" 
+                  style="stroke-dasharray: 175.9; stroke-dashoffset: 175.9;" />
+              </svg>
+              <button class="play-button" id="btn-audio-play">
+                <i class="bi bi-play-fill" style="margin-left: 3px;"></i>
+              </button>
+            </div>
+          </div>
+          <audio id="main-audio" hidden></audio>
         </div>
       </div>
-      <audio id="main-audio" hidden></audio>
     </div>
 
     <div class="stats-bar">
