@@ -205,7 +205,9 @@
       align-items: center;
       justify-content: center;
       gap: 16px;
-      margin: 20px 0 0 0;
+      margin: 0 0 30px 0;
+      padding: 20px 0;
+      border-bottom: 1px solid #f0f0f0;
       width: auto;
       position: relative;
       z-index: 20;
@@ -232,7 +234,7 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: #000;
+      background: var(--text-dark);
       border: none;
       outline: none;
       color: var(--accent);
@@ -282,7 +284,7 @@
       font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: rgba(255,255,255,0.9);
+      color: var(--text-dark);
       font-weight: 800;
     }
 
@@ -642,13 +644,12 @@
     body.layout-desktop .hero-bg {
       background-size: cover;
     }
-    body.layout-desktop .hero h1 { font-size: 52px; }
-    body.layout-desktop .hero .quote { font-size: 17px; max-width: 90%; margin-bottom: 20px; }
+    body.layout-desktop .hero h1 { font-size: 56px; }
+    body.layout-desktop .hero .quote { font-size: 18px; max-width: 90%; margin-bottom: 20px; }
     body.layout-desktop .hero .craft-tag { margin-bottom: 8px; }
     body.layout-desktop .btn { max-width: 360px; margin-bottom: 8px; }
     body.layout-desktop .audio-player-container {
       justify-content: flex-start;
-      margin: 10px 0 0 0;
     }
     body.layout-desktop .stats-bar {
       grid-column: 2;
@@ -861,25 +862,6 @@
         <button class="btn primary" id="btn-contact-top">
           <i class="bi bi-send-fill"></i> KONTAKTOVAT MISTRA
         </button>
-
-        <!-- Audio Player (inside hero) -->
-        <div id="audio-player-container" class="audio-player-container" style="display: none;">
-          <div class="audio-label">Reference SC</div>
-          <div class="player-main">
-            <div class="play-button-wrapper">
-              <canvas class="visualizer-canvas" id="audio-visualizer"></canvas>
-              <svg class="progress-ring" width="64" height="64" viewBox="0 0 64 64">
-                <circle stroke="var(--accent)" stroke-width="2" fill="none" r="24" cx="32" cy="32" />
-                <circle class="progress-ring__circle" stroke-width="2" fill="transparent" r="28" cx="32" cy="32" 
-                  style="stroke-dasharray: 175.9; stroke-dashoffset: 175.9;" />
-              </svg>
-              <button class="play-button" id="btn-audio-play">
-                <i class="bi bi-play-fill" style="margin-left: 3px;"></i>
-              </button>
-            </div>
-          </div>
-          <audio id="main-audio" hidden></audio>
-        </div>
       </div>
     </div>
 
@@ -901,6 +883,26 @@
     </div>
 
     <div class="content-area">
+
+      <!-- Audio Player -->
+      <div id="audio-player-container" class="audio-player-container" style="display: none;">
+        <div class="audio-label">Reference SC</div>
+        <div class="player-main">
+          <div class="play-button-wrapper">
+            <canvas class="visualizer-canvas" id="audio-visualizer"></canvas>
+            <svg class="progress-ring" width="64" height="64" viewBox="0 0 64 64">
+              <circle stroke="var(--accent)" stroke-width="2" fill="none" r="24" cx="32" cy="32" />
+              <circle class="progress-ring__circle" stroke-width="2" fill="transparent" r="28" cx="32" cy="32" 
+                style="stroke-dasharray: 175.9; stroke-dashoffset: 175.9;" />
+            </svg>
+            <button class="play-button" id="btn-audio-play">
+              <i class="bi bi-play-fill" style="margin-left: 3px;"></i>
+            </button>
+          </div>
+        </div>
+        <audio id="main-audio" hidden></audio>
+      </div>
+
       <div id="master-accordions">
         <!-- Příběh -->
         <div class="accordion-item" id="acc-story">
