@@ -550,6 +550,111 @@
       .app-viewport { box-shadow: 0 0 100px rgba(0,0,0,0.8); }
     }
 
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-close {
+      position: fixed;
+      top: 20px; right: 24px;
+      font-size: 36px;
+      color: white;
+      cursor: pointer;
+      z-index: 9001;
+      line-height: 1;
+    }
+    .lightbox-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-content img, .lightbox-content video {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+
+    /* Form fields */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: #aaa;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 15px;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(245,185,50,0.15);
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Master Picker */
+    #master-picker {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-black);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .picker-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 20px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 440px;
+    }
+    .picker-card h2 {
+      font-family: 'Bungee', cursive;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .picker-card select {
+      width: 100%;
+      padding: 14px 16px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      margin-bottom: 16px;
+      font-family: var(--font-main);
+    }
+
   </style>
 </head>
 <body>
