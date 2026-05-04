@@ -818,314 +818,357 @@
       if (!master) { await showPicker(); return; }
 
       // --- POPULATE UI ---
-      if (!master.name) { console.error("Master name missing"); return; }
-      document.title = `Bez Školy – ${master.name}`;
-      const nameEl = document.getElementById('master-name');
-      if (nameEl) {
-        nameEl.innerHTML = (master.name || '').split(' ').join('<br>');
-        nameEl.classList.remove('skeleton');
-        nameEl.style.width = ''; nameEl.style.height = ''; nameEl.style.color = '';
-      }
+      try {
+        if (!master.name) { console.error("Master name missing"); return; }
+        document.title = `Bez Školy – ${master.name}`;
+        const nameEl = document.getElementById('master-name');
+        if (nameEl) {
+          nameEl.innerHTML = (master.name || '').split(' ').join('<br>');
+          nameEl.classList.remove('skeleton');
+          nameEl.style.width = ''; nameEl.style.height = ''; nameEl.style.color = '';
+        }
 
-      const craftEl = document.getElementById('master-craft');
-      craftEl.textContent = (master.craft || 'Řemeslo').toUpperCase();
-      craftEl.classList.remove('skeleton');
-      craftEl.style.width = ''; craftEl.style.height = ''; craftEl.style.color = '';
-      document.getElementById('stat-location').textContent = master.location || 'Česká Rep.';
-      
-      const descParts = (master.desc || '').split('.');
-      const quote = descParts[0] ? `"${descParts[0].trim()}."` : '"Naučím tě řemeslo tak, jak se ho kdysi učili skuteční mistři."';
-      const quoteEl = document.getElementById('master-quote');
-      quoteEl.textContent = quote;
-      quoteEl.classList.remove('skeleton');
-      quoteEl.style.width = ''; quoteEl.style.height = ''; quoteEl.style.color = '';
-      if (typeof marked !== 'undefined' && master.desc) {
-        document.getElementById('master-desc').innerHTML = marked.parse(master.desc);
-      } else {
-        document.getElementById('master-desc').textContent = master.desc || 'Tento mistr zatím nemá vyplněný svůj příběh.';
-      }
+        const craftEl = document.getElementById('master-craft');
+        if (craftEl) {
+          craftEl.textContent = (master.craft || 'Řemeslo').toUpperCase();
+          craftEl.classList.remove('skeleton');
+          craftEl.style.width = ''; craftEl.style.height = ''; craftEl.style.color = '';
+        }
 
-      // --- ACCORDIONS ---
-      const handleAccordion = (id, value) => {
-        const item = document.getElementById(`acc-${id}`);
-        const content = document.getElementById(`master-${id}`);
-        if (value && value !== '-') {
-          item.style.display = 'block';
-          if (typeof marked !== 'undefined') {
-            content.innerHTML = marked.parse(value);
+        const locEl = document.getElementById('stat-location');
+        if (locEl) locEl.textContent = master.location || 'Česká Rep.';
+        
+        const descParts = (master.desc || '').split('.');
+        const quote = descParts[0] ? `"${descParts[0].trim()}."` : '"Naučím tě řemeslo tak, jak se ho kdysi učili skuteční mistři."';
+        const quoteEl = document.getElementById('master-quote');
+        if (quoteEl) {
+          quoteEl.textContent = quote;
+          quoteEl.classList.remove('skeleton');
+          quoteEl.style.width = ''; quoteEl.style.height = ''; quoteEl.style.color = '';
+        }
+
+        const descEl = document.getElementById('master-desc');
+        if (descEl) {
+          if (typeof marked !== 'undefined' && master.desc) {
+            descEl.innerHTML = marked.parse(master.desc);
           } else {
-            content.textContent = value;
+            descEl.textContent = master.desc || 'Tento mistr zatím nemá vyplněný svůj příběh.';
           }
-        } else {
-          item.style.display = 'none';
-        }
-      };
-
-      handleAccordion('requirements', master.requirements);
-      handleAccordion('motivation', master.stats?.["Co nás motivuje učit"]);
-      handleAccordion('accommodation', master.accommodation);
-      handleAccordion('compensation', master.compensation);
-      handleAccordion('recommendations', master.recommendations);
-
-      // Accordion Toggle Logic
-      document.querySelectorAll('.accordion-trigger').forEach(trigger => {
-        trigger.onclick = () => {
-          const item = trigger.parentElement;
-          item.classList.toggle('active');
-        };
-      });
-
-      const heroBg = document.getElementById('hero-bg');
-      const photo = master.photo || 'mystery_master.png';
-      heroBg.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%), url('${photo}')`;
-      if (master.photoSettings) {
-        heroBg.style.backgroundPosition = `${50 + (master.photoSettings.x || 0)}% ${50 + (master.photoSettings.y || 0)}%`;
-      }
-
-      // Stats
-      const statStudents = document.getElementById('stat-students');
-      if (statStudents) {
-        statStudents.textContent = master.stats?.['Kapacita učedníků'] || 'Individuální';
-      }
-
-      // --- AUDIO PLAYER (Original logic) ---
-      const audioContainer = document.getElementById('audio-player-container');
-      const audioEl = document.getElementById('main-audio');
-      const playBtn = document.getElementById('btn-audio-play');
-      const circle = document.querySelector('.progress-ring__circle');
-      const canvas = document.getElementById('audio-visualizer');
-      const ctxCanvas = canvas.getContext('2d');
-      const circumference = 2 * Math.PI * 28;
-
-      let audioCtx, analyser, dataArray, source;
-
-      const initAudioContext = () => {
-        if (audioCtx) return;
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        source = audioCtx.createMediaElementSource(audioEl);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-      };
-
-      const drawVisualizer = () => {
-        if (!audioEl.paused) {
-          requestAnimationFrame(drawVisualizer);
-          analyser.getByteTimeDomainData(dataArray);
-          ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
-          ctxCanvas.lineWidth = 2;
-          ctxCanvas.strokeStyle = "#f5b932";
-          ctxCanvas.beginPath();
-          const sliceWidth = canvas.width * 1.0 / analyser.frequencyBinCount;
-          let x = 0;
-          for (let i = 0; i < analyser.frequencyBinCount; i++) {
-            const v = dataArray[i] / 128.0;
-            const y = ((v - 1) * 2 + 1) * canvas.height / 2;
-            if (i === 0) ctxCanvas.moveTo(x, y);
-            else ctxCanvas.lineTo(x, y);
-            x += sliceWidth;
-          }
-          ctxCanvas.lineTo(canvas.width, canvas.height / 2);
-          ctxCanvas.stroke();
-        } else {
-          ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
-        }
-      };
-
-      const resizeCanvas = () => {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-      };
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-
-      if (typeof getAudio === 'function') {
-        let audioSrc = master.audio;
-        if (audioSrc && audioSrc.startsWith("idb:")) {
-          audioSrc = await getAudio(audioSrc.replace("idb:", ""));
-        } else {
-          audioSrc = await getAudio(`audio_${master.id}`) || master.audio;
         }
 
-        if (audioSrc) {
-          audioContainer.style.display = 'flex';
-          resizeCanvas(); // Important: Recalculate size after making visible
-          audioEl.src = audioSrc;
-          
-          playBtn.onclick = () => {
-            initAudioContext();
-            if (audioEl.paused) {
-              audioEl.play().then(() => {
-                playBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
-                drawVisualizer();
-              }).catch(e => console.error("Playback failed", e));
+        // --- ACCORDIONS ---
+        const handleAccordion = (id, value) => {
+          const item = document.getElementById(`acc-${id}`);
+          const content = document.getElementById(`master-${id}`);
+          if (item && content) {
+            if (value && value !== '-') {
+              item.style.display = 'block';
+              if (typeof marked !== 'undefined') {
+                content.innerHTML = marked.parse(value);
+              } else {
+                content.textContent = value;
+              }
             } else {
-              audioEl.pause();
-              playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:3px;"></i>';
+              item.style.display = 'none';
+            }
+          }
+        };
+
+        handleAccordion('requirements', master.requirements);
+        handleAccordion('motivation', master.stats?.["Co nás motivuje učit"]);
+        handleAccordion('accommodation', master.accommodation);
+        handleAccordion('compensation', master.compensation);
+        handleAccordion('recommendations', master.recommendations);
+
+        // Accordion Toggle Logic
+        document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+          trigger.onclick = () => {
+            const item = trigger.parentElement;
+            item.classList.toggle('active');
+          };
+        });
+
+        const heroBg = document.getElementById('hero-bg');
+        if (heroBg) {
+          const photo = master.photo || 'mystery_master.png';
+          heroBg.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%), url('${photo}')`;
+          if (master.photoSettings) {
+            heroBg.style.backgroundPosition = `${50 + (master.photoSettings.x || 0)}% ${50 + (master.photoSettings.y || 0)}%`;
+          }
+        }
+
+        // Stats
+        const statStudents = document.getElementById('stat-students');
+        if (statStudents) {
+          statStudents.textContent = master.stats?.['Kapacita učedníků'] || 'Individuální';
+        }
+
+        // --- AUDIO PLAYER ---
+        const audioContainer = document.getElementById('audio-player-container');
+        const audioEl = document.getElementById('main-audio');
+        const playBtn = document.getElementById('btn-audio-play');
+        const circle = document.querySelector('.progress-ring__circle');
+        const canvas = document.getElementById('audio-visualizer');
+        const ctxCanvas = canvas ? canvas.getContext('2d') : null;
+        const circumference = 2 * Math.PI * 28;
+
+        let audioCtx, analyser, dataArray, source;
+
+        const initAudioContext = () => {
+          if (audioCtx) return;
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 256;
+          source = audioCtx.createMediaElementSource(audioEl);
+          source.connect(analyser);
+          analyser.connect(audioCtx.destination);
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
+        };
+
+        const drawVisualizer = () => {
+          if (!audioEl || !ctxCanvas || !analyser) return;
+          if (!audioEl.paused) {
+            requestAnimationFrame(drawVisualizer);
+            analyser.getByteTimeDomainData(dataArray);
+            ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
+            ctxCanvas.lineWidth = 2;
+            ctxCanvas.strokeStyle = "#f5b932";
+            ctxCanvas.beginPath();
+            const sliceWidth = canvas.width * 1.0 / analyser.frequencyBinCount;
+            let x = 0;
+            for (let i = 0; i < analyser.frequencyBinCount; i++) {
+              const v = dataArray[i] / 128.0;
+              const y = ((v - 1) * 2 + 1) * canvas.height / 2;
+              if (i === 0) ctxCanvas.moveTo(x, y);
+              else ctxCanvas.lineTo(x, y);
+              x += sliceWidth;
+            }
+            ctxCanvas.lineTo(canvas.width, canvas.height / 2);
+            ctxCanvas.stroke();
+          } else {
+            ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        };
+
+        const resizeCanvas = () => {
+          if (canvas) {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+          }
+        };
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        if (audioEl && typeof getAudio === 'function') {
+          let audioSrc = master.audio;
+          if (audioSrc && audioSrc.startsWith("idb:")) {
+            audioSrc = await getAudio(audioSrc.replace("idb:", ""));
+          } else {
+            audioSrc = await getAudio(`audio_${master.id}`) || master.audio;
+          }
+
+          if (audioSrc && audioContainer) {
+            audioContainer.style.display = 'flex';
+            resizeCanvas();
+            audioEl.src = audioSrc;
+            
+            if (playBtn) {
+              playBtn.onclick = () => {
+                initAudioContext();
+                if (audioEl.paused) {
+                  audioEl.play().then(() => {
+                    playBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+                    drawVisualizer();
+                  }).catch(e => console.error("Playback failed", e));
+                } else {
+                  audioEl.pause();
+                  playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:3px;"></i>';
+                }
+              };
+            }
+
+            audioEl.ontimeupdate = () => {
+              if (circle) {
+                const progress = audioEl.currentTime / audioEl.duration;
+                const offset = circumference - progress * circumference;
+                circle.style.strokeDashoffset = offset;
+              }
+            };
+
+            audioEl.onended = () => {
+              if (playBtn) playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:3px;"></i>';
+              if (circle) circle.style.strokeDashoffset = circumference;
+              if (ctxCanvas) ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
+            };
+          }
+        }
+
+        // --- GALLERY ---
+        const scroller = document.getElementById('gallery-scroller');
+        const gallery = master.gallery || [];
+        
+        const lightbox = document.getElementById('lightbox');
+        const lbContent = document.getElementById('lightbox-content');
+        const lbClose = document.getElementById('lightbox-close');
+
+        const openLightbox = (index) => {
+          if (!lbContent || !lightbox) return;
+          lbContent.innerHTML = '';
+          gallery.forEach((item, idx) => {
+            let el;
+            if (item.type === 'video') {
+              el = document.createElement('video');
+              el.src = item.src;
+              el.controls = true;
+            } else {
+              el = document.createElement('img');
+              el.src = item.src;
+            }
+            if (idx === index) el.style.display = 'block';
+            lbContent.appendChild(el);
+          });
+          lightbox.style.display = 'flex';
+        };
+
+        if (scroller) {
+          if (gallery.length === 0) {
+            scroller.parentElement.style.display = 'none';
+            const h2 = scroller.parentElement.previousElementSibling;
+            if (h2 && h2.tagName === 'H2') h2.style.display = 'none';
+          } else {
+            gallery.forEach((item, idx) => {
+              const div = document.createElement('div');
+              div.className = 'gallery-item';
+              div.innerHTML = `
+                <div class="gallery-index">${String(idx + 1).padStart(2, '0')}/${String(gallery.length).padStart(2, '0')}</div>
+                ${item.type === 'video' ? `<video src="${item.src}"></video>` : `<img src="${item.src}" alt="">`}
+              `;
+              div.onclick = () => openLightbox(idx);
+              scroller.appendChild(div);
+            });
+          }
+        }
+        
+        if (lbClose) lbClose.onclick = () => { lightbox.style.display = 'none'; };
+
+        // --- SOCIALS ---
+        const socials = document.getElementById('master-socials');
+        if (socials) {
+          const socialConfigs = [
+            { key: "fb", icon: "bi-facebook" },
+            { key: "ig", icon: "bi-instagram" },
+            { key: "tt", icon: "bi-tiktok" },
+            { key: "li", icon: "bi-linkedin" },
+            { key: "yt", icon: "bi-youtube" }
+          ];
+          socialConfigs.forEach(conf => {
+            if (master.socials?.[conf.key]) {
+              const a = document.createElement('a');
+              a.href = master.socials[conf.key];
+              a.target = "_blank";
+              a.innerHTML = `<i class="bi ${conf.icon}"></i>`;
+              socials.appendChild(a);
+            }
+          });
+        }
+
+        // --- CONTACT FORM ---
+        const btnContact = document.getElementById('btn-contact-top');
+        if (btnContact) {
+          btnContact.addEventListener('click', () => {
+            const accContact = document.getElementById('acc-contact');
+            if (accContact) {
+              accContact.classList.add('active');
+              accContact.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        }
+
+        const form = document.getElementById('message-form');
+        const notice = document.getElementById('msg-notice');
+        const storedSession = JSON.parse(localStorage.getItem('sc2.session') || '{}');
+        if (form && storedSession.email) {
+          const nameInput = document.getElementById('msg-name');
+          const emailInput = document.getElementById('msg-email');
+          const phoneInput = document.getElementById('msg-phone');
+          if (nameInput) nameInput.value = storedSession.name || '';
+          if (emailInput) emailInput.value = storedSession.email || '';
+          if (phoneInput) phoneInput.value = storedSession.phone || '';
+        }
+
+        if (form) {
+          form.onsubmit = async (e) => {
+            e.preventDefault();
+            if (notice) {
+              notice.style.display = 'block';
+              notice.style.color = '#333';
+              notice.textContent = 'Odesílám...';
+            }
+
+            const profile = {
+              name: document.getElementById('msg-name').value.trim(),
+              phone: document.getElementById('msg-phone').value.trim(),
+            };
+            const email = document.getElementById('msg-email').value.trim();
+            const text = document.getElementById('msg-text').value.trim();
+
+            if (typeof ensureUser === 'function' && typeof getMessages === 'function' && typeof saveMessages === 'function') {
+              await ensureUser(email, profile);
+              const messages = await getMessages();
+              messages.push({
+                id: `msg-${Date.now()}`,
+                toMaster: id,
+                from: email,
+                text: text,
+                createdAt: new Date().toISOString(),
+                deletedByAdmin: false,
+                deletedByUser: false,
+                userName: profile.name,
+                userPhone: profile.phone
+              });
+              
+              const res = await saveMessages(messages);
+              if (res && res.status === 'success') {
+                // Success Overlay (AI Rule #4)
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                  background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
+                  display: flex; flex-direction: column; align-items: center; justify-content: center;
+                  z-index: 5000; color: white; text-align: center;
+                  animation: overlayIn 0.5s ease-out;
+                `;
+                overlay.innerHTML = `
+                  <div style="font-size: 60px; color: var(--accent); margin-bottom: 20px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                  </div>
+                  <h2 style="font-family: 'Bungee'; font-size: 24px;">ZPRÁVA ODESLÁNA!</h2>
+                  <p style="margin-top: 10px; opacity: 0.8;">Mistr se ti ozve co nejdříve.</p>
+                  <style>
+                    @keyframes overlayIn { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+                  </style>
+                `;
+                document.body.appendChild(overlay);
+                
+                setTimeout(() => {
+                  overlay.style.opacity = '0';
+                  overlay.style.transition = 'opacity 0.5s ease';
+                  setTimeout(() => {
+                    overlay.remove();
+                    form.reset();
+                  }, 500);
+                }, 1500);
+
+              } else if (notice) {
+                notice.style.color = 'red';
+                notice.textContent = 'Chyba při odesílání zprávy.';
+              }
             }
           };
-
-          audioEl.ontimeupdate = () => {
-            const progress = audioEl.currentTime / audioEl.duration;
-            const offset = circumference - progress * circumference;
-            circle.style.strokeDashoffset = offset;
-          };
-
-          audioEl.onended = () => {
-            playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:3px;"></i>';
-            circle.style.strokeDashoffset = circumference;
-            ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
-          };
         }
+      } catch (err) {
+        console.error("UI Population error:", err);
       }
-
-      // --- GALLERY (Variant 1) ---
-      const scroller = document.getElementById('gallery-scroller');
-      const gallery = master.gallery || [];
-      
-      const lightbox = document.getElementById('lightbox');
-      const lbContent = document.getElementById('lightbox-content');
-      const lbClose = document.getElementById('lightbox-close');
-
-      const openLightbox = (index) => {
-        lbContent.innerHTML = '';
-        gallery.forEach((item, idx) => {
-          let el;
-          if (item.type === 'video') {
-            el = document.createElement('video');
-            el.src = item.src;
-            el.controls = true;
-          } else {
-            el = document.createElement('img');
-            el.src = item.src;
-          }
-          if (idx === index) el.style.display = 'block'; // Simplification for now
-          lbContent.appendChild(el);
-        });
-        lightbox.style.display = 'flex';
-      };
-
-      if (gallery.length === 0) {
-        scroller.parentElement.style.display = 'none';
-        scroller.parentElement.previousElementSibling.style.display = 'none';
-      } else {
-        gallery.forEach((item, idx) => {
-          const div = document.createElement('div');
-          div.className = 'gallery-item';
-          div.innerHTML = `
-            <div class="gallery-index">${String(idx + 1).padStart(2, '0')}/${String(gallery.length).padStart(2, '0')}</div>
-            ${item.type === 'video' ? `<video src="${item.src}"></video>` : `<img src="${item.src}" alt="">`}
-          `;
-          div.onclick = () => openLightbox(idx);
-          scroller.appendChild(div);
-        });
-      }
-      
-      lbClose.onclick = () => { lightbox.style.display = 'none'; };
-
-      // --- SOCIALS ---
-      const socials = document.getElementById('master-socials');
-      const socialConfigs = [
-        { key: "fb", icon: "bi-facebook" },
-        { key: "ig", icon: "bi-instagram" },
-        { key: "tt", icon: "bi-tiktok" },
-        { key: "li", icon: "bi-linkedin" },
-        { key: "yt", icon: "bi-youtube" }
-      ];
-      socialConfigs.forEach(conf => {
-        if (master.socials?.[conf.key]) {
-          const a = document.createElement('a');
-          a.href = master.socials[conf.key];
-          a.target = "_blank";
-          a.innerHTML = `<i class="bi ${conf.icon}"></i>`;
-          socials.appendChild(a);
-        }
-      });
-
-      // --- CONTACT FORM ---
-      document.getElementById('btn-contact-top').addEventListener('click', () => {
-        const accContact = document.getElementById('acc-contact');
-        accContact.classList.add('active');
-        accContact.scrollIntoView({ behavior: 'smooth' });
-      });
-
-      const form = document.getElementById('message-form');
-      const notice = document.getElementById('msg-notice');
-      const session = JSON.parse(localStorage.getItem('sc2.session') || '{}');
-      if (session.email) {
-        document.getElementById('msg-name').value = session.name || '';
-        document.getElementById('msg-email').value = session.email || '';
-        document.getElementById('msg-phone').value = session.phone || '';
-      }
-
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-        notice.style.display = 'block';
-        notice.style.color = '#333';
-        notice.textContent = 'Odesílám...';
-
-        const profile = {
-          name: document.getElementById('msg-name').value.trim(),
-          phone: document.getElementById('msg-phone').value.trim(),
-        };
-        const email = document.getElementById('msg-email').value.trim();
-        const text = document.getElementById('msg-text').value.trim();
-
-        if (typeof ensureUser === 'function' && typeof getMessages === 'function' && typeof saveMessages === 'function') {
-          await ensureUser(email, profile);
-          const messages = await getMessages();
-          messages.push({
-            id: `msg-${Date.now()}`,
-            toMaster: id,
-            from: email,
-            text: text,
-            createdAt: new Date().toISOString(),
-            deletedByAdmin: false,
-            deletedByUser: false,
-            userName: profile.name,
-            userPhone: profile.phone
-          });
-          
-          const res = await saveMessages(messages);
-          if (res && res.status === 'success') {
-            // Success Overlay (AI Rule #4)
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-              position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-              background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
-              display: flex; flex-direction: column; align-items: center; justify-content: center;
-              z-index: 5000; color: white; text-align: center;
-              animation: overlayIn 0.5s ease-out;
-            `;
-            overlay.innerHTML = `
-              <div style="font-size: 60px; color: var(--accent); margin-bottom: 20px;">
-                <i class="bi bi-check-circle-fill"></i>
-              </div>
-              <h2 style="font-family: 'Bungee'; font-size: 24px;">ZPRÁVA ODESLÁNA!</h2>
-              <p style="margin-top: 10px; opacity: 0.8;">Mistr se ti ozve co nejdříve.</p>
-              <style>
-                @keyframes overlayIn { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
-              </style>
-            `;
-            document.body.appendChild(overlay);
-            
-            setTimeout(() => {
-              overlay.style.opacity = '0';
-              overlay.style.transition = 'opacity 0.5s ease';
-              setTimeout(() => {
-                overlay.remove();
-                form.reset();
-              }, 500);
-            }, 1500);
-
-          } else {
-            notice.style.color = 'red';
-            notice.textContent = 'Chyba při odesílání zprávy.';
-          }
-        }
-      };
       // --- PARALLAX EFFECT ---
       window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
