@@ -1007,23 +1007,17 @@
         const statStudents = document.getElementById('stat-students');
         if (statStudents) {
           let kapacitaStr = master.stats?.['Kapacita učedníků'];
-          let labelEl = statStudents.nextElementSibling;
           
           if (!kapacitaStr) {
             statStudents.textContent = 'Individuální';
-            if (labelEl) labelEl.textContent = 'kapacita';
           } else {
             let num = parseInt(kapacitaStr, 10);
             if (!isNaN(num) && num.toString() === kapacitaStr.toString().trim()) {
-              statStudents.textContent = num;
-              if (labelEl) {
-                if (num === 1) labelEl.textContent = 'učedník';
-                else if (num >= 2 && num <= 4) labelEl.textContent = 'učedníci';
-                else labelEl.textContent = 'učedníků';
-              }
+              if (num === 1) statStudents.textContent = num + ' učedník';
+              else if (num >= 2 && num <= 4) statStudents.textContent = num + ' učedníci';
+              else statStudents.textContent = num + ' učedníků';
             } else {
               statStudents.textContent = kapacitaStr;
-              if (labelEl) labelEl.textContent = 'kapacita';
             }
           }
         }
