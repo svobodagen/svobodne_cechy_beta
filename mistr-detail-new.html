@@ -51,7 +51,8 @@
 
     /* App Container */
     .app-viewport {
-      max-width: 500px;
+      width: 100%;
+      max-width: 1200px;
       margin: 0 auto;
       background: var(--bg-black);
       min-height: 100vh;
@@ -147,22 +148,24 @@
     }
     .side-menu-overlay.active { display: block; opacity: 1; }
 
-    /* Layout specific overrides to prevent header overlap */
-    .layout-phone .app-header,
-    .layout-tablet .app-header {
-      position: relative;
-      background: var(--bg-black);
-      backdrop-filter: none;
-      padding: 20px;
+    /* Responsive overrides to prevent header overlap */
+    @media (max-width: 1024px) {
+      .app-header {
+        position: relative;
+        background: var(--bg-black);
+        backdrop-filter: none;
+        padding: 20px;
+      }
+      .hero {
+        height: auto;
+        min-height: 60vh;
+        padding-top: 20px;
+      }
     }
-    .layout-phone .hero,
-    .layout-tablet .hero {
-      height: auto;
-      min-height: 60vh;
-      padding-top: 20px;
-    }
-    .layout-phone .app-logo img {
-      height: 48px !important;
+    @media (max-width: 768px) {
+      .app-logo img {
+        height: 48px !important;
+      }
     }
 
     /* Hero Section */
@@ -966,18 +969,6 @@
 </head>
 <body>
 
-  <!-- Device Switcher -->
-  <div class="device-switcher" id="device-switcher">
-    <button id="sw-phone" onclick="setLayout('phone')">
-      <i class="bi bi-phone"></i> Telefon
-    </button>
-    <button id="sw-tablet" onclick="setLayout('tablet')">
-      <i class="bi bi-tablet"></i> Tablet
-    </button>
-    <button id="sw-desktop" onclick="setLayout('desktop')">
-      <i class="bi bi-laptop"></i> Počítač
-    </button>
-  </div>
 
   <div class="app-viewport">
     <header class="app-header">
@@ -1746,25 +1737,6 @@
   </script>
 
   <script>
-    // --- DEVICE SWITCHER ---
-    function setLayout(mode) {
-      document.body.classList.remove('layout-phone', 'layout-tablet', 'layout-desktop');
-      document.body.classList.add('layout-' + mode);
-      document.querySelectorAll('.device-switcher button').forEach(b => b.classList.remove('active'));
-      document.getElementById('sw-' + mode).classList.add('active');
-      localStorage.setItem('sc2.layoutMode', mode);
-    }
-
-    function autoDetectLayout() {
-      const saved = localStorage.getItem('sc2.layoutMode');
-      if (saved) { setLayout(saved); return; }
-      const w = window.innerWidth;
-      if (w >= 1024) setLayout('desktop');
-      else if (w >= 768) setLayout('tablet');
-      else setLayout('phone');
-    }
-
-    autoDetectLayout();
 
     // --- HAMBURGER MENU LOGIC ---
     const menuOpen = document.getElementById('menu-open');
