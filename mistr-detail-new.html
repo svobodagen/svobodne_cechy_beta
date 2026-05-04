@@ -1225,13 +1225,22 @@
         };
 
         handleAccordion('education', master.education);
-        handleAccordion('reference-sc', master.reference_sc);
-
-        // Special handling for reference accordion visibility
+        
+        // Manual handle for reference to match its specific ID 'acc-reference'
         const accRef = document.getElementById('acc-reference');
-        if (accRef) {
-          if ((master.audio && master.audio !== '-') || (master.reference_sc && master.reference_sc !== '-')) {
+        const contentRef = document.getElementById('master-reference-sc');
+        if (accRef && contentRef) {
+          const val = master.reference_sc;
+          if ((master.audio && master.audio !== '-') || (val && val !== '-')) {
             accRef.style.display = 'block';
+            if (val && val !== '-') {
+              if (typeof marked !== 'undefined') contentRef.innerHTML = marked.parse(val);
+              else contentRef.textContent = val;
+            } else {
+              contentRef.innerHTML = '<p class="muted">K tomuto mistru zatím není k dispozici slovní reference, ale můžete si poslechnout audio.</p>';
+            }
+          } else {
+            accRef.style.display = 'none';
           }
         }
 
