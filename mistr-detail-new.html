@@ -974,6 +974,7 @@
         const descEl = document.getElementById('master-desc');
         if (descEl) {
           if (typeof marked !== 'undefined' && master.desc) {
+            marked.setOptions({ breaks: true });
             descEl.innerHTML = marked.parse(master.desc);
           } else {
             descEl.textContent = master.desc || 'Tento mistr zatím nemá vyplněný svůj příběh.';
