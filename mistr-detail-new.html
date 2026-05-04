@@ -915,15 +915,15 @@
       <div class="accordion-item inverse" id="acc-reference" style="display: none; margin-bottom: 30px;">
         <div class="accordion-trigger" style="position: relative; overflow: hidden;">
           <!-- Audio Play Button as Icon -->
-          <div class="accordion-icon">
-            <div class="play-button-wrapper" style="width: 56px; height: 56px; margin: 0;">
-              <svg class="progress-ring" width="56" height="56" viewBox="0 0 64 64" style="width: 56px; height: 56px;">
-                <circle stroke="rgba(255,255,255,0.2)" stroke-width="2" fill="none" r="28" cx="32" cy="32" />
-                <circle class="progress-ring__circle" stroke-width="2" fill="transparent" r="28" cx="32" cy="32" 
-                  style="stroke-dasharray: 175.9; stroke-dashoffset: 175.9; stroke: var(--accent);" />
+          <div class="accordion-icon" style="background: none; width: 44px; height: 44px;">
+            <div class="play-button-wrapper" style="width: 44px; height: 44px; margin: 0;">
+              <svg class="progress-ring" width="44" height="44" viewBox="0 0 64 64" style="width: 44px; height: 44px;">
+                <circle stroke="rgba(255,255,255,0.2)" stroke-width="3" fill="none" r="30" cx="32" cy="32" />
+                <circle class="progress-ring__circle" stroke-width="3" fill="transparent" r="30" cx="32" cy="32" 
+                  style="stroke-dasharray: 188.5; stroke-dashoffset: 188.5; stroke: var(--accent);" />
               </svg>
-              <button class="play-button" id="btn-audio-play" style="width: 44px; height: 44px; font-size: 20px; background: var(--accent); color: #000; box-shadow: none;">
-                <i class="bi bi-play-fill" style="margin-left: 2px;"></i>
+              <button class="play-button" id="btn-audio-play" style="width: 32px; height: 32px; font-size: 16px; background: var(--accent); color: #000; box-shadow: none;">
+                <i class="bi bi-play-fill" style="margin-left: 1px;"></i>
               </button>
             </div>
           </div>
@@ -1349,7 +1349,8 @@
             audioEl.src = audioSrc;
             
             if (playBtn) {
-              playBtn.onclick = () => {
+              playBtn.onclick = (e) => {
+                e.stopPropagation(); // Stop event from reaching the accordion trigger
                 initAudioContext();
                 const accRef = document.getElementById('acc-reference');
                 if (audioEl.paused) {
@@ -1360,7 +1361,7 @@
                   }).catch(e => console.error("Playback failed", e));
                 } else {
                   audioEl.pause();
-                  playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:2px;"></i>';
+                  playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:1px;"></i>';
                   if (accRef) accRef.classList.remove('playing');
                 }
               };
@@ -1369,16 +1370,16 @@
             audioEl.ontimeupdate = () => {
               if (circle) {
                 const progress = audioEl.currentTime / audioEl.duration;
-                const circumferenceSmall = 2 * Math.PI * 28;
+                const circumferenceSmall = 2 * Math.PI * 30;
                 const offset = circumferenceSmall - progress * circumferenceSmall;
                 circle.style.strokeDashoffset = offset;
               }
             };
 
             audioEl.onended = () => {
-              if (playBtn) playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:2px;"></i>';
+              if (playBtn) playBtn.innerHTML = '<i class="bi bi-play-fill" style="margin-left:1px;"></i>';
               if (circle) {
-                 const circumferenceSmall = 2 * Math.PI * 28;
+                 const circumferenceSmall = 2 * Math.PI * 30;
                  circle.style.strokeDashoffset = circumferenceSmall;
               }
               const accRef = document.getElementById('acc-reference');
