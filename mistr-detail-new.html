@@ -19,6 +19,7 @@
   <style>
     :root {
       --accent: #f5b932;
+      --accent-gradient: linear-gradient(135deg, #f5b932 0%, #d49a1a 100%);
       --bg-black: #000000;
       --bg-light: #f7f7f7;
       --text-white: #ffffff;
@@ -26,6 +27,15 @@
       --text-muted: #71717a;
       --border: rgba(255, 255, 255, 0.1);
       --font-main: 'Plus Jakarta Sans', sans-serif;
+      /* Layered shadows for depth */
+      --shadow-premium: 
+        0 2px 4px rgba(0,0,0,0.02),
+        0 10px 20px rgba(0,0,0,0.04),
+        0 20px 40px rgba(0,0,0,0.06),
+        0 30px 60px rgba(0,0,0,0.08);
+      --shadow-dark:
+        0 10px 30px rgba(0,0,0,0.5),
+        0 20px 60px rgba(0,0,0,0.3);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,6 +46,7 @@
       font-family: var(--font-main);
       line-height: 1.5;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* App Container */
@@ -45,40 +56,42 @@
       background: var(--bg-black);
       min-height: 100vh;
       position: relative;
-      padding-bottom: 80px;
+      padding-bottom: 90px;
     }
 
     /* Header / Logo */
     .app-header {
-      padding: 20px;
+      padding: 20px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: absolute;
       top: 0; width: 100%; z-index: 100;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+      backdrop-filter: blur(4px);
     }
     .app-logo { text-align: center; flex-grow: 1; text-decoration: none; color: white; }
-    .app-logo div { font-family: 'Bungee', cursive; font-size: 20px; line-height: 1; }
-    .app-logo span { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+    .app-logo div { font-family: 'Bungee', cursive; font-size: 20px; line-height: 1; letter-spacing: 1px; }
+    .app-logo span { font-size: 9px; text-transform: uppercase; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
 
     /* Hero Section */
     .hero {
       position: relative;
-      height: 80vh;
+      height: 85vh;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding: 40px 24px;
+      padding: 60px 24px;
       overflow: hidden;
     }
 
     .hero-bg {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%),
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.95) 100%),
                   url('mystery_master.png') center/cover no-repeat;
       z-index: 1;
-      transition: background 0.5s ease;
+      transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .hero-content { position: relative; z-index: 2; }
@@ -87,32 +100,39 @@
       color: var(--accent);
       text-transform: uppercase;
       font-weight: 800;
-      font-size: 14px;
-      margin-bottom: 8px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+      display: inline-block;
+      padding: 4px 0;
+      border-bottom: 2px solid var(--accent);
     }
 
     .hero h1 {
-      font-size: 44px;
+      font-size: 48px;
       font-weight: 800;
-      line-height: 0.95;
-      margin-bottom: 16px;
+      line-height: 0.9;
+      margin-bottom: 20px;
       text-transform: uppercase;
+      letter-spacing: -1px;
     }
 
     .hero .quote {
       font-size: 18px;
       font-style: italic;
-      line-height: 1.4;
-      margin-bottom: 30px;
-      max-width: 90%;
-      border-left: 3px solid var(--accent);
-      padding-left: 15px;
+      line-height: 1.5;
+      margin-bottom: 35px;
+      max-width: 95%;
+      border-left: 4px solid;
+      border-image: linear-gradient(to bottom, var(--accent), transparent) 1;
+      padding-left: 20px;
+      color: rgba(255,255,255,0.9);
     }
 
     .btn {
       width: 100%;
-      padding: 16px;
-      border-radius: 7px;
+      padding: 18px;
+      border-radius: 10px;
       font-weight: 800;
       text-transform: uppercase;
       text-decoration: none;
@@ -121,54 +141,68 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      transition: transform 0.2s;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       margin-bottom: 12px;
       border: none;
       cursor: pointer;
+      letter-spacing: 1px;
     }
 
-    .btn.primary { background: var(--accent); color: #000; }
-    .btn.outline { background: transparent; color: white; border: 2px solid white; }
-    .btn:active { transform: scale(0.98); }
+    .btn.primary { 
+      background: var(--accent-gradient); 
+      color: #000; 
+      box-shadow: 0 4px 15px rgba(245, 185, 50, 0.3);
+    }
+    .btn.outline { 
+      background: rgba(255,255,255,0.05); 
+      color: white; 
+      border: 1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(5px);
+    }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn:active { transform: scale(0.96); }
 
     /* Stats Bar */
     .stats-bar {
       background: var(--bg-light);
-      padding: 24px;
+      padding: 30px 24px;
       display: flex;
       justify-content: space-between;
       color: var(--text-dark);
+      border-radius: 0 0 24px 24px;
     }
 
     .stat-item {
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       flex: 1;
     }
 
     .stat-icon {
-      width: 44px; height: 44px;
-      background: #e9e9e9;
-      border-radius: 50%;
+      width: 48px; height: 48px;
+      background: #fff;
+      color: var(--accent);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
       flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
-    .stat-item strong { font-size: 14px; font-weight: 800; display: block; }
-    .stat-item span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-item strong { font-size: 15px; font-weight: 800; display: block; line-height: 1.2; }
+    .stat-item span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
-    /* Original Audio Player Adapted */
+    /* Audio Player */
     .audio-player-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      margin: 20px 0;
+      margin: 30px 0;
       width: 100%;
       position: relative;
       z-index: 20;
@@ -183,8 +217,8 @@
 
     .play-button-wrapper {
       position: relative;
-      width: 140px;
-      height: 76px;
+      width: 160px;
+      height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -192,26 +226,26 @@
     }
 
     .play-button {
-      width: 50px;
-      height: 50px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: #000;
+      background: var(--accent-gradient);
       border: none;
       outline: none;
-      color: var(--accent);
+      color: #000;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       z-index: 10;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-size: 24px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 28px;
+      box-shadow: 0 0 20px rgba(245, 185, 50, 0.4);
     }
 
-    .play-button:hover,
-    .play-button:active {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(245, 185, 50, 0.3);
+    .play-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(245, 185, 50, 0.6);
     }
 
     .progress-ring {
@@ -219,14 +253,13 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(-90deg);
-      transform-origin: center;
       pointer-events: none;
       z-index: 11;
     }
 
     .progress-ring__circle {
       transition: stroke-dashoffset 0.1s linear;
-      stroke: #ffffff;
+      stroke: var(--accent);
     }
 
     .visualizer-canvas {
@@ -234,17 +267,18 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 140px;
-      height: 44px;
+      width: 160px;
+      height: 50px;
       background: transparent;
       pointer-events: none;
       z-index: 1;
+      opacity: 0.5;
     }
 
     .audio-label {
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
       color: var(--text-muted);
       font-weight: 800;
     }
@@ -254,23 +288,33 @@
       background: white;
       color: var(--text-dark);
       padding: 40px 24px;
-      border-radius: 15px 15px 0 0;
-      margin-top: 20px;
+      border-radius: 30px 30px 0 0;
+      margin-top: -20px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
     }
 
-    /* Accordion Style Content Sections */
+    /* Accordion Improved */
     .accordion-item {
       background: white;
-      border-radius: 9px;
-      margin-bottom: 12px;
+      border-radius: 16px;
+      margin-bottom: 16px;
       border: 1px solid #f0f0f0;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-premium);
+    }
+    
+    .accordion-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
     }
 
     .accordion-trigger {
       width: 100%;
-      padding: 16px 20px;
+      padding: 20px;
       display: flex;
       align-items: center;
       gap: 16px;
@@ -283,14 +327,21 @@
     .accordion-icon {
       width: 44px;
       height: 44px;
-      background: var(--bg-black);
-      color: var(--accent);
-      border-radius: 50%;
+      background: #f7f7f7;
+      color: #000;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 20px;
       flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .accordion-item.active .accordion-icon {
+      background: var(--accent);
+      color: #000;
+      transform: rotate(10deg);
     }
 
     .accordion-title-box {
@@ -304,6 +355,7 @@
       text-transform: uppercase;
       color: var(--text-dark);
       line-height: 1.2;
+      letter-spacing: 0.5px;
     }
 
     .accordion-subtitle {
@@ -312,189 +364,192 @@
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     .accordion-caret {
       color: var(--text-muted);
-      transition: transform 0.3s;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-size: 18px;
     }
 
     .accordion-item.active .accordion-caret {
       transform: rotate(180deg);
+      color: var(--accent);
     }
 
     .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out, padding 0.3s ease;
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       padding: 0 20px;
     }
 
     .accordion-item.active .accordion-content {
-      max-height: 2000px;
-      padding: 10px 20px 24px 20px;
+      grid-template-rows: 1fr;
+      padding: 0 20px 30px 80px;
+    }
+
+    .accordion-inner {
+      overflow: hidden;
     }
 
     /* Inverse (Dark) Accordion */
     .accordion-item.inverse {
       background: #000;
       border-color: #222;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
     .accordion-item.inverse .accordion-title { color: #fff; }
-    .accordion-item.inverse .accordion-subtitle { color: var(--accent); }
+    .accordion-item.inverse .accordion-subtitle { color: var(--accent); opacity: 0.8; }
     .accordion-item.inverse .accordion-icon { background: var(--accent); color: #000; }
     .accordion-item.inverse .accordion-caret { color: #fff; }
     .accordion-item.inverse .form-group label { color: #aaa; }
     .accordion-item.inverse input, .accordion-item.inverse textarea {
-      background: #1a1a1a;
+      background: #111;
       border-color: #333;
       color: #fff;
+      padding: 16px;
     }
     .accordion-item.inverse input:focus, .accordion-item.inverse textarea:focus {
       border-color: var(--accent);
+      outline: none;
     }
 
     .description {
       font-size: 15px;
-      line-height: 1.6;
-      color: #333;
+      line-height: 1.7;
+      color: #444;
     }
-    .description p { margin-bottom: 15px; }
-    .description ul { padding-left: 20px; margin-bottom: 15px; }
-    .description li { margin-bottom: 5px; list-style-type: disc; }
+    .description p { margin-bottom: 20px; }
+    .description ul { padding-left: 20px; margin-bottom: 20px; }
+    .description li { margin-bottom: 8px; list-style-type: none; position: relative; }
+    .description li::before { content: "•"; color: var(--accent); font-weight: bold; position: absolute; left: -15px; }
     .description strong { color: #000; font-weight: 800; }
 
     /* Tags */
     .tag-cloud {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 32px;
     }
     .tag {
       background: #f0f0f0;
-      padding: 6px 14px;
-      border-radius: 30px;
+      padding: 8px 16px;
+      border-radius: 12px;
       font-size: 12px;
       font-weight: 700;
       color: var(--text-dark);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .tag.aura { background: var(--accent); }
+    .tag.aura { background: var(--accent-gradient); color: #000; }
 
-    /* Cinematic Gallery Scroll (Variant 1) */
+    /* Gallery */
     .gallery-container {
-      margin: 30px -24px; /* Bleed to edges */
+      margin: 30px -24px;
       position: relative;
     }
     .gallery-scroller {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      padding: 0 24px 20px 24px;
-      scrollbar-width: none; /* Hide scrollbar */
+      padding: 0 24px 30px 24px;
+      scrollbar-width: none;
     }
     .gallery-scroller::-webkit-scrollbar { display: none; }
     
     .gallery-item {
-      flex: 0 0 85%;
+      flex: 0 0 82%;
       aspect-ratio: 4/5;
       scroll-snap-align: center;
       position: relative;
-      border-radius: 9px;
+      border-radius: 20px;
       overflow: hidden;
       background: #111;
       cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+    .gallery-item:active { transform: scale(0.95); }
     .gallery-item img, .gallery-item video {
       width: 100%; height: 100%; object-fit: cover;
     }
     .gallery-index {
       position: absolute;
-      top: 15px; right: 15px;
-      background: var(--accent);
-      color: #000;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 10px;
+      top: 20px; right: 20px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
       font-weight: 800;
       z-index: 5;
-    }
-
-    /* Form Section */
-    .form-section {
-      background: #fafafa;
-      border-radius: 12px;
-      padding: 30px 24px;
-      border: 1px solid #eee;
-    }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; color: var(--text-muted); }
-    .form-group input, .form-group textarea {
-      width: 100%; padding: 14px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; font-size: 15px;
-      background: white;
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
     /* Socials */
     .social-row {
       display: flex;
       justify-content: flex-start;
-      gap: 20px;
+      gap: 24px;
       margin-bottom: 30px;
-      font-size: 24px;
+      font-size: 26px;
     }
-    .social-row a { color: var(--text-dark); transition: color 0.2s; }
-    .social-row a:hover { color: var(--accent); }
+    .social-row a { 
+      color: var(--text-dark); 
+      transition: all 0.3s ease; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px; height: 50px;
+      background: #f7f7f7;
+      border-radius: 50%;
+    }
+    .social-row a:hover { 
+      color: #000; 
+      background: var(--accent);
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(245, 185, 50, 0.4);
+    }
 
     /* Tab Bar */
     .tab-bar {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 500px;
-      background: #000; padding: 12px 0;
+      background: rgba(0,0,0,0.85); 
+      backdrop-filter: blur(15px);
+      padding: 15px 0 25px 0;
       display: flex; justify-content: space-around;
-      border-top: 1px solid #222; z-index: 100;
+      border-top: 1px solid rgba(255,255,255,0.1); 
+      z-index: 100;
+      border-radius: 24px 24px 0 0;
     }
 
-    .tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 10px; }
+    .tab-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .tab-item.active { color: var(--accent); }
-    .tab-item i { font-size: 20px; }
+    .tab-item i { font-size: 22px; }
 
-    /* Picker Overlay */
-    #master-picker {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.95); z-index: 2000;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 24px; backdrop-filter: blur(10px);
+    /* Skeleton Loading */
+    .skeleton {
+      background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 4px;
     }
-    .picker-card {
-      background: #111; border-radius: 24px; padding: 40px; width: 100%; max-width: 420px;
-      border: 1px solid var(--accent); text-align: center;
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
-    .picker-card h2 { font-family: 'Bungee'; margin-bottom: 20px; font-size: 24px; }
-    .picker-card select {
-      width: 100%; padding: 15px; border-radius: 12px; background: #222; color: white; border: 1px solid #333;
-      margin-bottom: 20px; font-family: inherit; font-size: 16px;
-    }
-
-    /* Gallery Lightbox */
-    .lightbox {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: black; z-index: 3000; display: none;
-      flex-direction: column;
-    }
-    .lightbox-close { position: absolute; top: 20px; right: 20px; font-size: 30px; color: white; cursor: pointer; z-index: 10; }
-    .lightbox-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .lightbox-content img, .lightbox-content video { max-width: 100%; max-height: 100%; object-fit: contain; }
 
     @media (min-width: 501px) {
-      body { background: #111; }
-      .app-viewport { box-shadow: 0 0 60px rgba(0,0,0,0.6); }
+      body { background: #0a0a0a; }
+      .app-viewport { box-shadow: 0 0 100px rgba(0,0,0,0.8); }
     }
+
   </style>
 </head>
 <body>
@@ -512,9 +567,9 @@
     <div class="hero">
       <div class="hero-bg" id="hero-bg"></div>
       <div class="hero-content">
-        <div class="craft-tag" id="master-craft">NAČÍTÁM...</div>
-        <h1 id="master-name">...</h1>
-        <div class="quote" id="master-quote">"..."</div>
+        <div class="craft-tag skeleton" id="master-craft" style="width: 120px; height: 20px; color: transparent;">NAČÍTÁM...</div>
+        <h1 id="master-name" class="skeleton" style="width: 80%; height: 50px; color: transparent; margin-bottom: 20px;">...</h1>
+        <div class="quote skeleton" id="master-quote" style="width: 90%; height: 60px; color: transparent;">"..."</div>
         
         <button class="btn primary" id="btn-contact-top">
           <i class="bi bi-send-fill"></i> KONTAKTOVAT MISTRA
@@ -573,8 +628,10 @@
             <i class="bi bi-chevron-down accordion-caret"></i>
           </button>
           <div class="accordion-content">
-            <div class="description" id="master-desc"></div>
-            <div class="social-row" id="master-socials" style="margin-top: 20px;"></div>
+            <div class="accordion-inner">
+              <div class="description" id="master-desc"></div>
+              <div class="social-row" id="master-socials" style="margin-top: 20px;"></div>
+            </div>
           </div>
         </div>
 
@@ -589,7 +646,9 @@
             <i class="bi bi-chevron-down accordion-caret"></i>
           </button>
           <div class="accordion-content">
-            <div class="description" id="master-requirements"></div>
+            <div class="accordion-inner">
+              <div class="description" id="master-requirements"></div>
+            </div>
           </div>
         </div>
 
@@ -604,7 +663,9 @@
             <i class="bi bi-chevron-down accordion-caret"></i>
           </button>
           <div class="accordion-content">
-            <div class="description" id="master-motivation"></div>
+            <div class="accordion-inner">
+              <div class="description" id="master-motivation"></div>
+            </div>
           </div>
         </div>
 
@@ -619,7 +680,9 @@
             <i class="bi bi-chevron-down accordion-caret"></i>
           </button>
           <div class="accordion-content">
-            <div class="description" id="master-accommodation"></div>
+            <div class="accordion-inner">
+              <div class="description" id="master-accommodation"></div>
+            </div>
           </div>
         </div>
 
@@ -634,7 +697,9 @@
             <i class="bi bi-chevron-down accordion-caret"></i>
           </button>
           <div class="accordion-content">
-            <div class="description" id="master-compensation"></div>
+            <div class="accordion-inner">
+              <div class="description" id="master-compensation"></div>
+            </div>
           </div>
         </div>
 
@@ -649,7 +714,9 @@
             <i class="bi bi-chevron-down accordion-caret"></i>
           </button>
           <div class="accordion-content">
-            <div class="description" id="master-recommendations"></div>
+            <div class="accordion-inner">
+              <div class="description" id="master-recommendations"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -673,27 +740,29 @@
           <i class="bi bi-chevron-down accordion-caret"></i>
         </button>
         <div class="accordion-content">
-          <div class="form-section" id="contact-form-section" style="margin-top:0; border:none; background:none; padding:0; box-shadow:none;">
-            <form id="message-form">
-              <div class="form-group">
-                <label>Jméno</label>
-                <input type="text" id="msg-name" required />
-              </div>
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="msg-email" required />
-              </div>
-              <div class="form-group">
-                <label>Telefon</label>
-                <input type="tel" id="msg-phone" required />
-              </div>
-              <div class="form-group">
-                <label>Zpráva</label>
-                <textarea id="msg-text" rows="4" required></textarea>
-              </div>
-              <button type="submit" class="btn primary">ODESLAT ZPRÁVU</button>
-            </form>
-            <div id="msg-notice" style="display:none; margin-top: 15px; text-align: center; font-weight: 700;"></div>
+          <div class="accordion-inner">
+            <div class="form-section" id="contact-form-section" style="margin-top:0; border:none; background:none; padding:0; box-shadow:none;">
+              <form id="message-form">
+                <div class="form-group">
+                  <label>Jméno</label>
+                  <input type="text" id="msg-name" required />
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="msg-email" required />
+                </div>
+                <div class="form-group">
+                  <label>Telefon</label>
+                  <input type="tel" id="msg-phone" required />
+                </div>
+                <div class="form-group">
+                  <label>Zpráva</label>
+                  <textarea id="msg-text" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn primary">ODESLAT ZPRÁVU</button>
+              </form>
+              <div id="msg-notice" style="display:none; margin-top: 15px; text-align: center; font-weight: 700;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -714,7 +783,7 @@
     <div class="lightbox-content" id="lightbox-content"></div>
   </div>
 
-  <script src="app.js?v=202605021705"></script>
+  <script src="app.js?v=202605040802"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
@@ -750,13 +819,23 @@
 
       // --- POPULATE UI ---
       document.title = `Bez Školy – ${master.name}`;
-      document.getElementById('master-name').innerHTML = master.name.split(' ').join('<br>');
-      document.getElementById('master-craft').textContent = (master.craft || 'Řemeslo').toUpperCase();
+      const nameEl = document.getElementById('master-name');
+      nameEl.innerHTML = master.name.split(' ').join('<br>');
+      nameEl.classList.remove('skeleton');
+      nameEl.style.width = ''; nameEl.style.height = ''; nameEl.style.color = '';
+
+      const craftEl = document.getElementById('master-craft');
+      craftEl.textContent = (master.craft || 'Řemeslo').toUpperCase();
+      craftEl.classList.remove('skeleton');
+      craftEl.style.width = ''; craftEl.style.height = ''; craftEl.style.color = '';
       document.getElementById('stat-location').textContent = master.location || 'Česká Rep.';
       
       const descParts = (master.desc || '').split('.');
       const quote = descParts[0] ? `"${descParts[0].trim()}."` : '"Naučím tě řemeslo tak, jak se ho kdysi učili skuteční mistři."';
-      document.getElementById('master-quote').textContent = quote;
+      const quoteEl = document.getElementById('master-quote');
+      quoteEl.textContent = quote;
+      quoteEl.classList.remove('skeleton');
+      quoteEl.style.width = ''; quoteEl.style.height = ''; quoteEl.style.color = '';
       if (typeof marked !== 'undefined' && master.desc) {
         document.getElementById('master-desc').innerHTML = marked.parse(master.desc);
       } else {
@@ -1008,15 +1087,82 @@
           
           const res = await saveMessages(messages);
           if (res && res.status === 'success') {
-            notice.style.color = 'green';
-            notice.textContent = 'Zpráva byla úspěšně odeslána!';
-            form.reset();
+            // Success Overlay (AI Rule #4)
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+              position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+              background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
+              display: flex; flex-direction: column; align-items: center; justify-content: center;
+              z-index: 5000; color: white; text-align: center;
+              animation: overlayIn 0.5s ease-out;
+            `;
+            overlay.innerHTML = `
+              <div style="font-size: 60px; color: var(--accent); margin-bottom: 20px;">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <h2 style="font-family: 'Bungee'; font-size: 24px;">ZPRÁVA ODESLÁNA!</h2>
+              <p style="margin-top: 10px; opacity: 0.8;">Mistr se ti ozve co nejdříve.</p>
+              <style>
+                @keyframes overlayIn { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+              </style>
+            `;
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => {
+              overlay.style.opacity = '0';
+              overlay.style.transition = 'opacity 0.5s ease';
+              setTimeout(() => {
+                overlay.remove();
+                form.reset();
+              }, 500);
+            }, 1500);
+
           } else {
             notice.style.color = 'red';
             notice.textContent = 'Chyba při odesílání zprávy.';
           }
         }
       };
+      // --- PARALLAX EFFECT ---
+      window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        if (heroBg) {
+          heroBg.style.transform = `translateY(${scrolled * 0.3}px)`;
+        }
+      });
+
+      // --- ENTRANCE ANIMATIONS ---
+      const observerOptions = { threshold: 0.1 };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.accordion-item, .stat-item, .section-header').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+        observer.observe(el);
+      });
+
+      // --- GALLERY ZOOM ON SCROLL ---
+      scroller.addEventListener('scroll', () => {
+        const items = scroller.querySelectorAll('.gallery-item');
+        const scrollerRect = scroller.getBoundingClientRect();
+        const scrollerCenter = scrollerRect.left + scrollerRect.width / 2;
+
+        items.forEach(item => {
+          const itemRect = item.getBoundingClientRect();
+          const itemCenter = itemRect.left + itemRect.width / 2;
+          const dist = Math.abs(scrollerCenter - itemCenter);
+          const scale = Math.max(0.9, 1 - dist / 1000);
+          item.style.transform = `scale(${scale})`;
+        });
+      });
     });
   </script>
 </body>
