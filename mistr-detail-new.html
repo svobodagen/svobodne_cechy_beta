@@ -51,13 +51,13 @@
 
     /* App Container */
     .app-viewport {
-      width: 100%;
-      max-width: 1200px;
+      max-width: 500px;
       margin: 0 auto;
       background: var(--bg-black);
       min-height: 100vh;
       position: relative;
-      padding-bottom: 90px;
+      padding-top: 40px;
+      transition: all 0.3s ease;
     }
 
     /* Header / Logo */
@@ -148,24 +148,22 @@
     }
     .side-menu-overlay.active { display: block; opacity: 1; }
 
-    /* Responsive overrides to prevent header overlap */
-    @media (max-width: 1024px) {
-      .app-header {
-        position: relative;
-        background: var(--bg-black);
-        backdrop-filter: none;
-        padding: 20px;
-      }
-      .hero {
-        height: auto;
-        min-height: 60vh;
-        padding-top: 20px;
-      }
+    /* Layout specific overrides to prevent header overlap */
+    .layout-phone .app-header,
+    .layout-tablet .app-header {
+      position: relative;
+      background: var(--bg-black);
+      backdrop-filter: none;
+      padding: 20px;
     }
-    @media (max-width: 768px) {
-      .app-logo img {
-        height: 48px !important;
-      }
+    .layout-phone .hero,
+    .layout-tablet .hero {
+      height: auto;
+      min-height: 60vh;
+      padding-top: 20px;
+    }
+    .layout-phone .app-logo img {
+      height: 48px !important;
     }
 
     /* Hero Section */
@@ -664,23 +662,6 @@
       box-shadow: 0 5px 15px rgba(245, 185, 50, 0.4);
     }
 
-    /* Tab Bar */
-    .tab-bar {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 500px;
-      background: rgba(0,0,0,0.85); 
-      backdrop-filter: blur(15px);
-      padding: 15px 0 25px 0;
-      display: flex; justify-content: space-around;
-      border-top: 1px solid rgba(255,255,255,0.1); 
-      z-index: 100;
-      border-radius: 0;
-    }
-
-    .tab-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-    .tab-item.active { color: var(--accent); }
-    .tab-item i { font-size: 22px; }
-
     /* Skeleton Loading */
     .skeleton {
       background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%);
@@ -969,6 +950,18 @@
 </head>
 <body>
 
+  <!-- Device Switcher -->
+  <div class="device-switcher" id="device-switcher">
+    <button id="sw-phone" onclick="setLayout('phone')">
+      <i class="bi bi-phone"></i> Telefon
+    </button>
+    <button id="sw-tablet" onclick="setLayout('tablet')">
+      <i class="bi bi-tablet"></i> Tablet
+    </button>
+    <button id="sw-desktop" onclick="setLayout('desktop')">
+      <i class="bi bi-laptop"></i> Počítač
+    </button>
+  </div>
 
   <div class="app-viewport">
     <header class="app-header">
@@ -1243,12 +1236,7 @@
 
     </div>
 
-    <nav class="tab-bar">
-      <a href="mistri.html" class="tab-item active"><i class="bi bi-people"></i><span>Mistři</span></a>
-      <a href="najit-mistra.html" class="tab-item"><i class="bi bi-question-circle"></i><span>Poptat</span></a>
-      <a href="profil.html" class="tab-item" id="tab-profil"><i class="bi bi-person-circle"></i><span>Profil</span></a>
-      <a href="admin.html" class="tab-item" id="tab-admin"><i class="bi bi-shield-lock"></i><span>Admin</span></a>
-    </nav>
+
   </div>
 
   <!-- Lightbox -->
@@ -1737,6 +1725,25 @@
   </script>
 
   <script>
+    // --- DEVICE SWITCHER ---
+    function setLayout(mode) {
+      document.body.classList.remove('layout-phone', 'layout-tablet', 'layout-desktop');
+      document.body.classList.add('layout-' + mode);
+      document.querySelectorAll('.device-switcher button').forEach(b => b.classList.remove('active'));
+      document.getElementById('sw-' + mode).classList.add('active');
+      localStorage.setItem('sc2.layoutMode', mode);
+    }
+
+    function autoDetectLayout() {
+      const saved = localStorage.getItem('sc2.layoutMode');
+      if (saved) { setLayout(saved); return; }
+      const w = window.innerWidth;
+      if (w >= 1024) setLayout('desktop');
+      else if (w >= 768) setLayout('tablet');
+      else setLayout('phone');
+    }
+
+    autoDetectLayout();
 
     // --- HAMBURGER MENU LOGIC ---
     const menuOpen = document.getElementById('menu-open');
