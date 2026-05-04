@@ -56,26 +56,22 @@
       background: var(--bg-black);
       min-height: 100vh;
       position: relative;
-      padding-top: 100px; /* Dostatek místa pro fixní hlavičku */
-      transition: all 0.3s ease;
+      padding-top: 120px; /* Místo pro switcher (40) + header (~80) */
     }
 
     /* Header / Logo */
     .app-header {
-      padding: 20px;
+      padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: fixed;
-      top: 0; 
-      left: 50%;
-      transform: translateX(-50%);
+      top: 42px; /* Přesně pod přepínačem */
+      left: 0;
       width: 100%; 
-      max-width: 500px; /* Aby lícovala s viewportem */
       z-index: 1000;
       background: rgba(0,0,0,0.1);
       backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
     }
     .app-logo { 
       text-decoration: none; 
@@ -681,15 +677,14 @@
     .device-switcher {
       position: fixed;
       top: 0; left: 0; width: 100%;
-      z-index: 10000;
-      background: rgba(10,10,10,0.95);
-      backdrop-filter: blur(10px);
-      padding: 8px 20px;
+      height: 42px;
+      z-index: 10001;
+      background: #111;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .device-switcher button {
       padding: 6px 14px;
@@ -717,7 +712,6 @@
       border-color: var(--accent);
       color: var(--accent);
     }
-    body { padding-top: 42px; }
 
     /* ============================================
        TABLET LAYOUT (body.layout-tablet)
