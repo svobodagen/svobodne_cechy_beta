@@ -111,8 +111,8 @@
     .hero h1 {
       font-size: 48px;
       font-weight: 800;
-      line-height: 0.9;
-      margin-bottom: 20px;
+      line-height: 1.1; /* Zvýšeno pro diakritiku */
+      margin: 12px 0 20px 0;
       text-transform: uppercase;
       letter-spacing: -1px;
     }
@@ -524,6 +524,25 @@
       font-weight: 800;
       z-index: 5;
       border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .craft-tag {
+      display: inline-flex;
+      padding: 6px 14px;
+      background: rgba(245, 185, 50, 0.1);
+      color: var(--accent);
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border: 1px solid rgba(245, 185, 50, 0.2);
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      line-height: 1.1;
+      margin-bottom: 16px;
     }
 
     /* Socials */
