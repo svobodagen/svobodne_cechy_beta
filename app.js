@@ -1871,6 +1871,7 @@ async function setupAdmin() {
       compensation: document.querySelector("#master-compensation"),
       recommendations: document.querySelector("#master-recommendations"),
       requirements: document.querySelector("#master-requirements"),
+      referenceSc: document.querySelector("#master-reference-sc"),
     };
   }
 
@@ -2010,6 +2011,7 @@ async function setupAdmin() {
         inputs.compensation.value = master.compensation || "";
         inputs.recommendations.value = master.recommendations || "";
         inputs.requirements.value = master.requirements || "";
+        inputs.referenceSc.value = master.reference_sc || "";
         inputs.fb.value = master.socials?.fb || "";
         inputs.ig.value = master.socials?.ig || "";
         inputs.tt.value = master.socials?.tt || "";
@@ -2095,6 +2097,7 @@ async function setupAdmin() {
         compensation: inputs.compensation.value.trim(),
         recommendations: inputs.recommendations.value.trim(),
         requirements: inputs.requirements.value.trim(),
+        reference_sc: inputs.referenceSc.value.trim(),
         photo: existing ? existing.photo : null,
         gallery: existing ? existing.gallery || [] : [],
         socials: {
