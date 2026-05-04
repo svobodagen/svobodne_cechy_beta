@@ -133,7 +133,7 @@ try {
                     }
                 }
 
-                $stmt = $pdo->prepare("REPLACE INTO masters (id, name, craft, location, rank, aura, description, stats, tags, badges, gallery, photo, audio, photoSettings, socials, education, accommodation, compensation, recommendations, requirements, reference_sc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("REPLACE INTO masters (id, name, craft, location, rank, aura, description, stats, tags, badges, gallery, photo, audio, photoSettings, socials, education, accommodation, compensation, recommendations, requirements, reference_sc, story) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $m['id'],
                     $m['name'],
@@ -155,7 +155,8 @@ try {
                     $m['compensation'] ?? null,
                     $m['recommendations'] ?? null,
                     $m['requirements'] ?? null,
-                    $m['reference_sc'] ?? null
+                    $m['reference_sc'] ?? null,
+                    $m['story'] ?? null
                 ]);
                 echo json_encode(['status' => 'success', 'photo' => $m['photo']]);
             } catch (PDOException $pe) {

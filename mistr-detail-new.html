@@ -953,14 +953,14 @@
           <button class="accordion-trigger">
             <div class="accordion-icon"><i class="bi bi-person-badge"></i></div>
             <div class="accordion-title-box">
-              <span class="accordion-title">Můj příběh</span>
-              <span class="accordion-subtitle">Kdo jsem a co dělám</span>
+              <span class="accordion-title">Příběh</span>
+              <span class="accordion-subtitle">O MISTROVI</span>
             </div>
             <i class="bi bi-chevron-down accordion-caret"></i>
           </button>
           <div class="accordion-content">
             <div class="accordion-inner">
-              <div class="description" id="master-desc"></div>
+              <div class="description" id="master-story-content"></div>
             </div>
           </div>
         </div>
@@ -1196,13 +1196,17 @@
           quoteEl.style.width = ''; quoteEl.style.height = ''; quoteEl.style.color = '';
         }
 
-        const descEl = document.getElementById('master-desc');
-        if (descEl) {
-          if (typeof marked !== 'undefined' && master.desc) {
-            marked.setOptions({ breaks: true });
-            descEl.innerHTML = marked.parse(master.desc);
+        const storyContent = document.getElementById('master-story-content');
+        if (storyContent) {
+          if (master.story && master.story !== '-') {
+            if (typeof marked !== 'undefined') {
+              marked.setOptions({ breaks: true });
+              storyContent.innerHTML = marked.parse(master.story);
+            } else {
+              storyContent.textContent = master.story;
+            }
           } else {
-            descEl.textContent = master.desc || 'Tento mistr zatím nemá vyplněný svůj příběh.';
+            storyContent.textContent = 'K tomuto mistru zatím není vyplněn příběh.';
           }
         }
 

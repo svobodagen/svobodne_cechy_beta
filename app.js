@@ -1872,6 +1872,7 @@ async function setupAdmin() {
       recommendations: document.querySelector("#master-recommendations"),
       requirements: document.querySelector("#master-requirements"),
       referenceSc: document.querySelector("#master-reference-sc"),
+      story: document.querySelector("#master-story"),
     };
   }
 
@@ -2012,6 +2013,7 @@ async function setupAdmin() {
         inputs.recommendations.value = master.recommendations || "";
         inputs.requirements.value = master.requirements || "";
         inputs.referenceSc.value = master.reference_sc || "";
+        inputs.story.value = master.story || "";
         inputs.fb.value = master.socials?.fb || "";
         inputs.ig.value = master.socials?.ig || "";
         inputs.tt.value = master.socials?.tt || "";
@@ -2098,6 +2100,7 @@ async function setupAdmin() {
         recommendations: inputs.recommendations.value.trim(),
         requirements: inputs.requirements.value.trim(),
         reference_sc: inputs.referenceSc.value.trim(),
+        story: inputs.story.value.trim(),
         photo: existing ? existing.photo : null,
         gallery: existing ? existing.gallery || [] : [],
         socials: {
