@@ -70,9 +70,15 @@
       background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
       backdrop-filter: blur(4px);
     }
-    .app-logo { text-align: center; flex-grow: 1; text-decoration: none; color: white; }
-    .app-logo div { font-family: 'Bungee', cursive; font-size: 20px; line-height: 1; letter-spacing: 1px; }
-    .app-logo span { font-size: 9px; text-transform: uppercase; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+    .app-logo { 
+      text-decoration: none; 
+      color: white; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+    }
+    .app-logo div { font-family: 'Bungee', cursive; font-size: 18px; line-height: 1; letter-spacing: 1px; }
 
     /* Hero Section */
     .hero {
@@ -892,8 +898,8 @@
     <header class="app-header">
       <a href="mistri.html" style="color: white; font-size: 24px;"><i class="bi bi-chevron-left"></i></a>
       <a href="index.html" class="app-logo">
-        <div>BEZ ŠKOLY</div>
-        <span>Uč se od mistrů</span>
+        <img src="LOGO_SC2.svg" alt="Svobodné cechy" style="height: 32px; margin-right: 12px;" />
+        <div style="font-family: 'Bungee', cursive; font-size: 18px; color: #fff;">SVOBODNÉ CECHY</div>
       </a>
       <nav class="desktop-nav">
         <a href="mistri.html" class="active">Mistři</a>
