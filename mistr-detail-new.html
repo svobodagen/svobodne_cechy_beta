@@ -773,7 +773,7 @@
       <a href="mistri.html" class="tab-item active"><i class="bi bi-people"></i><span>Mistři</span></a>
       <a href="najit-mistra.html" class="tab-item"><i class="bi bi-question-circle"></i><span>Poptat</span></a>
       <a href="profil.html" class="tab-item" id="tab-profil"><i class="bi bi-person-circle"></i><span>Profil</span></a>
-      <a href="admin.html" class="tab-item" id="tab-admin" style="display: none;"><i class="bi bi-shield-lock"></i><span>Admin</span></a>
+      <a href="admin.html" class="tab-item" id="tab-admin"><i class="bi bi-shield-lock"></i><span>Admin</span></a>
     </nav>
   </div>
 
@@ -786,19 +786,6 @@
   <script src="app.js?v=202605040802"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // --- AUTH GUARD (AI Rule #3) ---
-      const session = typeof getSession === 'function' ? getSession() : null;
-      if (session && session.role === 'admin') {
-        document.getElementById('tab-admin').style.display = 'flex';
-      }
-
-      document.getElementById('tab-profil').onclick = (e) => {
-        if (!session) {
-          e.preventDefault();
-          window.location.href = 'login.html';
-        }
-      };
-
       const params = new URLSearchParams(window.location.search);
       let id = params.get('id');
 
@@ -831,11 +818,14 @@
       if (!master) { await showPicker(); return; }
 
       // --- POPULATE UI ---
+      if (!master.name) { console.error("Master name missing"); return; }
       document.title = `Bez Školy – ${master.name}`;
       const nameEl = document.getElementById('master-name');
-      nameEl.innerHTML = master.name.split(' ').join('<br>');
-      nameEl.classList.remove('skeleton');
-      nameEl.style.width = ''; nameEl.style.height = ''; nameEl.style.color = '';
+      if (nameEl) {
+        nameEl.innerHTML = (master.name || '').split(' ').join('<br>');
+        nameEl.classList.remove('skeleton');
+        nameEl.style.width = ''; nameEl.style.height = ''; nameEl.style.color = '';
+      }
 
       const craftEl = document.getElementById('master-craft');
       craftEl.textContent = (master.craft || 'Řemeslo').toUpperCase();
