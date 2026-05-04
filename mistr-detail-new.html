@@ -546,10 +546,169 @@
       100% { background-position: -200% 0; }
     }
 
-    @media (min-width: 501px) {
-      body { background: #0a0a0a; }
-      .app-viewport { box-shadow: 0 0 100px rgba(0,0,0,0.8); }
+    /* ============================================
+       DEVICE SWITCHER BAR
+       ============================================ */
+    .device-switcher {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      z-index: 10000;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(10px);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
+    .device-switcher button {
+      padding: 6px 14px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .device-switcher button.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .device-switcher button:hover:not(.active) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    body { padding-top: 42px; }
+
+    /* ============================================
+       TABLET LAYOUT (body.layout-tablet)
+       ============================================ */
+    body.layout-tablet { background: #0a0a0a; }
+    body.layout-tablet .app-viewport {
+      max-width: 768px;
+      box-shadow: 0 0 100px rgba(0,0,0,0.8);
+    }
+    body.layout-tablet .hero { height: 60vh; }
+    body.layout-tablet .hero h1 { font-size: 56px; }
+    body.layout-tablet .content-area { padding: 50px 40px; }
+    body.layout-tablet .accordion-trigger { padding: 24px; }
+    body.layout-tablet .stats-bar { padding: 24px 40px; }
+    body.layout-tablet .gallery-item { flex: 0 0 46%; }
+    body.layout-tablet .tab-bar { max-width: 768px; }
+
+    /* ============================================
+       DESKTOP LAYOUT (body.layout-desktop)
+       ============================================ */
+    body.layout-desktop { background: #0a0a0a; }
+    body.layout-desktop .app-viewport {
+      max-width: 1400px;
+      display: grid;
+      grid-template-columns: 45% 55%;
+      grid-template-rows: auto;
+      padding-bottom: 0;
+      box-shadow: 0 0 120px rgba(0,0,0,0.9);
+    }
+
+    /* Header spans full width */
+    body.layout-desktop .app-header {
+      grid-column: 1 / -1;
+      position: sticky;
+      top: 42px;
+      z-index: 100;
+    }
+
+    /* Hero = sticky left photo panel */
+    body.layout-desktop .hero {
+      grid-column: 1;
+      grid-row: 2 / 20;
+      position: sticky;
+      top: 42px;
+      height: calc(100vh - 42px);
+      padding: 60px 48px;
+    }
+    body.layout-desktop .hero h1 { font-size: 64px; }
+    body.layout-desktop .hero .quote { font-size: 20px; max-width: 85%; }
+    body.layout-desktop .btn { max-width: 360px; }
+
+    /* Right column elements */
+    body.layout-desktop .audio-player-container {
+      grid-column: 2;
+      margin: 20px 48px;
+      justify-content: flex-start;
+    }
+    body.layout-desktop .stats-bar {
+      grid-column: 2;
+      padding: 24px 48px;
+      margin: 0;
+    }
+    body.layout-desktop .content-area {
+      grid-column: 2;
+      padding: 50px 48px;
+      box-shadow: none;
+    }
+    body.layout-desktop .description { font-size: 16px; line-height: 1.8; }
+    body.layout-desktop .accordion-trigger { padding: 24px 28px; }
+    body.layout-desktop .accordion-title { font-size: 16px; }
+
+    /* Gallery = grid on desktop */
+    body.layout-desktop .gallery-container { margin: 30px 0; }
+    body.layout-desktop .gallery-scroller {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      overflow-x: visible;
+      scroll-snap-type: none;
+      padding: 0 0 20px 0;
+    }
+    body.layout-desktop .gallery-item {
+      flex: none;
+      aspect-ratio: 1;
+      scroll-snap-align: unset;
+    }
+    body.layout-desktop .gallery-item:hover {
+      transform: scale(1.03);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    /* Hide mobile tab bar on desktop */
+    body.layout-desktop .tab-bar { display: none; }
+
+    /* Desktop nav in header */
+    body.layout-desktop .desktop-nav {
+      display: flex !important;
+      gap: 32px;
+    }
+    body.layout-desktop .desktop-nav a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    body.layout-desktop .desktop-nav a:hover,
+    body.layout-desktop .desktop-nav a.active { color: var(--accent); }
+
+    /* Phone layout (default + forced) */
+    body.layout-phone { background: #0a0a0a; }
+    body.layout-phone .app-viewport {
+      max-width: 500px;
+      box-shadow: 0 0 100px rgba(0,0,0,0.8);
+    }
+
+    /* Desktop nav hidden by default */
+    .desktop-nav { display: none; }
 
     /* Lightbox */
     .lightbox {
@@ -660,6 +819,19 @@
 </head>
 <body>
 
+  <!-- Device Switcher -->
+  <div class="device-switcher" id="device-switcher">
+    <button id="sw-phone" onclick="setLayout('phone')">
+      <i class="bi bi-phone"></i> Telefon
+    </button>
+    <button id="sw-tablet" onclick="setLayout('tablet')">
+      <i class="bi bi-tablet"></i> Tablet
+    </button>
+    <button id="sw-desktop" onclick="setLayout('desktop')">
+      <i class="bi bi-laptop"></i> Počítač
+    </button>
+  </div>
+
   <div class="app-viewport">
     <header class="app-header">
       <a href="mistri.html" style="color: white; font-size: 24px;"><i class="bi bi-chevron-left"></i></a>
@@ -667,6 +839,11 @@
         <div>BEZ ŠKOLY</div>
         <span>Uč se od mistrů</span>
       </a>
+      <nav class="desktop-nav">
+        <a href="mistri.html" class="active">Mistři</a>
+        <a href="najit-mistra.html">Poptat</a>
+        <a href="profil.html">Profil</a>
+      </nav>
       <i class="bi bi-heart" style="font-size: 22px;"></i>
     </header>
 
@@ -1349,6 +1526,28 @@
         });
       });
     });
+  </script>
+
+  <script>
+    // --- DEVICE SWITCHER ---
+    function setLayout(mode) {
+      document.body.classList.remove('layout-phone', 'layout-tablet', 'layout-desktop');
+      document.body.classList.add('layout-' + mode);
+      document.querySelectorAll('.device-switcher button').forEach(b => b.classList.remove('active'));
+      document.getElementById('sw-' + mode).classList.add('active');
+      localStorage.setItem('sc2.layoutMode', mode);
+    }
+
+    function autoDetectLayout() {
+      const saved = localStorage.getItem('sc2.layoutMode');
+      if (saved) { setLayout(saved); return; }
+      const w = window.innerWidth;
+      if (w >= 1024) setLayout('desktop');
+      else if (w >= 768) setLayout('tablet');
+      else setLayout('phone');
+    }
+
+    autoDetectLayout();
   </script>
 </body>
 </html>
