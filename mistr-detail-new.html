@@ -16,7 +16,7 @@
   <!-- Markdown Parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  <link rel="stylesheet" href="design-system.css">
+  <link rel="stylesheet" href="design-system.css?v=202605051638">
 
   <style>
     :root {
@@ -702,6 +702,7 @@
       font-size: 15px;
       transition: border-color 0.2s;
       -webkit-appearance: none;
+      text-align: center;
     }
     .form-group input:focus, .form-group textarea:focus {
       outline: none;
@@ -747,6 +748,8 @@
       font-size: 15px;
       margin-bottom: 16px;
       font-family: var(--font-main);
+      text-align: center;
+      text-align-last: center;
     }
 
   </style>
@@ -1048,7 +1051,7 @@
     <div class="lightbox-content" id="lightbox-content"></div>
   </div>
 
-  <script src="app.js?v=202605040957"></script>
+  <script src="app.js?v=202605051638"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
