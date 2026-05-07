@@ -16,11 +16,11 @@
   <!-- Markdown Parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  <link rel="stylesheet" href="design-system.css?v=202605051638">
+  <link rel="stylesheet" href="design-system.css?v=202605071920">
 
   <style>
     :root {
-      /* Page specific tokens */
+      --text-dark: #111111;
     }
 
     /* Hero Section */
@@ -1051,7 +1051,7 @@
     <div class="lightbox-content" id="lightbox-content"></div>
   </div>
 
-  <script src="app.js?v=202605051638"></script>
+  <script src="app.js?v=202605071920"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
@@ -1084,6 +1084,9 @@
 
       const master = await getMaster(id);
       if (!master) { await showPicker(); return; }
+
+      let heroBg;
+      let scroller;
 
       // --- POPULATE UI ---
       try {
@@ -1184,7 +1187,7 @@
           };
         });
 
-        const heroBg = document.getElementById('hero-bg');
+        heroBg = document.getElementById('hero-bg');
         if (heroBg) {
           const photo = master.photo || 'mystery_master.png';
           heroBg.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%), url('${photo}')`;
@@ -1322,7 +1325,7 @@
         }
 
         // --- GALLERY ---
-        const scroller = document.getElementById('gallery-scroller');
+        scroller = document.getElementById('gallery-scroller');
         const gallery = master.gallery || [];
         
         const lightbox = document.getElementById('lightbox');
