@@ -1,4 +1,4 @@
-const STORAGE = {
+// VERZE: 202605072051
   masters: "load_masters",
   users: "load_users",
   messages: "load_messages",
@@ -107,6 +107,36 @@ function getSession() {
 
 function setSession(session) {
   save(STORAGE.session, session);
+}
+
+function showSuccessOverlay(message, subtext, redirectUrl) {
+  const overlay = document.createElement("div");
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 20000;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+    color: #fff;
+    text-align: center;
+  `;
+  overlay.innerHTML = `
+    <div style="background: var(--card, #14162b); padding: 40px; border-radius: 24px; border: 1px solid var(--accent); max-width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+      <div style="font-size: 64px; color: var(--accent); margin-bottom: 20px;"><i class="bi bi-check-circle-fill"></i></div>
+      <h2 style="margin: 0 0 10px 0; font-family: 'Bungee', cursive;">${message}</h2>
+      <p style="margin: 0; color: var(--muted);">${subtext}</p>
+    </div>
+    <style>
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+  `;
+  document.body.appendChild(overlay);
+
+  setTimeout(() => {
+    if (redirectUrl) window.location.href = redirectUrl;
+    else overlay.remove();
+  }, 1500);
 }
 
 async function getMasters(light = true) {
@@ -1330,8 +1360,8 @@ async function setupLogin() {
     }
     setSession({ email, role: user.role });
     await refreshNav();
-    loginNotice.style.display = "block";
-    loginNotice.textContent = `Přihlášen jako ${user.role}.`;
+    
+    showSuccessOverlay("PŘIHLÁŠENO!", `Vítej zpět, ${user.name || email}`, isAdmin ? "admin.html" : "profil.html");
     if (!user.password || forceChange) {
       changeForm.style.display = "grid";
       changeNotice.style.display = "block";
