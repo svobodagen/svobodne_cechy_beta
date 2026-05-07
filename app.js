@@ -1,4 +1,5 @@
 // VERZE: 202605072051
+const STORAGE = {
   masters: "load_masters",
   users: "load_users",
   messages: "load_messages",
