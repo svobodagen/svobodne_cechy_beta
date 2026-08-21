@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Učednictví u mistra Jiřího Pačinka – Svobodné Cechy</title>
+  <meta name="description" content="Zjistěte, jestli je učednictví u mistra skláře Jiřího Pačinka to pravé pro vás. Přihlaste se k nezávaznému rozhovoru." />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #0B0A08;
+      --color-dark: #17120E;
+      --color-cream: #F4EFE7;
+      --color-white: #FFFDF8;
+      --color-accent: #E87516;
+      --color-glass: rgba(255,255,255,0.08);
+      --text: #F4EFE7;
+      --text-muted: #A39B8E;
+      --font-heading: 'Cormorant Garamond', serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-dark)); color: var(--text); line-height: 1.6; padding-bottom: 3rem; }
+    .container { max-width: 1100px; margin: auto; padding: 0 1.5rem; }
+    
+    .site-header { position: sticky; top: 0; background: rgba(11,10,8,0.9); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid rgba(232,117,22,0.2); }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; max-width: 1100px; margin: auto; }
+    .logo { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--color-accent); text-decoration: none; }
+    .nav-menu { list-style: none; display: flex; gap: 1.5rem; align-items: center; }
+    .nav-menu a { color: var(--text); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color .2s; }
+    .nav-menu a:hover { color: var(--color-accent); }
+    .cta-nav { background: var(--color-accent); color: #fff !important; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; }
+    
+    .hero { padding: 5rem 0 3rem; text-align: center; }
+    .eyebrow { text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 1rem; }
+    .hero h1 { font-family: var(--font-heading); font-size: 3.2rem; color: var(--color-white); margin-bottom: 1.2rem; line-height: 1.15; }
+    .subtitle { font-size: 1.25rem; color: var(--text-muted); max-width: 750px; margin: 0 auto 2rem; }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+    .btn { display: inline-block; padding: 0.9rem 1.8rem; border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; }
+    .btn-primary { background: var(--color-accent); color: #fff; }
+    .btn-primary:hover { background: #d0640d; transform: translateY(-2px); }
+    .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
+    .btn-secondary:hover { background: rgba(232,117,22,0.15); transform: translateY(-2px); }
+    
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 3rem 0; }
+    .card { background: var(--color-glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 2rem; }
+    .card h3 { font-family: var(--font-heading); font-size: 1.8rem; color: var(--color-accent); margin-bottom: 0.8rem; }
+    
+    .master-bio { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: center; background: var(--color-glass); border: 1px solid rgba(232,117,22,0.3); border-radius: 16px; padding: 2.5rem; margin: 4rem 0; }
+    .master-bio img { width: 100%; border-radius: 12px; object-fit: cover; }
+    .bio-text h2 { font-family: var(--font-heading); font-size: 2.4rem; color: var(--color-white); margin-bottom: 1rem; }
+
+    footer { text-align: center; margin-top: 4rem; padding: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="#" class="logo">PAČINEK GLASS x SVOBODNÉ CECHY</a>
+      <ul class="nav-menu">
+        <li><a href="#pro-koho">Pro koho</a></li>
+        <li><a href="#mistr">O mistrovi</a></li>
+        <li><a href="#co-se-naucis">Co se naučíš</a></li>
+        <li><a href="#kontakt" class="cta-nav">MÁM ZÁJEM O ROZHOVOR</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">Exkluzivní učednictví • Sklářství Kunratice u Cvikova</p>
+      <h1>NAUČ SE UNIKÁTNÍ SKLÁŘSKÉ ŘEMESLO PŘÍMO OD MISTRA JIŘÍHO PAČINKA</h1>
+      <p class="subtitle">Příležitost pro mladé lidi (12–18 let / mladé dospělé), kteří chtějí poznat horké sklo, pracovat rukama a získat praktické dovednosti do života.</p>
+      <div class="hero-buttons">
+        <a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        <a href="#mistr" class="btn btn-secondary">POZNAT MISTRA PAČINKA</a>
+      </div>
+    </section>
+
+    <section id="pro-koho" class="card-grid">
+      <div class="card">
+        <h3>🔥 Horké řemeslo</h3>
+        <p>Práce s žhavou sklovinou na huti. Poznáš fascinující proměnu tekutého skla v umělecká díla a užitkové předměty.</p>
+      </div>
+      <div class="card">
+        <h3>🤝 Osobní vedení</h3>
+        <p>Žádná teorie ze školy. Učíš se přímo v provozu sklářské hutě pod osobním dohledem jednoho z nejuznávanějších českých sklářů.</p>
+      </div>
+      <div class="card">
+        <h3>💡 Reálné zakázky</h3>
+        <p>Podílíš se na tvorbě plastických objektů, svítidel i unikátních instalací pro klienty z celého světa.</p>
+      </div>
+    </section>
+
+    <section id="mistr" class="master-bio">
+      <div>
+        <img src="../images/sample_master.png" alt="Jiří Pačinek" />
+      </div>
+      <div class="bio-text">
+        <h2>Mistr sklář Jiří Pačinek</h2>
+        <p>Jiří Pačinek patří mezi přední české umělecké skláře. Jeho hutní sklo zdobí soukromé sbírky i veřejné prostory po celém světě. V Kunraticích u Cvikova vybudoval unikátní sklářskou huť a Křišťálovou zahradu.</p>
+        <p style="margin-top: 1rem; color: var(--color-accent); font-weight: 600;">„Řemeslo není jen práce. Je to životní postoj, trpělivost a pokora před materiálem.“</p>
+      </div>
+    </section>
+
+    <section id="kontakt" class="card" style="text-align: center; max-width: 700px; margin: 4rem auto; border-color: var(--color-accent);">
+      <h2>Máš zájem o učednictví?</h2>
+      <p style="margin: 1rem 0 2rem;">Vyplň krátký nezávazný formulář nebo nás kontaktuj na WhatsApp.</p>
+      <a href="https://wa.me/420602763599?text=Dobr%C3%BD%20den,%20m%C3%A1m%20z%C3%A1jem%20o%20u%C4%8Dednictv%C3%AD%20u%20mistra%20Ji%C5%99%C3%ADho%20Pa%C4%8Dinka" class="btn btn-primary" target="_blank" style="background:#25D366;">
+        Napsat na WhatsApp (+420 602 763 599)
+      </a>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Svobodné Cechy & Pačinek Glass • Soukromá landing page pro kampaň</p>
+  </footer>
+</body>
+</html>
