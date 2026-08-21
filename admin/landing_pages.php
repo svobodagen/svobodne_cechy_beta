@@ -1,8 +1,30 @@
 <?php
 // admin/landing_pages.php
 $dir = __DIR__ . "/landing_pages";
-if (!file_exists($dir)) {
-    mkdir($dir, 0777, true);
+$uploadsDir = __DIR__ . "/../uploads";
+
+if (!file_exists($dir)) { mkdir($dir, 0777, true); }
+if (!file_exists($uploadsDir)) { mkdir($uploadsDir, 0777, true); }
+
+// AJAX Image Upload Handler
+if (isset($_GET['action']) && $_GET['action'] === 'upload') {
+    header('Content-Type: application/json');
+    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+        if (in_array($ext, $allowed)) {
+            $newFilename = 'img_' . time() . '_' . rand(100, 999) . '.' . $ext;
+            $targetPath = $uploadsDir . '/' . $newFilename;
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $targetPath)) {
+                echo json_encode(['success' => true, 'url' => '../uploads/' . $newFilename]);
+                exit;
+            }
+        }
+        echo json_encode(['success' => false, 'message' => 'Neplatný typ souboru.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Chyba při nahrávání souboru.']);
+    }
+    exit;
 }
 
 // Function to generate full HTML from section data array
@@ -408,14 +430,6 @@ if (isset($_POST['save_sections_form'])) {
     }
 }
 
-// Handle Saving Raw HTML (for advanced mode)
-if (isset($_POST['save_raw_html'])) {
-    $slug = basename($_POST['edit_slug']);
-    $htmlPath = $dir . "/" . $slug . ".html";
-    file_put_contents($htmlPath, $_POST['raw_html_content']);
-    $message = "HTML kód byl úspěšně uložen.";
-}
-
 // Handle Deleting Pages
 if (isset($_GET['delete'])) {
     $deleteSlug = str_replace('.html', '', basename($_GET['delete']));
@@ -432,7 +446,6 @@ if (isset($_POST['create_new'])) {
     $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(str_replace(' ', '-', $rawSlug)));
     if (empty($slug)) { $slug = "landing-" . time(); }
 
-    // Default template data
     $defaultJson = file_exists($dir . "/jiri-pacinek.json") ? file_get_contents($dir . "/jiri-pacinek.json") : "{}";
     $data = json_decode($defaultJson, true);
     $data['slug'] = $slug;
@@ -523,6 +536,12 @@ if ($editingSlug) {
     .form-control { width: 100%; padding: 0.75rem 1rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
     textarea.form-control { min-height: 80px; resize: vertical; }
 
+    /* Upload Box UI */
+    .upload-row { display: flex; gap: 0.8rem; align-items: center; margin-top: 0.4rem; }
+    .upload-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px dashed var(--accent); padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .upload-btn:hover { background: rgba(232,117,22,0.2); }
+    .thumb-preview { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); background: #000; }
+
     .item-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
     .item-card h4 { font-size: 0.9rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.4rem; }
 
@@ -535,8 +554,8 @@ if ($editingSlug) {
       <a href="../admin.html" class="btn-back"><i class="bi bi-arrow-left"></i> Zpět do Rozcestníku administrace</a>
     </div>
 
-    <h1>Vizuální Editor Landing Pages</h1>
-    <p class="subtitle">Upravuj obsah po jednotlivých sekcích (texty, nadpisy, fotky, WhatsApp dotazy) bez nutnosti psát jakýkoliv kód!</p>
+    <h1>Vizuální Editor Landing Pages s Nahráváním Fotek</h1>
+    <p class="subtitle">Upravuj obsah po jednotlivých sekcích a nahrávej fotky přímo ze svého počítače!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -560,7 +579,7 @@ if ($editingSlug) {
                 <button type="button" class="tab-btn" onclick="showTab('tab-master')">3. MISTR</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-outcomes')">4. CO SE NAUČÍŠ</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-timeline')">5. POSTUP</button>
-                <button type="button" class="tab-btn" onclick="showTab('tab-portfolio')">6. GALERIE</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-portfolio')">6. GALERIE FOTEK</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-testimonials')">7. REFERENCE</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-faq')">8. FAQ</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-contact')">9. KONTAKT</button>
@@ -586,8 +605,15 @@ if ($editingSlug) {
                   <input type="text" class="form-control" id="h_btn1" value="<?= htmlspecialchars($editingData['hero']['btn_primary'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
-                  <label>Fotka v huti (Cesta k obrázku)</label>
-                  <input type="text" class="form-control" id="h_img" value="<?= htmlspecialchars($editingData['hero']['image'] ?? '') ?>" />
+                  <label>Fotka v huti (Hero Obrázek)</label>
+                  <div class="upload-row">
+                    <img src="<?= htmlspecialchars($editingData['hero']['image'] ?? '../images/sample_master.png') ?>" id="prev_h_img" class="thumb-preview" />
+                    <input type="text" class="form-control" id="h_img" value="<?= htmlspecialchars($editingData['hero']['image'] ?? '') ?>" />
+                    <label class="upload-btn">
+                      <i class="bi bi-upload"></i> Nahrát fotku
+                      <input type="file" accept="image/*" style="display:none;" onchange="uploadImage(this, 'h_img', 'prev_h_img')" />
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -607,14 +633,8 @@ if ($editingSlug) {
                   <?php foreach (($editingData['uvp']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card uvp-item-box">
                       <h4>Karta #<?= $idx+1 ?></h4>
-                      <div class="form-group">
-                        <label>Titulek karty</label>
-                        <input type="text" class="form-control uvp-item-title" value="<?= htmlspecialchars($item['title']) ?>" />
-                      </div>
-                      <div class="form-group">
-                        <label>Popis karty</label>
-                        <textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea>
-                      </div>
+                      <div class="form-group"><label>Titulek karty</label><input type="text" class="form-control uvp-item-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis karty</label><textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -641,7 +661,14 @@ if ($editingSlug) {
                 </div>
                 <div class="form-group">
                   <label>Fotka mistra</label>
-                  <input type="text" class="form-control" id="m_img" value="<?= htmlspecialchars($editingData['master']['image'] ?? '') ?>" />
+                  <div class="upload-row">
+                    <img src="<?= htmlspecialchars($editingData['master']['image'] ?? '../images/sample_master.png') ?>" id="prev_m_img" class="thumb-preview" />
+                    <input type="text" class="form-control" id="m_img" value="<?= htmlspecialchars($editingData['master']['image'] ?? '') ?>" />
+                    <label class="upload-btn">
+                      <i class="bi bi-upload"></i> Nahrát fotku mistra
+                      <input type="file" accept="image/*" style="display:none;" onchange="uploadImage(this, 'm_img', 'prev_m_img')" />
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -681,13 +708,23 @@ if ($editingSlug) {
 
               <!-- TAB 6: GALERIE -->
               <div id="tab-portfolio" class="tab-content">
-                <h3 style="color:#fff; margin-bottom:1rem;">🖼️ Sekce 6: Galerie a realizace</h3>
+                <h3 style="color:#fff; margin-bottom:1rem;">🖼️ Sekce 6: Galerie a Fotky z huti</h3>
                 <div id="portfolio_container">
                   <?php foreach (($editingData['portfolio']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card portfolio-item-box">
-                      <h4>Obrázek #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Cesta k obrázku</label><input type="text" class="form-control p-img" value="<?= htmlspecialchars($item['image']) ?>" /></div>
-                      <div class="form-group"><label>Popisek pod obrázkem</label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
+                      <h4>Fotka #<?= $idx+1 ?></h4>
+                      <div class="form-group">
+                        <label>Fotka v galerii</label>
+                        <div class="upload-row">
+                          <img src="<?= htmlspecialchars($item['image']) ?>" id="prev_p_img_<?= $idx ?>" class="thumb-preview" />
+                          <input type="text" class="form-control p-img" id="p_img_<?= $idx ?>" value="<?= htmlspecialchars($item['image']) ?>" />
+                          <label class="upload-btn">
+                            <i class="bi bi-upload"></i> Nahrát fotku
+                            <input type="file" accept="image/*" style="display:none;" onchange="uploadImage(this, 'p_img_<?= $idx ?>', 'prev_p_img_<?= $idx ?>')" />
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -741,7 +778,7 @@ if ($editingSlug) {
 
               <div style="margin-top: 2rem;">
                 <button type="submit" name="save_sections_form" onclick="prepareJsonData()" class="btn-action btn-view" style="font-size: 1rem; padding: 0.8rem 2rem;">
-                  <i class="bi bi-check-circle-fill"></i> Uložit všechny sekce
+                  <i class="bi bi-check-circle-fill"></i> Uložit všechny sekce a fotky
                 </button>
                 <a href="landing_pages.php" class="btn-action btn-copy" style="margin-left: 1rem;">Zavřít editor</a>
               </div>
@@ -762,6 +799,33 @@ if ($editingSlug) {
           document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
           document.getElementById(tabId).classList.add('active');
           event.target.classList.add('active');
+        }
+
+        // AJAX Image Upload Function
+        function uploadImage(fileInput, targetInputId, previewImgId) {
+          if (!fileInput.files || !fileInput.files[0]) return;
+          const formData = new FormData();
+          formData.append('file', fileInput.files[0]);
+
+          fetch('landing_pages.php?action=upload', {
+            method: 'POST',
+            body: formData
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              document.getElementById(targetInputId).value = data.url;
+              if (previewImgId && document.getElementById(previewImgId)) {
+                document.getElementById(previewImgId).src = data.url;
+              }
+              alert('Fotka byla úspěšně nahrána!');
+            } else {
+              alert('Chyba při nahrávání: ' + (data.message || 'Neznámá chyba'));
+            }
+          })
+          .catch(err => {
+            alert('Chyba nahrávání souboru: ' + err.message);
+          });
         }
 
         function prepareJsonData() {
@@ -891,7 +955,7 @@ if ($editingSlug) {
             echo "<td style='font-family:monospace; color:var(--text-muted); font-size:0.85rem;'>" . htmlspecialchars($relPath) . "</td>";
             echo "<td>";
             echo "<div style='display:flex; gap:0.5rem;'>";
-            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce</a>";
+            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce & fotky</a>";
             echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
             echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
             echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";
