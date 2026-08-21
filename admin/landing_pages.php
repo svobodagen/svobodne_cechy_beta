@@ -5,69 +5,454 @@ if (!file_exists($dir)) {
     mkdir($dir, 0777, true);
 }
 
+// Function to generate full HTML from section data array
+function renderLandingPageHtml($data) {
+    $slug = htmlspecialchars($data['slug'] ?? 'master');
+    $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
+    $metaTitle = htmlspecialchars($data['meta_title'] ?? $masterName . ' – Svobodné Cechy');
+    $metaDesc = htmlspecialchars($data['meta_desc'] ?? '');
+    
+    // Hero
+    $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? '');
+    $h_h1 = htmlspecialchars($data['hero']['h1'] ?? '');
+    $h_sub = htmlspecialchars($data['hero']['subtitle'] ?? '');
+    $h_btn1 = htmlspecialchars($data['hero']['btn_primary'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
+    $h_btn2 = htmlspecialchars($data['hero']['btn_secondary'] ?? 'PODÍVAT SE, JAK SE PRACUJE SE SKLEM');
+    $h_img = htmlspecialchars($data['hero']['image'] ?? '../images/sample_master.png');
+
+    // UVP
+    $uvp_eyebrow = htmlspecialchars($data['uvp']['eyebrow'] ?? '');
+    $uvp_title = htmlspecialchars($data['uvp']['title'] ?? '');
+    $uvp_sub = htmlspecialchars($data['uvp']['subtitle'] ?? '');
+    $uvp_items = $data['uvp']['items'] ?? [];
+    $uvp_cards_html = "";
+    foreach ($uvp_items as $item) {
+        $t = htmlspecialchars($item['title'] ?? '');
+        $d = htmlspecialchars($item['desc'] ?? '');
+        $uvp_cards_html .= "<div class='uvp-card'><h3>{$t}</h3><p>{$d}</p></div>";
+    }
+
+    // Master
+    $m_eyebrow = htmlspecialchars($data['master']['eyebrow'] ?? '');
+    $m_name = htmlspecialchars($data['master']['name'] ?? '');
+    $m_title = htmlspecialchars($data['master']['title'] ?? '');
+    $m_bio = htmlspecialchars($data['master']['bio'] ?? '');
+    $m_quote = htmlspecialchars($data['master']['quote'] ?? '');
+    $m_bio2 = htmlspecialchars($data['master']['bio2'] ?? '');
+    $m_img = htmlspecialchars($data['master']['image'] ?? '../images/sample_master.png');
+
+    // Outcomes
+    $o_eyebrow = htmlspecialchars($data['outcomes']['eyebrow'] ?? '');
+    $o_title = htmlspecialchars($data['outcomes']['title'] ?? '');
+    $o_sub = htmlspecialchars($data['outcomes']['subtitle'] ?? '');
+    $o_items = $data['outcomes']['items'] ?? [];
+    $outcomes_html = "";
+    foreach ($o_items as $item) {
+        $icon = htmlspecialchars($item['icon'] ?? '🔥');
+        $t = htmlspecialchars($item['title'] ?? '');
+        $d = htmlspecialchars($item['desc'] ?? '');
+        $outcomes_html .= "<div class='outcome-item'><h4>{$icon} {$t}</h4><p>{$d}</p></div>";
+    }
+
+    // Timeline
+    $t_eyebrow = htmlspecialchars($data['timeline']['eyebrow'] ?? '');
+    $t_title = htmlspecialchars($data['timeline']['title'] ?? '');
+    $t_sub = htmlspecialchars($data['timeline']['subtitle'] ?? '');
+    $t_disc = htmlspecialchars($data['timeline']['disclaimer'] ?? '');
+    $t_steps = $data['timeline']['steps'] ?? [];
+    $timeline_html = "";
+    foreach ($t_steps as $step) {
+        $num = htmlspecialchars($step['num'] ?? '01');
+        $st = htmlspecialchars($step['title'] ?? '');
+        $sd = htmlspecialchars($step['desc'] ?? '');
+        $timeline_html .= "<div class='timeline-step'><div class='step-number'>{$num}</div><div class='step-content'><h4>{$st}</h4><p>{$sd}</p></div></div>";
+    }
+
+    // Portfolio
+    $p_eyebrow = htmlspecialchars($data['portfolio']['eyebrow'] ?? '');
+    $p_title = htmlspecialchars($data['portfolio']['title'] ?? '');
+    $p_sub = htmlspecialchars($data['portfolio']['subtitle'] ?? '');
+    $p_items = $data['portfolio']['items'] ?? [];
+    $portfolio_html = "";
+    foreach ($p_items as $item) {
+        $pimg = htmlspecialchars($item['image'] ?? '../images/sample_master.png');
+        $pcap = htmlspecialchars($item['caption'] ?? '');
+        $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' /><div class='portfolio-caption'>{$pcap}</div></div>";
+    }
+
+    // Testimonials
+    $ts_eyebrow = htmlspecialchars($data['testimonials']['eyebrow'] ?? '');
+    $ts_title = htmlspecialchars($data['testimonials']['title'] ?? '');
+    $ts_sub = htmlspecialchars($data['testimonials']['subtitle'] ?? '');
+    $ts_items = $data['testimonials']['items'] ?? [];
+    $testimonials_html = "";
+    foreach ($ts_items as $item) {
+        $quote = htmlspecialchars($item['quote'] ?? '');
+        $name = htmlspecialchars($item['name'] ?? '');
+        $role = htmlspecialchars($item['role'] ?? '');
+        $testimonials_html .= "<div class='testimonial-card'><p class='quote-text'>{$quote}</p><div class='author-info'><div><strong>{$name}</strong><span>{$role}</span></div></div></div>";
+    }
+
+    // FAQ
+    $f_eyebrow = htmlspecialchars($data['faq']['eyebrow'] ?? '');
+    $f_title = htmlspecialchars($data['faq']['title'] ?? '');
+    $f_sub = htmlspecialchars($data['faq']['subtitle'] ?? '');
+    $f_items = $data['faq']['items'] ?? [];
+    $faq_html = "";
+    foreach ($f_items as $item) {
+        $q = htmlspecialchars($item['q'] ?? '');
+        $a = htmlspecialchars($item['a'] ?? '');
+        $faq_html .= "<details><summary>{$q}</summary><p>{$a}</p></details>";
+    }
+
+    // CTA
+    $cta_title = htmlspecialchars($data['cta']['title'] ?? '');
+    $cta_text = htmlspecialchars($data['cta']['text'] ?? '');
+    $cta_btn = htmlspecialchars($data['cta']['btn'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
+
+    // Contact
+    $c_eyebrow = htmlspecialchars($data['contact']['eyebrow'] ?? '');
+    $c_title = htmlspecialchars($data['contact']['title'] ?? '');
+    $c_sub = htmlspecialchars($data['contact']['subtitle'] ?? '');
+    $wa_num = htmlspecialchars($data['contact']['whatsapp_num'] ?? '420602763599');
+    $wa_msg = urlencode($data['contact']['whatsapp_msg'] ?? 'Dobrý den, mám zájem o učednictví.');
+    $ig_link = htmlspecialchars($data['contact']['instagram_link'] ?? 'https://instagram.com');
+    $phone_parent = htmlspecialchars($data['contact']['phone_parent'] ?? '+420 602 763 599');
+
+    return <<<HTML
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{$metaTitle}</title>
+  <meta name="description" content="{$metaDesc}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #0B0A08;
+      --color-dark: #17120E;
+      --color-cream: #F4EFE7;
+      --color-white: #FFFDF8;
+      --color-accent: #E87516;
+      --color-glass: rgba(255, 255, 255, 0.05);
+      --color-glass-border: rgba(255, 255, 255, 0.1);
+      --text: #F4EFE7;
+      --text-muted: #A39B8E;
+      --font-heading: 'Cormorant Garamond', serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-dark)); color: var(--text); line-height: 1.6; font-size: 18px; }
+    .container { max-width: 1200px; margin: auto; padding: 0 1.5rem; }
+
+    .site-header { position: sticky; top: 0; background: rgba(11, 10, 8, 0.92); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid rgba(232, 117, 22, 0.2); }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; max-width: 1280px; margin: auto; }
+    .logo { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; color: var(--color-accent); text-decoration: none; letter-spacing: 1px; }
+    .nav-menu { list-style: none; display: flex; gap: 1.5rem; align-items: center; }
+    .nav-menu a { color: var(--text); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color .2s; }
+    .nav-menu a:hover { color: var(--color-accent); }
+    .cta-nav { background: var(--color-accent); color: #fff !important; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 700; }
+
+    .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 3rem; padding: 5rem 0 4rem; min-height: 75vh; }
+    .hero-content { max-width: 620px; }
+    .eyebrow { text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 1rem; }
+    .hero h1 { font-family: var(--font-heading); font-size: 3.5rem; color: var(--color-white); margin-bottom: 1.2rem; line-height: 1.1; }
+    .subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 1.8rem; border-radius: 6px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all .2s; min-height: 52px; cursor: pointer; border: none; }
+    .btn-primary { background: var(--color-accent); color: #fff; }
+    .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
+    .hero-image img { width: 100%; border-radius: 12px; box-shadow: 0 12px 35px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
+
+    .section-title { text-align: center; margin-bottom: 3.5rem; }
+    .section-title h2 { font-family: var(--font-heading); font-size: 2.8rem; color: var(--color-white); margin-bottom: 0.5rem; }
+    .section-title p { color: var(--text-muted); font-size: 1.1rem; max-width: 700px; margin: auto; }
+
+    .uvp-section { padding: 5rem 0; }
+    .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.8rem; }
+    .uvp-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 2rem; }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: 1.6rem; color: var(--color-accent); margin-bottom: 0.8rem; }
+
+    .master-section { padding: 5rem 0; background: rgba(0,0,0,0.3); }
+    .master-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 3.5rem; align-items: center; }
+    .master-photo img { width: 100%; border-radius: 14px; border: 1px solid var(--color-accent); }
+    .master-info h3 { font-family: var(--font-heading); font-size: 2.4rem; color: var(--color-white); margin-bottom: 0.5rem; }
+    .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .quote-box { font-family: var(--font-heading); font-style: italic; font-size: 1.4rem; color: var(--color-cream); border-left: 3px solid var(--color-accent); padding-left: 1.2rem; margin: 1.5rem 0; }
+
+    .outcomes-section { padding: 5rem 0; }
+    .outcomes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.8rem; }
+    .outcome-item { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.8rem; }
+    .outcome-item h4 { font-family: var(--font-heading); font-size: 1.5rem; color: var(--color-white); margin-bottom: 0.5rem; }
+
+    .timeline-section { padding: 5rem 0; background: rgba(0,0,0,0.2); }
+    .timeline { display: flex; flex-direction: column; gap: 1.5rem; max-width: 900px; margin: auto; }
+    .timeline-step { display: grid; grid-template-columns: 80px 1fr; gap: 1.5rem; background: var(--color-glass); border: 1px solid var(--color-glass-border); border-left: 4px solid var(--color-accent); border-radius: 8px; padding: 1.5rem; align-items: center; }
+    .step-number { font-family: var(--font-heading); font-size: 2.5rem; font-weight: 700; color: var(--color-accent); text-align: center; }
+    .step-content h4 { font-family: var(--font-heading); font-size: 1.5rem; color: var(--color-white); margin-bottom: 0.3rem; }
+    .disclaimer-box { text-align: center; font-size: 0.95rem; color: var(--text-muted); margin-top: 2rem; font-style: italic; }
+
+    .portfolio-section { padding: 5rem 0; }
+    .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .portfolio-item { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--color-glass-border); }
+    .portfolio-item img { width: 100%; height: 260px; object-fit: cover; display: block; }
+    .portfolio-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 1.2rem 1rem 0.8rem; color: var(--color-white); font-weight: 600; font-size: 0.95rem; }
+
+    .testimonials-section { padding: 5rem 0; background: rgba(0,0,0,0.3); }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.8rem; }
+    .testimonial-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 2rem; }
+    .quote-text { font-style: italic; margin-bottom: 1.2rem; color: var(--color-cream); }
+    .author-info strong { color: var(--color-accent); display: block; }
+
+    .faq-section { padding: 5rem 0; }
+    .faq-list { max-width: 850px; margin: auto; display: flex; flex-direction: column; gap: 1rem; }
+    details { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 8px; padding: 1.2rem 1.5rem; }
+    details[open] { border-color: var(--color-accent); background: rgba(232, 117, 22, 0.05); }
+    summary { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 600; color: var(--color-white); cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+    summary::after { content: '+'; font-size: 1.6rem; color: var(--color-accent); }
+    details[open] summary::after { content: '−'; }
+
+    .primary-cta-box { background: linear-gradient(135deg, rgba(232,117,22,0.15), rgba(17,14,11,0.9)); border: 2px solid var(--color-accent); border-radius: 16px; padding: 4rem 2rem; text-align: center; margin: 4rem auto; max-width: 900px; }
+    .primary-cta-box h2 { font-family: var(--font-heading); font-size: 2.8rem; color: var(--color-white); margin-bottom: 1rem; }
+
+    .contact-section { padding: 4rem 0 6rem; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+    .contact-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 14px; padding: 2.5rem; }
+    .btn-wa { background: #25D366; color: #fff; text-decoration: none; font-weight: 700; border-radius: 6px; padding: 1rem; text-align: center; display: flex; justify-content: center; gap: 0.6rem; }
+    .btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff; text-decoration: none; font-weight: 700; border-radius: 6px; padding: 1rem; text-align: center; display: flex; justify-content: center; gap: 0.6rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-control { width: 100%; padding: 0.8rem 1rem; background: rgba(0,0,0,0.5); border: 1px solid var(--color-glass-border); border-radius: 6px; color: #fff; }
+
+    .mobile-sticky-cta { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,10,8,0.95); border-top: 1px solid var(--color-accent); padding: 0.8rem 1rem; z-index: 999; }
+    footer { border-top: 1px solid var(--color-glass-border); padding: 3rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+
+    @media (max-width: 900px) {
+      .hero, .master-grid, .contact-grid { grid-template-columns: 1fr; text-align: center; }
+      .nav-menu { display: none; }
+      .mobile-sticky-cta { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="#" class="logo">SVOBODNÉ CECHY</a>
+      <ul class="nav-menu">
+        <li><a href="#uvp">Proč?</a></li>
+        <li><a href="#mistr">O mistrovi</a></li>
+        <li><a href="#co-se-naucis">Co se naučíš</a></li>
+        <li><a href="#jak-to-probiha">Jak to probíhá</a></li>
+        <li><a href="#realizace">Realizace</a></li>
+        <li><a href="#reference">Reference</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#kontakt" class="cta-nav">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <div class="hero-content">
+        <p class="eyebrow">{$h_eyebrow}</p>
+        <h1>{$h_h1}</h1>
+        <p class="subtitle">{$h_sub}</p>
+        <div class="hero-buttons">
+          <a href="#kontakt" class="btn btn-primary">{$h_btn1}</a>
+          <a href="#realizace" class="btn btn-secondary">{$h_btn2}</a>
+        </div>
+      </div>
+      <div class="hero-image"><img src="{$h_img}" alt="Fotografie z huti" /></div>
+    </section>
+
+    <section id="uvp" class="uvp-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$uvp_eyebrow}</p>
+        <h2>{$uvp_title}</h2>
+        <p>{$uvp_sub}</p>
+      </div>
+      <div class="uvp-grid">{$uvp_cards_html}</div>
+    </section>
+
+    <section id="mistr" class="master-section">
+      <div class="container master-grid">
+        <div class="master-photo"><img src="{$m_img}" alt="Mistr {$m_name}" /></div>
+        <div class="master-info">
+          <p class="eyebrow">{$m_eyebrow}</p>
+          <h3>{$m_name}</h3>
+          <p class="master-title">{$m_title}</p>
+          <p>{$m_bio}</p>
+          <div class="quote-box">{$m_quote}</div>
+          <p>{$m_bio2}</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="co-se-naucis" class="outcomes-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$o_eyebrow}</p>
+        <h2>{$o_title}</h2>
+        <p>{$o_sub}</p>
+      </div>
+      <div class="outcomes-grid">{$outcomes_html}</div>
+    </section>
+
+    <section id="jak-to-probiha" class="timeline-section">
+      <div class="container">
+        <div class="section-title">
+          <p class="eyebrow">{$t_eyebrow}</p>
+          <h2>{$t_title}</h2>
+          <p>{$t_sub}</p>
+        </div>
+        <div class="timeline">{$timeline_html}</div>
+        <p class="disclaimer-box">{$t_disc}</p>
+      </div>
+    </section>
+
+    <section id="realizace" class="portfolio-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$p_eyebrow}</p>
+        <h2>{$p_title}</h2>
+        <p>{$p_sub}</p>
+      </div>
+      <div class="portfolio-grid">{$portfolio_html}</div>
+    </section>
+
+    <section id="reference" class="testimonials-section">
+      <div class="container">
+        <div class="section-title">
+          <p class="eyebrow">{$ts_eyebrow}</p>
+          <h2>{$ts_title}</h2>
+          <p>{$ts_sub}</p>
+        </div>
+        <div class="testimonials-grid">{$testimonials_html}</div>
+      </div>
+    </section>
+
+    <section id="faq" class="faq-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$f_eyebrow}</p>
+        <h2>{$f_title}</h2>
+        <p>{$f_sub}</p>
+      </div>
+      <div class="faq-list">{$faq_html}</div>
+    </section>
+
+    <div class="container">
+      <div class="primary-cta-box">
+        <h2>{$cta_title}</h2>
+        <p>{$cta_text}</p>
+        <a href="#kontakt" class="btn btn-primary">{$cta_btn}</a>
+      </div>
+    </div>
+
+    <section id="kontakt" class="contact-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$c_eyebrow}</p>
+        <h2>{$c_title}</h2>
+        <p>{$c_sub}</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>💬 Rychlá zpráva (pro zájemce)</h3>
+          <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+            <a href="https://wa.me/{$wa_num}?text={$wa_msg}" class="btn-wa" target="_blank">NAPSAT NA WHATSAPP (+{$wa_num})</a>
+            <a href="{$ig_link}" class="btn-ig" target="_blank">NAPSAT NA INSTAGRAM</a>
+          </div>
+          <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--color-glass-border);">
+            <h4 style="font-family:var(--font-heading); font-size:1.4rem;">👨‍👩‍👦 Jste rodič?</h4>
+            <p style="font-size:0.95rem; color:var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše vysvětlíme.</p>
+            <a href="tel:{$wa_num}" class="btn btn-secondary" style="margin-top:1rem; width:100%;">CHCI SI ZAVOLAT ({$phone_parent})</a>
+          </div>
+        </div>
+        <div class="contact-card">
+          <h3>📝 Kontaktní formulář</h3>
+          <form onsubmit="event.preventDefault(); alert('Děkujeme! Zprávu jsme přijali.');">
+            <div class="form-group"><label>Jméno</label><input type="text" class="form-control" placeholder="Jan Novák" required /></div>
+            <div class="form-group"><label>Jsem:</label><select class="form-control"><option>Budoucí učedník</option><option>Rodič</option></select></div>
+            <div class="form-group"><label>Kontakt</label><input type="text" class="form-control" placeholder="Telefon nebo e-mail" required /></div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">ODESLAT DOTAZ</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div class="mobile-sticky-cta"><a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a></div>
+  <footer><div class="container"><p>© 2026 Svobodné Cechy. Všechna práva vyhrazena.</p></div></footer>
+</body>
+</html>
+HTML;
+}
+
 $message = "";
 $messageType = "success";
 
-// Handle Saving Edits
-if (isset($_POST['save_page_content'])) {
-    $editFile = basename($_POST['edit_filename']);
-    $content = $_POST['page_content'];
-    $targetPath = $dir . "/" . $editFile;
-    
-    if (file_exists($targetPath) && str_ends_with($editFile, '.html')) {
-        file_put_contents($targetPath, $content);
-        $message = "Stránka '{$editFile}' byla úspěšně uložena.";
+// Handle Saving Visual Form Data
+if (isset($_POST['save_sections_form'])) {
+    $slug = basename($_POST['edit_slug']);
+    $jsonPath = $dir . "/" . $slug . ".json";
+    $htmlPath = $dir . "/" . $slug . ".html";
+
+    $formData = json_decode($_POST['sections_json_data'], true);
+    if (is_array($formData)) {
+        file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        $generatedHtml = renderLandingPageHtml($formData);
+        file_put_contents($htmlPath, $generatedHtml);
+        $message = "Všechny sekce landing page pro '{$slug}' byly úspěšně uloženy!";
     } else {
-        $message = "Chyba při ukládání souboru.";
+        $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
     }
 }
 
-// Handle Deleting Pages
-if (isset($_GET['delete'])) {
-    $deleteFile = basename($_GET['delete']);
-    $targetPath = $dir . "/" . $deleteFile;
-    if (file_exists($targetPath) && str_ends_with($deleteFile, '.html')) {
-        unlink($targetPath);
-        header("Location: landing_pages.php?msg=deleted");
-        exit;
-    }
+// Handle Saving Raw HTML (for advanced mode)
+if (isset($_POST['save_raw_html'])) {
+    $slug = basename($_POST['edit_slug']);
+    $htmlPath = $dir . "/" . $slug . ".html";
+    file_put_contents($htmlPath, $_POST['raw_html_content']);
+    $message = "HTML kód byl úspěšně uložen.";
 }
 
-// Handle Creating New Pages
-if (isset($_POST['create_new'])) {
-    $name = trim($_POST['master_name']);
-    $slug = trim($_POST['slug']);
-    // sanitize slug
-    $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(str_replace(' ', '-', $slug)));
-    if (empty($slug)) { $slug = "landing-page-" . time(); }
-    
-    $filepath = $dir . "/{$slug}.html";
-    
-    // Copy rich template content if available, replacing placeholders
-    $templateSource = file_exists(__DIR__ . "/landing_pages/jiri-pacinek.html") 
-        ? file_get_contents(__DIR__ . "/landing_pages/jiri-pacinek.html") 
-        : "";
-
-    if (!empty($templateSource)) {
-        $pageContent = str_replace(
-            ['Jiřího Pačinka', 'Jiří Pačinek', 'JIŘÍ PAČINEK', 'jiri-pacinek'],
-            [$name, $name, mb_strtoupper($name), $slug],
-            $templateSource
-        );
-    } else {
-        $pageContent = "<!DOCTYPE html><html lang='cs'><head><meta charset='UTF-8'><title>{$name} – Landing Page</title></head><body><h1>{$name}</h1></body></html>";
-    }
-
-    file_put_contents($filepath, $pageContent);
-    header("Location: landing_pages.php?edit={$slug}.html&created=1");
+// Handle Deleting Pages
+if (isset($_GET['delete'])) {
+    $deleteSlug = str_replace('.html', '', basename($_GET['delete']));
+    @unlink($dir . "/" . $deleteSlug . ".html");
+    @unlink($dir . "/" . $deleteSlug . ".json");
+    header("Location: landing_pages.php?msg=deleted");
     exit;
 }
 
-$editingFile = isset($_GET['edit']) ? basename($_GET['edit']) : null;
-$editingContent = "";
-if ($editingFile && file_exists($dir . "/" . $editingFile)) {
-    $editingContent = file_get_contents($dir . "/" . $editingFile);
+// Handle Creating New Page
+if (isset($_POST['create_new'])) {
+    $name = trim($_POST['master_name']);
+    $rawSlug = trim($_POST['slug']);
+    $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(str_replace(' ', '-', $rawSlug)));
+    if (empty($slug)) { $slug = "landing-" . time(); }
+
+    // Default template data
+    $defaultJson = file_exists($dir . "/jiri-pacinek.json") ? file_get_contents($dir . "/jiri-pacinek.json") : "{}";
+    $data = json_decode($defaultJson, true);
+    $data['slug'] = $slug;
+    $data['master_name'] = $name;
+    $data['master']['name'] = mb_strtoupper($name);
+
+    file_put_contents($dir . "/" . $slug . ".json", json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    file_put_contents($dir . "/" . $slug . ".html", renderLandingPageHtml($data));
+
+    header("Location: landing_pages.php?edit={$slug}&created=1");
+    exit;
+}
+
+$editingSlug = isset($_GET['edit']) ? str_replace('.html', '', basename($_GET['edit'])) : null;
+$editingData = null;
+if ($editingSlug) {
+    $jsonFile = $dir . "/" . $editingSlug . ".json";
+    if (file_exists($jsonFile)) {
+        $editingData = json_decode(file_get_contents($jsonFile), true);
+    }
 }
 ?>
 <!doctype html>
@@ -75,7 +460,7 @@ if ($editingFile && file_exists($dir . "/" . $editingFile)) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Správa a Editace Landing Pages – Svobodné Cechy</title>
+  <title>Vizuální Editor Landing Pages – Svobodné Cechy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -92,76 +477,56 @@ if ($editingFile && file_exists($dir . "/" . $editingFile)) {
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 2rem 1rem; }
-    .container { max-width: 1200px; margin: auto; }
+    .container { max-width: 1280px; margin: auto; }
     
     .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .btn-back { color: var(--accent); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; }
-    .btn-back:hover { text-decoration: underline; }
+    .btn-back { color: var(--accent); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; }
     
     h1 { font-family: 'Bungee', cursive; font-size: 1.8rem; color: var(--accent); margin-bottom: 0.3rem; }
     p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
 
     .msg { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 600; }
     .msg.success { background: rgba(37, 211, 102, 0.15); border: 1px solid #25D366; color: #25D366; }
-    .msg.error { background: rgba(255, 77, 77, 0.15); border: 1px solid #ff4d4d; color: #ff4d4d; }
 
-    /* Main Grid */
-    .admin-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-bottom: 2rem; }
     .card h2 { font-size: 1.3rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
 
-    /* Table */
+    /* Tables */
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden; }
-    th { background: rgba(232,117,22,0.15); color: var(--accent); padding: 1rem; text-align: left; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+    th { background: rgba(232,117,22,0.15); color: var(--accent); padding: 1rem; text-align: left; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; }
     td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    
-    .badge-file { font-family: monospace; background: rgba(255,255,255,0.08); padding: 0.3rem 0.6rem; border-radius: 4px; color: #fff; font-size: 0.9rem; }
+    .badge-file { font-family: monospace; background: rgba(255,255,255,0.08); padding: 0.3rem 0.6rem; border-radius: 4px; color: #fff; }
 
     /* Actions */
-    .actions-cell { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .btn-action { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: all .2s; }
-    .btn-view { background: var(--accent); color: #fff; }
-    .btn-view:hover { background: var(--accent-hover); }
+    .btn-action { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: all .2s; }
     .btn-edit { background: #3b82f6; color: #fff; }
     .btn-edit:hover { background: #2563eb; }
+    .btn-view { background: var(--accent); color: #fff; }
+    .btn-view:hover { background: var(--accent-hover); }
     .btn-copy { background: rgba(255,255,255,0.1); color: var(--text); border: 1px solid var(--border); }
-    .btn-copy:hover { background: rgba(255,255,255,0.2); }
-    .btn-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
-    .btn-delete:hover { background: #ef4444; color: #fff; }
+    .btn-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
 
-    /* Editor Section */
-    .editor-section { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
-    @media (max-width: 900px) { .editor-section { grid-template-columns: 1fr; } }
+    /* Visual Editor Layout */
+    .editor-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
+    @media (max-width: 1024px) { .editor-layout { grid-template-columns: 1fr; } }
 
-    textarea.code-editor {
-      width: 100%;
-      height: 600px;
-      background: #070605;
-      color: #7dd3fc;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.9rem;
-      padding: 1.2rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      resize: vertical;
-      line-height: 1.5;
-    }
-    textarea.code-editor:focus { outline: none; border-color: var(--accent); }
+    /* Section Tabs */
+    .section-tab-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+    .tab-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    .preview-frame {
-      width: 100%;
-      height: 600px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-    /* Form Fields */
-    label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-top: 1rem; }
-    input[type="text"] { width: 100%; padding: 0.8rem 1rem; margin-top: 0.3rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
-    input[type="submit"] { margin-top: 1.2rem; background: var(--accent); color: #fff; border: none; padding: 0.8rem 1.6rem; border-radius: 6px; font-weight: 700; cursor: pointer; }
-    input[type="submit"]:hover { background: var(--accent-hover); }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.3rem; }
+    .form-control { width: 100%; padding: 0.75rem 1rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
+    textarea.form-control { min-height: 80px; resize: vertical; }
+
+    .item-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .item-card h4 { font-size: 0.9rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.4rem; }
+
+    .preview-iframe { width: 100%; height: 750px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
   </style>
 </head>
 <body>
@@ -170,121 +535,396 @@ if ($editingFile && file_exists($dir . "/" . $editingFile)) {
       <a href="../admin.html" class="btn-back"><i class="bi bi-arrow-left"></i> Zpět do Rozcestníku administrace</a>
     </div>
 
-    <h1>Správa a Editace Landing Pages Mistrů</h1>
-    <p class="subtitle">Zde můžeš vytvářet, upravovat a spravovat soukromé přistávací stránky určené pro marketingové kampaně jednotlivých mistrů.</p>
-
-    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'deleted'): ?>
-      <div class="msg success">✓ Landing page byla úspěšně smazána.</div>
-    <?php endif; ?>
+    <h1>Vizuální Editor Landing Pages</h1>
+    <p class="subtitle">Upravuj obsah po jednotlivých sekcích (texty, nadpisy, fotky, WhatsApp dotazy) bez nutnosti psát jakýkoliv kód!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
     <?php endif; ?>
 
-    <?php if ($editingFile): ?>
-      <!-- EDITOR SECTION -->
-      <div class="card" style="border-color: var(--accent); margin-bottom: 2rem;">
-        <h2><i class="bi bi-pencil-square" style="color: var(--accent);"></i> Úprava stránky: <span style="color:var(--accent);"><?= htmlspecialchars($editingFile) ?></span></h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-          Můžeš upravit libovolný text nebo HTML kód. Vpravo vidíš okamžitý živý náhled.
-        </p>
+    <?php if ($editingSlug && $editingData): ?>
+      <!-- VISUAL SECTION EDITOR -->
+      <div class="card" style="border-color: var(--accent);">
+        <h2><i class="bi bi-sliders" style="color: var(--accent);"></i> Vizuální Úprava Sekcí: <span style="color:var(--accent);"><?= htmlspecialchars($editingSlug) ?>.html</span></h2>
+        
+        <form method="post" action="landing_pages.php?edit=<?= urlencode($editingSlug) ?>" id="visualEditorForm">
+          <input type="hidden" name="edit_slug" value="<?= htmlspecialchars($editingSlug) ?>" />
+          <input type="hidden" name="sections_json_data" id="sections_json_data" />
 
-        <form method="post" action="landing_pages.php?edit=<?= urlencode($editingFile) ?>">
-          <input type="hidden" name="edit_filename" value="<?= htmlspecialchars($editingFile) ?>" />
-          
-          <div class="editor-section">
+          <div class="editor-layout">
+            <!-- LEFT: SECTION TABS & FORM FIELDS -->
             <div>
-              <label style="margin-top:0; margin-bottom:0.5rem; color:#fff;">HTML Kód stránky:</label>
-              <textarea name="page_content" id="codeEditor" class="code-editor" oninput="updatePreview()"><?= htmlspecialchars($editingContent) ?></textarea>
-            </div>
-            <div>
-              <label style="margin-top:0; margin-bottom:0.5rem; color:#fff;">Živý Náhled (Preview):</label>
-              <iframe id="livePreview" class="preview-frame" src="landing_pages/<?= htmlspecialchars($editingFile) ?>"></iframe>
-            </div>
-          </div>
+              <div class="section-tab-nav">
+                <button type="button" class="tab-btn active" onclick="showTab('tab-hero')">1. HERO</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-uvp')">2. UVP</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-master')">3. MISTR</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-outcomes')">4. CO SE NAUČÍŠ</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-timeline')">5. POSTUP</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-portfolio')">6. GALERIE</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-testimonials')">7. REFERENCE</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-faq')">8. FAQ</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-contact')">9. KONTAKT</button>
+              </div>
 
-          <div style="display: flex; gap: 1rem; margin-top: 1.5rem; align-items: center;">
-            <input type="submit" name="save_page_content" value="Uložit změny v kódu" class="btn-action btn-view" style="font-size:1rem; padding:0.8rem 1.8rem;" />
-            <a href="landing_pages.php" class="btn-action btn-copy">Zavřít editor / Zpět na seznam</a>
+              <!-- TAB 1: HERO -->
+              <div id="tab-hero" class="tab-content active">
+                <h3 style="color:#fff; margin-bottom:1rem;">🚀 Sekce 1: HERO (Úvodní obrazovka)</h3>
+                <div class="form-group">
+                  <label>Eyebrow (malý text nad nadpisem)</label>
+                  <input type="text" class="form-control" id="h_eyebrow" value="<?= htmlspecialchars($editingData['hero']['eyebrow'] ?? '') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Hlavní Nadpis (H1)</label>
+                  <input type="text" class="form-control" id="h_h1" value="<?= htmlspecialchars($editingData['hero']['h1'] ?? '') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul (Dlouhý popis nabídky)</label>
+                  <textarea class="form-control" id="h_sub"><?= htmlspecialchars($editingData['hero']['subtitle'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Text hlavního tlačítka (CTA)</label>
+                  <input type="text" class="form-control" id="h_btn1" value="<?= htmlspecialchars($editingData['hero']['btn_primary'] ?? '') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Fotka v huti (Cesta k obrázku)</label>
+                  <input type="text" class="form-control" id="h_img" value="<?= htmlspecialchars($editingData['hero']['image'] ?? '') ?>" />
+                </div>
+              </div>
+
+              <!-- TAB 2: UVP -->
+              <div id="tab-uvp" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">💎 Sekce 2: UVP (Proč toto učednictví)</h3>
+                <div class="form-group">
+                  <label>Nadpis sekce UVP</label>
+                  <input type="text" class="form-control" id="uvp_title" value="<?= htmlspecialchars($editingData['uvp']['title'] ?? '') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce</label>
+                  <input type="text" class="form-control" id="uvp_sub" value="<?= htmlspecialchars($editingData['uvp']['subtitle'] ?? '') ?>" />
+                </div>
+                <h4 style="color:#fff; margin:1rem 0 0.5rem;">Argumentační karty:</h4>
+                <div id="uvp_cards_container">
+                  <?php foreach (($editingData['uvp']['items'] ?? []) as $idx => $item): ?>
+                    <div class="item-card uvp-item-box">
+                      <h4>Karta #<?= $idx+1 ?></h4>
+                      <div class="form-group">
+                        <label>Titulek karty</label>
+                        <input type="text" class="form-control uvp-item-title" value="<?= htmlspecialchars($item['title']) ?>" />
+                      </div>
+                      <div class="form-group">
+                        <label>Popis karty</label>
+                        <textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <!-- TAB 3: MISTR -->
+              <div id="tab-master" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">👑 Sekce 3: O mistrovi</h3>
+                <div class="form-group">
+                  <label>Jméno mistra</label>
+                  <input type="text" class="form-control" id="m_name" value="<?= htmlspecialchars($editingData['master']['name'] ?? '') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Titul mistra & Sklárna</label>
+                  <input type="text" class="form-control" id="m_title" value="<?= htmlspecialchars($editingData['master']['title'] ?? '') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Příběh mistra (Popis)</label>
+                  <textarea class="form-control" id="m_bio"><?= htmlspecialchars($editingData['master']['bio'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Citát mistra</label>
+                  <textarea class="form-control" id="m_quote"><?= htmlspecialchars($editingData['master']['quote'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Fotka mistra</label>
+                  <input type="text" class="form-control" id="m_img" value="<?= htmlspecialchars($editingData['master']['image'] ?? '') ?>" />
+                </div>
+              </div>
+
+              <!-- TAB 4: CO SE NAUČÍŠ -->
+              <div id="tab-outcomes" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">📚 Sekce 4: Co se učedník naučí</h3>
+                <div class="form-group">
+                  <label>Nadpis sekce</label>
+                  <input type="text" class="form-control" id="o_title" value="<?= htmlspecialchars($editingData['outcomes']['title'] ?? '') ?>" />
+                </div>
+                <div id="outcomes_container">
+                  <?php foreach (($editingData['outcomes']['items'] ?? []) as $idx => $item): ?>
+                    <div class="item-card outcome-item-box">
+                      <h4>Dovednost #<?= $idx+1 ?></h4>
+                      <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon" value="<?= htmlspecialchars($item['icon']) ?>" /></div>
+                      <div class="form-group"><label>Název dovednosti</label><input type="text" class="form-control outcome-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis dovednosti</label><textarea class="form-control outcome-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <!-- TAB 5: POSTUP -->
+              <div id="tab-timeline" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">🗺️ Sekce 5: Jak probíhá cesta k učednictví</h3>
+                <div id="timeline_container">
+                  <?php foreach (($editingData['timeline']['steps'] ?? []) as $idx => $step): ?>
+                    <div class="item-card timeline-step-box">
+                      <h4>Krok <?= htmlspecialchars($step['num']) ?></h4>
+                      <div class="form-group"><label>Číslo</label><input type="text" class="form-control step-num" value="<?= htmlspecialchars($step['num']) ?>" /></div>
+                      <div class="form-group"><label>Název kroku</label><input type="text" class="form-control step-title" value="<?= htmlspecialchars($step['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis kroku</label><textarea class="form-control step-desc"><?= htmlspecialchars($step['desc']) ?></textarea></div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <!-- TAB 6: GALERIE -->
+              <div id="tab-portfolio" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">🖼️ Sekce 6: Galerie a realizace</h3>
+                <div id="portfolio_container">
+                  <?php foreach (($editingData['portfolio']['items'] ?? []) as $idx => $item): ?>
+                    <div class="item-card portfolio-item-box">
+                      <h4>Obrázek #<?= $idx+1 ?></h4>
+                      <div class="form-group"><label>Cesta k obrázku</label><input type="text" class="form-control p-img" value="<?= htmlspecialchars($item['image']) ?>" /></div>
+                      <div class="form-group"><label>Popisek pod obrázkem</label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <!-- TAB 7: REFERENCE -->
+              <div id="tab-testimonials" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">💬 Sekce 7: Reference</h3>
+                <div id="testimonials_container">
+                  <?php foreach (($editingData['testimonials']['items'] ?? []) as $idx => $item): ?>
+                    <div class="item-card testimonial-item-box">
+                      <h4>Reference #<?= $idx+1 ?></h4>
+                      <div class="form-group"><label>Citace</label><textarea class="form-control ts-quote"><?= htmlspecialchars($item['quote']) ?></textarea></div>
+                      <div class="form-group"><label>Jméno</label><input type="text" class="form-control ts-name" value="<?= htmlspecialchars($item['name']) ?>" /></div>
+                      <div class="form-group"><label>Role / Vztah k dílně</label><input type="text" class="form-control ts-role" value="<?= htmlspecialchars($item['role']) ?>" /></div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <!-- TAB 8: FAQ -->
+              <div id="tab-faq" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">❓ Sekce 8: Časté otázky</h3>
+                <div id="faq_container">
+                  <?php foreach (($editingData['faq']['items'] ?? []) as $idx => $item): ?>
+                    <div class="item-card faq-item-box">
+                      <h4>Otázka #<?= $idx+1 ?></h4>
+                      <div class="form-group"><label>Otázka</label><input type="text" class="form-control faq-q" value="<?= htmlspecialchars($item['q']) ?>" /></div>
+                      <div class="form-group"><label>Odpověď</label><textarea class="form-control faq-a"><?= htmlspecialchars($item['a']) ?></textarea></div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <!-- TAB 9: KONTAKT -->
+              <div id="tab-contact" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">📱 Sekce 9: Kontakt a WhatsApp</h3>
+                <div class="form-group">
+                  <label>WhatsApp číslo (např. 420602763599 bez mezery)</label>
+                  <input type="text" class="form-control" id="c_wa_num" value="<?= htmlspecialchars($editingData['contact']['whatsapp_num'] ?? '') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Předvyplněná zpráva pro zájemce na WhatsApp</label>
+                  <textarea class="form-control" id="c_wa_msg"><?= htmlspecialchars($editingData['contact']['whatsapp_msg'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Telefon pro rodiče</label>
+                  <input type="text" class="form-control" id="c_phone" value="<?= htmlspecialchars($editingData['contact']['phone_parent'] ?? '') ?>" />
+                </div>
+              </div>
+
+              <div style="margin-top: 2rem;">
+                <button type="submit" name="save_sections_form" onclick="prepareJsonData()" class="btn-action btn-view" style="font-size: 1rem; padding: 0.8rem 2rem;">
+                  <i class="bi bi-check-circle-fill"></i> Uložit všechny sekce
+                </button>
+                <a href="landing_pages.php" class="btn-action btn-copy" style="margin-left: 1rem;">Zavřít editor</a>
+              </div>
+            </div>
+
+            <!-- RIGHT: LIVE PREVIEW IFRAME -->
+            <div>
+              <h3 style="color:#fff; margin-bottom: 0.5rem;"><i class="bi bi-eye"></i> Živý Náhled Stránky</h3>
+              <iframe id="livePreviewFrame" class="preview-iframe" src="landing_pages/<?= htmlspecialchars($editingSlug) ?>.html"></iframe>
+            </div>
           </div>
         </form>
       </div>
 
       <script>
-        function updatePreview() {
-          const code = document.getElementById('codeEditor').value;
-          const iframe = document.getElementById('livePreview');
-          const doc = iframe.contentDocument || iframe.contentWindow.document;
-          doc.open();
-          doc.write(code);
-          doc.close();
+        function showTab(tabId) {
+          document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+          document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+          document.getElementById(tabId).classList.add('active');
+          event.target.classList.add('active');
+        }
+
+        function prepareJsonData() {
+          const data = {
+            slug: <?= json_encode($editingSlug) ?>,
+            master_name: document.getElementById('m_name').value,
+            meta_title: document.getElementById('h_h1').value + ' | Svobodné Cechy',
+            meta_desc: document.getElementById('h_sub').value,
+            hero: {
+              eyebrow: document.getElementById('h_eyebrow').value,
+              h1: document.getElementById('h_h1').value,
+              subtitle: document.getElementById('h_sub').value,
+              btn_primary: document.getElementById('h_btn1').value,
+              btn_secondary: "PODÍVAT SE, JAK SE PRACUJE SE SKLEM",
+              image: document.getElementById('h_img').value
+            },
+            uvp: {
+              eyebrow: "Proč toto učednictví?",
+              title: document.getElementById('uvp_title').value,
+              subtitle: document.getElementById('uvp_sub').value,
+              items: Array.from(document.querySelectorAll('.uvp-item-box')).map(box => ({
+                title: box.querySelector('.uvp-item-title').value,
+                desc: box.querySelector('.uvp-item-desc').value
+              }))
+            },
+            master: {
+              eyebrow: "KDO TĚ BUDE UČIT",
+              name: document.getElementById('m_name').value,
+              title: document.getElementById('m_title').value,
+              bio: document.getElementById('m_bio').value,
+              quote: document.getElementById('m_quote').value,
+              bio2: "V dílně sází na poctivý přístup a předávání sklářského umění další generaci.",
+              image: document.getElementById('m_img').value
+            },
+            outcomes: {
+              eyebrow: "Praktické dovednosti",
+              title: document.getElementById('o_title').value,
+              subtitle: "Konkrétní znalosti a návyky, které si z dílny odneseš do života.",
+              items: Array.from(document.querySelectorAll('.outcome-item-box')).map(box => ({
+                icon: box.querySelector('.outcome-icon').value,
+                title: box.querySelector('.outcome-title').value,
+                desc: box.querySelector('.outcome-desc').value
+              }))
+            },
+            timeline: {
+              eyebrow: "Postup krok za krokem",
+              title: "JAK PROBÍHÁ CESTA K UČEDNICTVÍ",
+              subtitle: "Pět jasných kroků od prvního projevení zájmu až po začátek práce v dílně.",
+              steps: Array.from(document.querySelectorAll('.timeline-step-box')).map(box => ({
+                num: box.querySelector('.step-num').value,
+                title: box.querySelector('.step-title').value,
+                desc: box.querySelector('.step-desc').value
+              })),
+              disclaimer: "💡 Základní cesta vypadá takto. Konkrétní průběh se přizpůsobuje zájemci."
+            },
+            portfolio: {
+              eyebrow: "Ukázka z prostředí",
+              title: "CO VZNIKÁ V DÍLNĚ",
+              subtitle: "Nahlédni do živého procesu sklářského umění.",
+              items: Array.from(document.querySelectorAll('.portfolio-item-box')).map(box => ({
+                image: box.querySelector('.p-img').value,
+                caption: box.querySelector('.p-cap').value
+              }))
+            },
+            testimonials: {
+              eyebrow: "Zkušenosti a reference",
+              title: "CO ŘÍKAJÍ LIDÉ, KTEŘÍ U TOHO BYLI",
+              subtitle: "Reálné pohledy zástupců a rodin.",
+              items: Array.from(document.querySelectorAll('.testimonial-item-box')).map(box => ({
+                quote: box.querySelector('.ts-quote').value,
+                name: box.querySelector('.ts-name').value,
+                role: box.querySelector('.ts-role').value
+              }))
+            },
+            faq: {
+              eyebrow: "Odpovědi na dotazy",
+              title: "ČASTÉ OTÁZKY",
+              subtitle: "Vše, co tě může zajímat před prvním kontaktem.",
+              items: Array.from(document.querySelectorAll('.faq-item-box')).map(box => ({
+                q: box.querySelector('.faq-q').value,
+                a: box.querySelector('.faq-a').value
+              }))
+            },
+            cta: {
+              title: "ZAJÍMÁ TĚ, JESTLI JE TO PRO TEBE?",
+              text: "Nemusíš se hned k ničemu zavazovat. První krok je jednoduchý nezávazný rozhovor.",
+              btn: document.getElementById('h_btn1').value
+            },
+            contact: {
+              eyebrow: "První krok",
+              title: "NAVÁŽEME KONTAKT",
+              subtitle: "Zvol si způsob, který je pro tě nejsnadnější.",
+              whatsapp_num: document.getElementById('c_wa_num').value,
+              whatsapp_msg: document.getElementById('c_wa_msg').value,
+              instagram_link: "https://instagram.com",
+              phone_parent: document.getElementById('c_phone').value
+            }
+          };
+
+          document.getElementById('sections_json_data').value = JSON.stringify(data);
         }
       </script>
-
     <?php endif; ?>
 
-    <div class="admin-grid">
-      <!-- LIST OF LANDING PAGES -->
-      <div class="card">
-        <h2><i class="bi bi-files" style="color: var(--accent);"></i> Vytvořené Landing Pages</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Soubor / Mistr</th>
-              <th>Relativní cesta (pro reklamu)</th>
-              <th>Akce</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            $files = array_diff(scandir($dir), ['..', '.', '.gitkeep']);
-            if (empty($files)) {
-              echo "<tr><td colspan='3' style='text-align:center; color:var(--text-muted); padding:2rem;'>Zatím nebyly vytvořeny žádné landing pages. Vytvoř první níže!</td></tr>";
-            } else {
-              foreach ($files as $file) {
-                if (!str_ends_with($file, '.html')) continue;
-                $relPath = "admin/landing_pages/" . $file;
-                echo "<tr>";
-                echo "<td><span class='badge-file'><i class='bi bi-file-earmark-code'></i> " . htmlspecialchars($file) . "</span></td>";
-                echo "<td style='font-family:monospace; color:var(--text-muted); font-size:0.85rem;'>" . htmlspecialchars($relPath) . "</td>";
-                echo "<td>";
-                echo "<div class='actions-cell'>";
-                echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($file) . "'><i class='bi bi-pencil-fill'></i> Upravit</a>";
-                echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
-                echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
-                echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu chceš smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";
-                echo "</div>";
-                echo "</td>";
-                echo "</tr>";
-              }
-            }
-            ?>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- CREATE NEW LANDING PAGE -->
-      <div class="card">
-        <h2><i class="bi bi-plus-circle" style="color: var(--accent);"></i> Vytvořit novou Landing Page pro dalšího mistra</h2>
-        <form method="post" action="landing_pages.php">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-            <div>
-              <label for="master_name">Jméno mistra / Název kampaně</label>
-              <input type="text" id="master_name" name="master_name" placeholder="Např. Karel Novák nebo Sklo Pačinek" required />
-            </div>
-            <div>
-              <label for="slug">URL Slug (název souboru bez .html)</label>
-              <input type="text" id="slug" name="slug" placeholder="např. karel-novak" required />
-            </div>
-          </div>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.8rem;">
-            Při vytvoření se automaticky použije kompletní 10-sekční struktura (Hero, UVP, O mistrovi, Co se naučíš, Timeline, Galerie, Reference, FAQ, WhatsApp kontakt a Formulář).
-          </p>
-          <input type="submit" name="create_new" value="Vytvořit a otevřít v editoru" />
-        </form>
-      </div>
-
+    <!-- LIST OF LANDING PAGES -->
+    <div class="card">
+      <h2><i class="bi bi-files" style="color: var(--accent);"></i> Přehled Landing Pages</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Název / Soubor</th>
+            <th>Cesta k souboru (pro reklamu)</th>
+            <th>Akce</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          $files = array_diff(scandir($dir), ['..', '.', '.gitkeep']);
+          $hasPages = false;
+          foreach ($files as $file) {
+            if (!str_ends_with($file, '.html')) continue;
+            $hasPages = true;
+            $slug = str_replace('.html', '', $file);
+            $relPath = "admin/landing_pages/" . $file;
+            echo "<tr>";
+            echo "<td><span class='badge-file'><i class='bi bi-file-earmark-text'></i> " . htmlspecialchars($slug) . "</span></td>";
+            echo "<td style='font-family:monospace; color:var(--text-muted); font-size:0.85rem;'>" . htmlspecialchars($relPath) . "</td>";
+            echo "<td>";
+            echo "<div style='display:flex; gap:0.5rem;'>";
+            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce</a>";
+            echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
+            echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
+            echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";
+            echo "</div>";
+            echo "</td>";
+            echo "</tr>";
+          }
+          if (!$hasPages) {
+            echo "<tr><td colspan='3' style='text-align:center; color:var(--text-muted); padding:2rem;'>Zatím nebyly vytvořeny žádné landing pages.</td></tr>";
+          }
+          ?>
+        </tbody>
+      </table>
     </div>
+
+    <!-- CREATE NEW LANDING PAGE -->
+    <div class="card">
+      <h2><i class="bi bi-plus-circle" style="color: var(--accent);"></i> Vytvořit novou Landing Page pro dalšího mistra</h2>
+      <form method="post" action="landing_pages.php">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <label style="color:#a39b8e;">Jméno mistra / Název</label>
+            <input type="text" name="master_name" class="form-control" placeholder="Např. Karel Novák" required />
+          </div>
+          <div>
+            <label style="color:#a39b8e;">URL Slug (bez .html)</label>
+            <input type="text" name="slug" class="form-control" placeholder="např. karel-novak" required />
+          </div>
+        </div>
+        <input type="submit" name="create_new" class="btn-action btn-view" value="Vytvořit a upravit sekce" style="margin-top:1.5rem; padding:0.8rem 1.8rem;" />
+      </form>
+    </div>
+
   </div>
 </body>
 </html>
