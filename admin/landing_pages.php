@@ -6,6 +6,27 @@ $uploadsDir = __DIR__ . "/../uploads";
 if (!file_exists($dir)) { mkdir($dir, 0777, true); }
 if (!file_exists($uploadsDir)) { mkdir($uploadsDir, 0777, true); }
 
+// Helper to fix image URL for landing page (located in admin/landing_pages/)
+function fixImgUrl($url) {
+    if (empty($url)) return '../../images/sample_master.png';
+    // If path refers to uploads, ensure correct 2-level relative path ../../uploads/
+    if (strpos($url, 'uploads/') !== false) {
+        $filename = basename($url);
+        return '../../uploads/' . $filename;
+    }
+    return $url;
+}
+
+// Helper to fix image URL for admin panel previews (located in admin/)
+function fixAdminPreviewUrl($url) {
+    if (empty($url)) return '../images/sample_master.png';
+    if (strpos($url, 'uploads/') !== false) {
+        $filename = basename($url);
+        return '../uploads/' . $filename;
+    }
+    return $url;
+}
+
 // AJAX Image Upload Handler
 if (isset($_GET['action']) && $_GET['action'] === 'upload') {
     header('Content-Type: application/json');
@@ -16,11 +37,16 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
             $newFilename = 'img_' . time() . '_' . rand(100, 999) . '.' . $ext;
             $targetPath = $uploadsDir . '/' . $newFilename;
             if (move_uploaded_file($_FILES['file']['tmp_name'], $targetPath)) {
-                echo json_encode(['success' => true, 'url' => '../uploads/' . $newFilename]);
+                // Return path relative to admin/landing_pages/
+                echo json_encode([
+                    'success' => true, 
+                    'url' => '../../uploads/' . $newFilename,
+                    'admin_preview_url' => '../uploads/' . $newFilename
+                ]);
                 exit;
             }
         }
-        echo json_encode(['success' => false, 'message' => 'Neplatný typ souboru.']);
+        echo json_encode(['success' => false, 'message' => 'Neplatný typ souboru. Nepodporovaná přípona.']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Chyba při nahrávání souboru.']);
     }
@@ -40,7 +66,7 @@ function renderLandingPageHtml($data) {
     $h_sub = htmlspecialchars($data['hero']['subtitle'] ?? '');
     $h_btn1 = htmlspecialchars($data['hero']['btn_primary'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
     $h_btn2 = htmlspecialchars($data['hero']['btn_secondary'] ?? 'PODÍVAT SE, JAK SE PRACUJE SE SKLEM');
-    $h_img = htmlspecialchars($data['hero']['image'] ?? '../images/sample_master.png');
+    $h_img = htmlspecialchars(fixImgUrl($data['hero']['image'] ?? ''));
 
     // UVP
     $uvp_eyebrow = htmlspecialchars($data['uvp']['eyebrow'] ?? '');
@@ -61,7 +87,7 @@ function renderLandingPageHtml($data) {
     $m_bio = htmlspecialchars($data['master']['bio'] ?? '');
     $m_quote = htmlspecialchars($data['master']['quote'] ?? '');
     $m_bio2 = htmlspecialchars($data['master']['bio2'] ?? '');
-    $m_img = htmlspecialchars($data['master']['image'] ?? '../images/sample_master.png');
+    $m_img = htmlspecialchars(fixImgUrl($data['master']['image'] ?? ''));
 
     // Outcomes
     $o_eyebrow = htmlspecialchars($data['outcomes']['eyebrow'] ?? '');
@@ -97,7 +123,7 @@ function renderLandingPageHtml($data) {
     $p_items = $data['portfolio']['items'] ?? [];
     $portfolio_html = "";
     foreach ($p_items as $item) {
-        $pimg = htmlspecialchars($item['image'] ?? '../images/sample_master.png');
+        $pimg = htmlspecialchars(fixImgUrl($item['image'] ?? ''));
         $pcap = htmlspecialchars($item['caption'] ?? '');
         $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' /><div class='portfolio-caption'>{$pcap}</div></div>";
     }
@@ -188,7 +214,7 @@ function renderLandingPageHtml($data) {
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 1.8rem; border-radius: 6px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all .2s; min-height: 52px; cursor: pointer; border: none; }
     .btn-primary { background: var(--color-accent); color: #fff; }
     .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
-    .hero-image img { width: 100%; border-radius: 12px; box-shadow: 0 12px 35px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
+    .hero-image img { width: 100%; max-height: 500px; object-fit: cover; border-radius: 12px; box-shadow: 0 12px 35px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
 
     .section-title { text-align: center; margin-bottom: 3.5rem; }
     .section-title h2 { font-family: var(--font-heading); font-size: 2.8rem; color: var(--color-white); margin-bottom: 0.5rem; }
@@ -201,7 +227,7 @@ function renderLandingPageHtml($data) {
 
     .master-section { padding: 5rem 0; background: rgba(0,0,0,0.3); }
     .master-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 3.5rem; align-items: center; }
-    .master-photo img { width: 100%; border-radius: 14px; border: 1px solid var(--color-accent); }
+    .master-photo img { width: 100%; max-height: 500px; object-fit: cover; border-radius: 14px; border: 1px solid var(--color-accent); }
     .master-info h3 { font-family: var(--font-heading); font-size: 2.4rem; color: var(--color-white); margin-bottom: 0.5rem; }
     .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; font-size: 0.9rem; }
     .quote-box { font-family: var(--font-heading); font-style: italic; font-size: 1.4rem; color: var(--color-cream); border-left: 3px solid var(--color-accent); padding-left: 1.2rem; margin: 1.5rem 0; }
@@ -538,9 +564,9 @@ if ($editingSlug) {
 
     /* Upload Box UI */
     .upload-row { display: flex; gap: 0.8rem; align-items: center; margin-top: 0.4rem; }
-    .upload-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px dashed var(--accent); padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .upload-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px dashed var(--accent); padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
     .upload-btn:hover { background: rgba(232,117,22,0.2); }
-    .thumb-preview { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); background: #000; }
+    .thumb-preview { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); background: #000; flex-shrink: 0; }
 
     .item-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
     .item-card h4 { font-size: 0.9rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.4rem; }
@@ -607,7 +633,7 @@ if ($editingSlug) {
                 <div class="form-group">
                   <label>Fotka v huti (Hero Obrázek)</label>
                   <div class="upload-row">
-                    <img src="<?= htmlspecialchars($editingData['hero']['image'] ?? '../images/sample_master.png') ?>" id="prev_h_img" class="thumb-preview" />
+                    <img src="<?= htmlspecialchars(fixAdminPreviewUrl($editingData['hero']['image'] ?? '')) ?>" id="prev_h_img" class="thumb-preview" />
                     <input type="text" class="form-control" id="h_img" value="<?= htmlspecialchars($editingData['hero']['image'] ?? '') ?>" />
                     <label class="upload-btn">
                       <i class="bi bi-upload"></i> Nahrát fotku
@@ -662,7 +688,7 @@ if ($editingSlug) {
                 <div class="form-group">
                   <label>Fotka mistra</label>
                   <div class="upload-row">
-                    <img src="<?= htmlspecialchars($editingData['master']['image'] ?? '../images/sample_master.png') ?>" id="prev_m_img" class="thumb-preview" />
+                    <img src="<?= htmlspecialchars(fixAdminPreviewUrl($editingData['master']['image'] ?? '')) ?>" id="prev_m_img" class="thumb-preview" />
                     <input type="text" class="form-control" id="m_img" value="<?= htmlspecialchars($editingData['master']['image'] ?? '') ?>" />
                     <label class="upload-btn">
                       <i class="bi bi-upload"></i> Nahrát fotku mistra
@@ -716,7 +742,7 @@ if ($editingSlug) {
                       <div class="form-group">
                         <label>Fotka v galerii</label>
                         <div class="upload-row">
-                          <img src="<?= htmlspecialchars($item['image']) ?>" id="prev_p_img_<?= $idx ?>" class="thumb-preview" />
+                          <img src="<?= htmlspecialchars(fixAdminPreviewUrl($item['image'] ?? '')) ?>" id="prev_p_img_<?= $idx ?>" class="thumb-preview" />
                           <input type="text" class="form-control p-img" id="p_img_<?= $idx ?>" value="<?= htmlspecialchars($item['image']) ?>" />
                           <label class="upload-btn">
                             <i class="bi bi-upload"></i> Nahrát fotku
@@ -816,8 +842,11 @@ if ($editingSlug) {
             if (data.success) {
               document.getElementById(targetInputId).value = data.url;
               if (previewImgId && document.getElementById(previewImgId)) {
-                document.getElementById(previewImgId).src = data.url;
+                document.getElementById(previewImgId).src = data.admin_preview_url || data.url;
               }
+              // Refresh preview iframe
+              const iframe = document.getElementById('livePreviewFrame');
+              if (iframe) { iframe.src = iframe.src; }
               alert('Fotka byla úspěšně nahrána!');
             } else {
               alert('Chyba při nahrávání: ' + (data.message || 'Neznámá chyba'));
