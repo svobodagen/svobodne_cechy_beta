@@ -3,13 +3,14 @@
   "master_name": "Jiří Pačinek",
   "meta_title": "Učednictví u Jiřího Pačinka | Nauč se sklářské řemeslo",
   "meta_desc": "Zajímá tě sklářské řemeslo? Poznej učednictví přímo v dílně Jiřího Pačinka v Kunraticích u Cvikova.",
+  "section_order": ["hero", "uvp", "master", "outcomes", "timeline", "portfolio", "testimonials", "faq", "cta", "contact"],
   "hero": {
     "eyebrow": "UČEDNICTVÍ U MISTRA SKLÁŘE",
     "h1": "NAUČ SE ŘEMESLO PŘÍMO OD MISTRA",
     "subtitle": "Učednictví u Jiřího Pačinka pro mladé lidi (12–18 let / mladé dospělé), kteří chtějí poznat skutečné řemeslo, pracovat rukama a vytvořit si vlastní cestu.",
     "btn_primary": "ZJISTIT, JESTLI JE TO PRO MĚ",
     "btn_secondary": "PODÍVAT SE, JAK SE PRACUJE SE SKLEM",
-    "image": "../images/sample_master.png"
+    "image": "../../images/sample_master.png"
   },
   "uvp": {
     "eyebrow": "Proč toto učednictví?",
@@ -31,7 +32,7 @@
     "bio": "Jiří Pačinek vybudoval rodinnou sklárnu Pačinek Glass a unikátní Křišťálovou zahradu v Kunraticích u Cvikova. Jeho ručně tvarované objekty, plastiky a svítidla obdivují sběratelé po celém světě.",
     "quote": "„Řemeslo není jen práce s materiálem. Je to pokora, soustředění a schopnost vtisknout žhavé hmotě tvar i myšlenku.“",
     "bio2": "V dílně sází na poctivý přístup, týmovou spolupráci u pece a předávání sklářského umění další generaci.",
-    "image": "../images/sample_master.png"
+    "image": "../../images/sample_master.png"
   },
   "outcomes": {
     "eyebrow": "Praktické dovednosti",
@@ -64,10 +65,10 @@
     "title": "CO VZNIKÁ V DÍLNĚ",
     "subtitle": "Nahlédni do živého procesu sklářského umění – od materiálu po hotové dílo.",
     "items": [
-      {"image": "../images/sample_master.png", "caption": "Žhavá sklovina u sázecí pece"},
-      {"image": "../images/sample_master.png", "caption": "Tvarování na sklářské lavici"},
-      {"image": "../images/sample_master.png", "caption": "Detail hutně tvarované skleněné plastiky"},
-      {"image": "../images/sample_master.png", "caption": "Křišťálová zahrada v Kunraticích"}
+      {"image": "../../images/sample_master.png", "caption": "Žhavá sklovina u sázecí pece"},
+      {"image": "../../images/sample_master.png", "caption": "Tvarování na sklářské lavici"},
+      {"image": "../../images/sample_master.png", "caption": "Detail hutně tvarované skleněné plastiky"},
+      {"image": "../../images/sample_master.png", "caption": "Křišťálová zahrada v Kunraticích"}
     ]
   },
   "testimonials": {
@@ -87,7 +88,7 @@
     "items": [
       {"q": "Pro koho je učednictví určeno?", "a": "Prvořadě pro mladé lidi ve věku cca 12–18 let a mladé dospělé, kteří mají zájem o ruční řemeslo, sklo a praktickou tvorbu."},
       {"q": "Musím mít předchozí zkušenosti se sklem?", "a": "Není to nutné! Všechny základy bezpečnosti, manipulace s nářadím i práce s materiálem tě naučíme přímo v dílně."},
-      {"q": "Jak probíhá zkušební den?", "a": "Během zkušebního dne se seznámíš s chodem huti, vyzkoušíš si základní úkons a zjistíš, zda ti atmosféra v dílně sedí."},
+      {"q": "Jak probíhá zkušební den?", "a": "Během zkušebního dne se seznámíš s chodem huti, vyzkoušíš si základní úkony a zjistíš, zda ti atmosféra v dílně sedí."},
       {"q": "Kde přesně se učednictví koná?", "a": "Učednictví probíhá přímo v areálu sklárny Pačinek Glass v Kunraticích u Cvikova (Liberecký kraj)."},
       {"q": "Je možné domluvit ubytování, pokud jsem zdaleka?", "a": "Možnosti ubytování a dopravy řešíme individuálně při osobním rozhovoru podle konkrétních potřeb učedníka."},
       {"q": "Musím se hned k nečemu zavázat?", "a": "Vůbec ne. Prvním krokem je zcela nezávazný rozhovor, kde si vyjasníme dotazy a představíme možnosti."}

@@ -9,7 +9,6 @@ if (!file_exists($uploadsDir)) { mkdir($uploadsDir, 0777, true); }
 // Helper to fix image URL for landing page (located in admin/landing_pages/)
 function fixImgUrl($url) {
     if (empty($url)) return '../../images/sample_master.png';
-    // If path refers to uploads, ensure correct 2-level relative path ../../uploads/
     if (strpos($url, 'uploads/') !== false) {
         $filename = basename($url);
         return '../../uploads/' . $filename;
@@ -37,7 +36,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
             $newFilename = 'img_' . time() . '_' . rand(100, 999) . '.' . $ext;
             $targetPath = $uploadsDir . '/' . $newFilename;
             if (move_uploaded_file($_FILES['file']['tmp_name'], $targetPath)) {
-                // Return path relative to admin/landing_pages/
                 echo json_encode([
                     'success' => true, 
                     'url' => '../../uploads/' . $newFilename,
@@ -46,21 +44,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
                 exit;
             }
         }
-        echo json_encode(['success' => false, 'message' => 'Neplatný typ souboru. Nepodporovaná přípona.']);
+        echo json_encode(['success' => false, 'message' => 'Neplatný typ souboru.']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Chyba při nahrávání souboru.']);
     }
     exit;
 }
 
-// Function to generate full HTML from section data array
+// Function to generate full HTML from section data array with dynamic section ordering
 function renderLandingPageHtml($data) {
     $slug = htmlspecialchars($data['slug'] ?? 'master');
     $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
     $metaTitle = htmlspecialchars($data['meta_title'] ?? $masterName . ' – Svobodné Cechy');
     $metaDesc = htmlspecialchars($data['meta_desc'] ?? '');
     
-    // Hero
+    // 1. Hero
     $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? '');
     $h_h1 = htmlspecialchars($data['hero']['h1'] ?? '');
     $h_sub = htmlspecialchars($data['hero']['subtitle'] ?? '');
@@ -68,19 +66,44 @@ function renderLandingPageHtml($data) {
     $h_btn2 = htmlspecialchars($data['hero']['btn_secondary'] ?? 'PODÍVAT SE, JAK SE PRACUJE SE SKLEM');
     $h_img = htmlspecialchars(fixImgUrl($data['hero']['image'] ?? ''));
 
-    // UVP
+    $heroSection = <<<HTML
+    <section class="container hero">
+      <div class="hero-content">
+        <p class="eyebrow">{$h_eyebrow}</p>
+        <h1>{$h_h1}</h1>
+        <p class="subtitle">{$h_sub}</p>
+        <div class="hero-buttons">
+          <a href="#kontakt" class="btn btn-primary">{$h_btn1}</a>
+          <a href="#realizace" class="btn btn-secondary">{$h_btn2}</a>
+        </div>
+      </div>
+      <div class="hero-image"><img src="{$h_img}" alt="Fotografie z huti" /></div>
+    </section>
+HTML;
+
+    // 2. UVP
     $uvp_eyebrow = htmlspecialchars($data['uvp']['eyebrow'] ?? '');
     $uvp_title = htmlspecialchars($data['uvp']['title'] ?? '');
     $uvp_sub = htmlspecialchars($data['uvp']['subtitle'] ?? '');
-    $uvp_items = $data['uvp']['items'] ?? [];
     $uvp_cards_html = "";
-    foreach ($uvp_items as $item) {
+    foreach (($data['uvp']['items'] ?? []) as $item) {
         $t = htmlspecialchars($item['title'] ?? '');
         $d = htmlspecialchars($item['desc'] ?? '');
         $uvp_cards_html .= "<div class='uvp-card'><h3>{$t}</h3><p>{$d}</p></div>";
     }
 
-    // Master
+    $uvpSection = <<<HTML
+    <section id="uvp" class="uvp-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$uvp_eyebrow}</p>
+        <h2>{$uvp_title}</h2>
+        <p>{$uvp_sub}</p>
+      </div>
+      <div class="uvp-grid">{$uvp_cards_html}</div>
+    </section>
+HTML;
+
+    // 3. Master
     $m_eyebrow = htmlspecialchars($data['master']['eyebrow'] ?? '');
     $m_name = htmlspecialchars($data['master']['name'] ?? '');
     $m_title = htmlspecialchars($data['master']['title'] ?? '');
@@ -89,76 +112,157 @@ function renderLandingPageHtml($data) {
     $m_bio2 = htmlspecialchars($data['master']['bio2'] ?? '');
     $m_img = htmlspecialchars(fixImgUrl($data['master']['image'] ?? ''));
 
-    // Outcomes
+    $masterSection = <<<HTML
+    <section id="mistr" class="master-section">
+      <div class="container master-grid">
+        <div class="master-photo"><img src="{$m_img}" alt="Mistr {$m_name}" /></div>
+        <div class="master-info">
+          <p class="eyebrow">{$m_eyebrow}</p>
+          <h3>{$m_name}</h3>
+          <p class="master-title">{$m_title}</p>
+          <p>{$m_bio}</p>
+          <div class="quote-box">{$m_quote}</div>
+          <p>{$m_bio2}</p>
+        </div>
+      </div>
+    </section>
+HTML;
+
+    // 4. Outcomes
     $o_eyebrow = htmlspecialchars($data['outcomes']['eyebrow'] ?? '');
     $o_title = htmlspecialchars($data['outcomes']['title'] ?? '');
     $o_sub = htmlspecialchars($data['outcomes']['subtitle'] ?? '');
-    $o_items = $data['outcomes']['items'] ?? [];
     $outcomes_html = "";
-    foreach ($o_items as $item) {
+    foreach (($data['outcomes']['items'] ?? []) as $item) {
         $icon = htmlspecialchars($item['icon'] ?? '🔥');
         $t = htmlspecialchars($item['title'] ?? '');
         $d = htmlspecialchars($item['desc'] ?? '');
         $outcomes_html .= "<div class='outcome-item'><h4>{$icon} {$t}</h4><p>{$d}</p></div>";
     }
 
-    // Timeline
+    $outcomesSection = <<<HTML
+    <section id="co-se-naucis" class="outcomes-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$o_eyebrow}</p>
+        <h2>{$o_title}</h2>
+        <p>{$o_sub}</p>
+      </div>
+      <div class="outcomes-grid">{$outcomes_html}</div>
+    </section>
+HTML;
+
+    // 5. Timeline
     $t_eyebrow = htmlspecialchars($data['timeline']['eyebrow'] ?? '');
     $t_title = htmlspecialchars($data['timeline']['title'] ?? '');
     $t_sub = htmlspecialchars($data['timeline']['subtitle'] ?? '');
     $t_disc = htmlspecialchars($data['timeline']['disclaimer'] ?? '');
-    $t_steps = $data['timeline']['steps'] ?? [];
     $timeline_html = "";
-    foreach ($t_steps as $step) {
+    foreach (($data['timeline']['steps'] ?? []) as $step) {
         $num = htmlspecialchars($step['num'] ?? '01');
         $st = htmlspecialchars($step['title'] ?? '');
         $sd = htmlspecialchars($step['desc'] ?? '');
         $timeline_html .= "<div class='timeline-step'><div class='step-number'>{$num}</div><div class='step-content'><h4>{$st}</h4><p>{$sd}</p></div></div>";
     }
 
-    // Portfolio
+    $timelineSection = <<<HTML
+    <section id="jak-to-probiha" class="timeline-section">
+      <div class="container">
+        <div class="section-title">
+          <p class="eyebrow">{$t_eyebrow}</p>
+          <h2>{$t_title}</h2>
+          <p>{$t_sub}</p>
+        </div>
+        <div class="timeline">{$timeline_html}</div>
+        <p class="disclaimer-box">{$t_disc}</p>
+      </div>
+    </section>
+HTML;
+
+    // 6. Portfolio
     $p_eyebrow = htmlspecialchars($data['portfolio']['eyebrow'] ?? '');
     $p_title = htmlspecialchars($data['portfolio']['title'] ?? '');
     $p_sub = htmlspecialchars($data['portfolio']['subtitle'] ?? '');
-    $p_items = $data['portfolio']['items'] ?? [];
     $portfolio_html = "";
-    foreach ($p_items as $item) {
+    foreach (($data['portfolio']['items'] ?? []) as $item) {
         $pimg = htmlspecialchars(fixImgUrl($item['image'] ?? ''));
         $pcap = htmlspecialchars($item['caption'] ?? '');
         $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' /><div class='portfolio-caption'>{$pcap}</div></div>";
     }
 
-    // Testimonials
+    $portfolioSection = <<<HTML
+    <section id="realizace" class="portfolio-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$p_eyebrow}</p>
+        <h2>{$p_title}</h2>
+        <p>{$p_sub}</p>
+      </div>
+      <div class="portfolio-grid">{$portfolio_html}</div>
+    </section>
+HTML;
+
+    // 7. Testimonials
     $ts_eyebrow = htmlspecialchars($data['testimonials']['eyebrow'] ?? '');
     $ts_title = htmlspecialchars($data['testimonials']['title'] ?? '');
     $ts_sub = htmlspecialchars($data['testimonials']['subtitle'] ?? '');
-    $ts_items = $data['testimonials']['items'] ?? [];
     $testimonials_html = "";
-    foreach ($ts_items as $item) {
+    foreach (($data['testimonials']['items'] ?? []) as $item) {
         $quote = htmlspecialchars($item['quote'] ?? '');
         $name = htmlspecialchars($item['name'] ?? '');
         $role = htmlspecialchars($item['role'] ?? '');
         $testimonials_html .= "<div class='testimonial-card'><p class='quote-text'>{$quote}</p><div class='author-info'><div><strong>{$name}</strong><span>{$role}</span></div></div></div>";
     }
 
-    // FAQ
+    $testimonialsSection = <<<HTML
+    <section id="reference" class="testimonials-section">
+      <div class="container">
+        <div class="section-title">
+          <p class="eyebrow">{$ts_eyebrow}</p>
+          <h2>{$ts_title}</h2>
+          <p>{$ts_sub}</p>
+        </div>
+        <div class="testimonials-grid">{$testimonials_html}</div>
+      </div>
+    </section>
+HTML;
+
+    // 8. FAQ
     $f_eyebrow = htmlspecialchars($data['faq']['eyebrow'] ?? '');
     $f_title = htmlspecialchars($data['faq']['title'] ?? '');
     $f_sub = htmlspecialchars($data['faq']['subtitle'] ?? '');
-    $f_items = $data['faq']['items'] ?? [];
     $faq_html = "";
-    foreach ($f_items as $item) {
+    foreach (($data['faq']['items'] ?? []) as $item) {
         $q = htmlspecialchars($item['q'] ?? '');
         $a = htmlspecialchars($item['a'] ?? '');
         $faq_html .= "<details><summary>{$q}</summary><p>{$a}</p></details>";
     }
 
-    // CTA
+    $faqSection = <<<HTML
+    <section id="faq" class="faq-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$f_eyebrow}</p>
+        <h2>{$f_title}</h2>
+        <p>{$f_sub}</p>
+      </div>
+      <div class="faq-list">{$faq_html}</div>
+    </section>
+HTML;
+
+    // 9. Primary CTA Box
     $cta_title = htmlspecialchars($data['cta']['title'] ?? '');
     $cta_text = htmlspecialchars($data['cta']['text'] ?? '');
     $cta_btn = htmlspecialchars($data['cta']['btn'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
 
-    // Contact
+    $ctaSection = <<<HTML
+    <div class="container">
+      <div class="primary-cta-box">
+        <h2>{$cta_title}</h2>
+        <p>{$cta_text}</p>
+        <a href="#kontakt" class="btn btn-primary">{$cta_btn}</a>
+      </div>
+    </div>
+HTML;
+
+    // 10. Contact
     $c_eyebrow = htmlspecialchars($data['contact']['eyebrow'] ?? '');
     $c_title = htmlspecialchars($data['contact']['title'] ?? '');
     $c_sub = htmlspecialchars($data['contact']['subtitle'] ?? '');
@@ -166,6 +270,64 @@ function renderLandingPageHtml($data) {
     $wa_msg = urlencode($data['contact']['whatsapp_msg'] ?? 'Dobrý den, mám zájem o učednictví.');
     $ig_link = htmlspecialchars($data['contact']['instagram_link'] ?? 'https://instagram.com');
     $phone_parent = htmlspecialchars($data['contact']['phone_parent'] ?? '+420 602 763 599');
+
+    $contactSection = <<<HTML
+    <section id="kontakt" class="contact-section container">
+      <div class="section-title">
+        <p class="eyebrow">{$c_eyebrow}</p>
+        <h2>{$c_title}</h2>
+        <p>{$c_sub}</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>💬 Rychlá zpráva (pro zájemce)</h3>
+          <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+            <a href="https://wa.me/{$wa_num}?text={$wa_msg}" class="btn-wa" target="_blank">NAPSAT NA WHATSAPP (+{$wa_num})</a>
+            <a href="{$ig_link}" class="btn-ig" target="_blank">NAPSAT NA INSTAGRAM</a>
+          </div>
+          <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--color-glass-border);">
+            <h4 style="font-family:var(--font-heading); font-size:1.4rem;">👨‍👩‍👦 Jste rodič?</h4>
+            <p style="font-size:0.95rem; color:var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše vysvětlíme.</p>
+            <a href="tel:{$wa_num}" class="btn btn-secondary" style="margin-top:1rem; width:100%;">CHCI SI ZAVOLAT ({$phone_parent})</a>
+          </div>
+        </div>
+        <div class="contact-card">
+          <h3>📝 Kontaktní formulář</h3>
+          <form onsubmit="event.preventDefault(); alert('Děkujeme! Zprávu jsme přijali.');">
+            <div class="form-group"><label>Jméno</label><input type="text" class="form-control" placeholder="Jan Novák" required /></div>
+            <div class="form-group"><label>Jsem:</label><select class="form-control"><option>Budoucí učedník</option><option>Rodič</option></select></div>
+            <div class="form-group"><label>Kontakt</label><input type="text" class="form-control" placeholder="Telefon nebo e-mail" required /></div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">ODESLAT DOTAZ</button>
+          </form>
+        </div>
+      </div>
+    </section>
+HTML;
+
+    // Map section keys to HTML blocks
+    $allSections = [
+        'hero' => $heroSection,
+        'uvp' => $uvpSection,
+        'master' => $masterSection,
+        'outcomes' => $outcomesSection,
+        'timeline' => $timelineSection,
+        'portfolio' => $portfolioSection,
+        'testimonials' => $testimonialsSection,
+        'faq' => $faqSection,
+        'cta' => $ctaSection,
+        'contact' => $contactSection
+    ];
+
+    // Default order
+    $defaultOrder = ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta', 'contact'];
+    $order = $data['section_order'] ?? $defaultOrder;
+
+    $renderedMain = "";
+    foreach ($order as $secKey) {
+        if (isset($allSections[$secKey])) {
+            $renderedMain .= $allSections[$secKey] . "\n";
+        }
+    }
 
     return <<<HTML
 <!DOCTYPE html>
@@ -303,131 +465,9 @@ function renderLandingPageHtml($data) {
   </header>
 
   <main>
-    <section class="container hero">
-      <div class="hero-content">
-        <p class="eyebrow">{$h_eyebrow}</p>
-        <h1>{$h_h1}</h1>
-        <p class="subtitle">{$h_sub}</p>
-        <div class="hero-buttons">
-          <a href="#kontakt" class="btn btn-primary">{$h_btn1}</a>
-          <a href="#realizace" class="btn btn-secondary">{$h_btn2}</a>
-        </div>
-      </div>
-      <div class="hero-image"><img src="{$h_img}" alt="Fotografie z huti" /></div>
-    </section>
-
-    <section id="uvp" class="uvp-section container">
-      <div class="section-title">
-        <p class="eyebrow">{$uvp_eyebrow}</p>
-        <h2>{$uvp_title}</h2>
-        <p>{$uvp_sub}</p>
-      </div>
-      <div class="uvp-grid">{$uvp_cards_html}</div>
-    </section>
-
-    <section id="mistr" class="master-section">
-      <div class="container master-grid">
-        <div class="master-photo"><img src="{$m_img}" alt="Mistr {$m_name}" /></div>
-        <div class="master-info">
-          <p class="eyebrow">{$m_eyebrow}</p>
-          <h3>{$m_name}</h3>
-          <p class="master-title">{$m_title}</p>
-          <p>{$m_bio}</p>
-          <div class="quote-box">{$m_quote}</div>
-          <p>{$m_bio2}</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="co-se-naucis" class="outcomes-section container">
-      <div class="section-title">
-        <p class="eyebrow">{$o_eyebrow}</p>
-        <h2>{$o_title}</h2>
-        <p>{$o_sub}</p>
-      </div>
-      <div class="outcomes-grid">{$outcomes_html}</div>
-    </section>
-
-    <section id="jak-to-probiha" class="timeline-section">
-      <div class="container">
-        <div class="section-title">
-          <p class="eyebrow">{$t_eyebrow}</p>
-          <h2>{$t_title}</h2>
-          <p>{$t_sub}</p>
-        </div>
-        <div class="timeline">{$timeline_html}</div>
-        <p class="disclaimer-box">{$t_disc}</p>
-      </div>
-    </section>
-
-    <section id="realizace" class="portfolio-section container">
-      <div class="section-title">
-        <p class="eyebrow">{$p_eyebrow}</p>
-        <h2>{$p_title}</h2>
-        <p>{$p_sub}</p>
-      </div>
-      <div class="portfolio-grid">{$portfolio_html}</div>
-    </section>
-
-    <section id="reference" class="testimonials-section">
-      <div class="container">
-        <div class="section-title">
-          <p class="eyebrow">{$ts_eyebrow}</p>
-          <h2>{$ts_title}</h2>
-          <p>{$ts_sub}</p>
-        </div>
-        <div class="testimonials-grid">{$testimonials_html}</div>
-      </div>
-    </section>
-
-    <section id="faq" class="faq-section container">
-      <div class="section-title">
-        <p class="eyebrow">{$f_eyebrow}</p>
-        <h2>{$f_title}</h2>
-        <p>{$f_sub}</p>
-      </div>
-      <div class="faq-list">{$faq_html}</div>
-    </section>
-
-    <div class="container">
-      <div class="primary-cta-box">
-        <h2>{$cta_title}</h2>
-        <p>{$cta_text}</p>
-        <a href="#kontakt" class="btn btn-primary">{$cta_btn}</a>
-      </div>
-    </div>
-
-    <section id="kontakt" class="contact-section container">
-      <div class="section-title">
-        <p class="eyebrow">{$c_eyebrow}</p>
-        <h2>{$c_title}</h2>
-        <p>{$c_sub}</p>
-      </div>
-      <div class="contact-grid">
-        <div class="contact-card">
-          <h3>💬 Rychlá zpráva (pro zájemce)</h3>
-          <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
-            <a href="https://wa.me/{$wa_num}?text={$wa_msg}" class="btn-wa" target="_blank">NAPSAT NA WHATSAPP (+{$wa_num})</a>
-            <a href="{$ig_link}" class="btn-ig" target="_blank">NAPSAT NA INSTAGRAM</a>
-          </div>
-          <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--color-glass-border);">
-            <h4 style="font-family:var(--font-heading); font-size:1.4rem;">👨‍👩‍👦 Jste rodič?</h4>
-            <p style="font-size:0.95rem; color:var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše vysvětlíme.</p>
-            <a href="tel:{$wa_num}" class="btn btn-secondary" style="margin-top:1rem; width:100%;">CHCI SI ZAVOLAT ({$phone_parent})</a>
-          </div>
-        </div>
-        <div class="contact-card">
-          <h3>📝 Kontaktní formulář</h3>
-          <form onsubmit="event.preventDefault(); alert('Děkujeme! Zprávu jsme přijali.');">
-            <div class="form-group"><label>Jméno</label><input type="text" class="form-control" placeholder="Jan Novák" required /></div>
-            <div class="form-group"><label>Jsem:</label><select class="form-control"><option>Budoucí učedník</option><option>Rodič</option></select></div>
-            <div class="form-group"><label>Kontakt</label><input type="text" class="form-control" placeholder="Telefon nebo e-mail" required /></div>
-            <button type="submit" class="btn btn-primary" style="width:100%;">ODESLAT DOTAZ</button>
-          </form>
-        </div>
-      </div>
-    </section>
+    {$renderedMain}
   </main>
+
   <div class="mobile-sticky-cta"><a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a></div>
   <footer><div class="container"><p>© 2026 Svobodné Cechy. Všechna práva vyhrazena.</p></div></footer>
 </body>
@@ -449,7 +489,7 @@ if (isset($_POST['save_sections_form'])) {
         file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $generatedHtml = renderLandingPageHtml($formData);
         file_put_contents($htmlPath, $generatedHtml);
-        $message = "Všechny sekce landing page pro '{$slug}' byly úspěšně uloženy!";
+        $message = "Všechny sekce a jejich pořadí pro '{$slug}' byly úspěšně uloženy!";
     } else {
         $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
@@ -499,7 +539,7 @@ if ($editingSlug) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vizuální Editor Landing Pages – Svobodné Cechy</title>
+  <title>Vizuální Editor a Řazení Sekcí Landing Pages – Svobodné Cechy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -553,6 +593,7 @@ if ($editingSlug) {
     .section-tab-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
     .tab-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
     .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .tab-btn.special-order { background: rgba(232,117,22,0.2); color: #fff; border-color: var(--accent); }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -580,8 +621,8 @@ if ($editingSlug) {
       <a href="../admin.html" class="btn-back"><i class="bi bi-arrow-left"></i> Zpět do Rozcestníku administrace</a>
     </div>
 
-    <h1>Vizuální Editor Landing Pages s Nahráváním Fotek</h1>
-    <p class="subtitle">Upravuj obsah po jednotlivých sekcích a nahrávej fotky přímo ze svého počítače!</p>
+    <h1>Vizuální Editor & Měnění Pořadí Sekcí</h1>
+    <p class="subtitle">Můžeš libovolně měnit pořadí sekcí tlačítky Nahoru/Dolů a upravovat jejich obsah!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -590,7 +631,7 @@ if ($editingSlug) {
     <?php if ($editingSlug && $editingData): ?>
       <!-- VISUAL SECTION EDITOR -->
       <div class="card" style="border-color: var(--accent);">
-        <h2><i class="bi bi-sliders" style="color: var(--accent);"></i> Vizuální Úprava Sekcí: <span style="color:var(--accent);"><?= htmlspecialchars($editingSlug) ?>.html</span></h2>
+        <h2><i class="bi bi-sliders" style="color: var(--accent);"></i> Vizuální Úprava a Řazení Sekcí: <span style="color:var(--accent);"><?= htmlspecialchars($editingSlug) ?>.html</span></h2>
         
         <form method="post" action="landing_pages.php?edit=<?= urlencode($editingSlug) ?>" id="visualEditorForm">
           <input type="hidden" name="edit_slug" value="<?= htmlspecialchars($editingSlug) ?>" />
@@ -600,7 +641,8 @@ if ($editingSlug) {
             <!-- LEFT: SECTION TABS & FORM FIELDS -->
             <div>
               <div class="section-tab-nav">
-                <button type="button" class="tab-btn active" onclick="showTab('tab-hero')">1. HERO</button>
+                <button type="button" class="tab-btn special-order active" onclick="showTab('tab-order')"><i class="bi bi-arrow-down-up"></i> ⚙️ POŘADÍ SEKCÍ</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-hero')">1. HERO</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-uvp')">2. UVP</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-master')">3. MISTR</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-outcomes')">4. CO SE NAUČÍŠ</button>
@@ -611,8 +653,17 @@ if ($editingSlug) {
                 <button type="button" class="tab-btn" onclick="showTab('tab-contact')">9. KONTAKT</button>
               </div>
 
+              <!-- TAB ORDER: SECTIONS REORDERING -->
+              <div id="tab-order" class="tab-content active">
+                <h3 style="color:#fff; margin-bottom:1rem;">⚙️ Měnění Pořadí Sekcí na Stránce</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                  Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo. Po uložení se sekce na webu seřadí přesně podle tohoto pořadí.
+                </p>
+                <div id="order_list_container"></div>
+              </div>
+
               <!-- TAB 1: HERO -->
-              <div id="tab-hero" class="tab-content active">
+              <div id="tab-hero" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">🚀 Sekce 1: HERO (Úvodní obrazovka)</h3>
                 <div class="form-group">
                   <label>Eyebrow (malý text nad nadpisem)</label>
@@ -804,7 +855,7 @@ if ($editingSlug) {
 
               <div style="margin-top: 2rem;">
                 <button type="submit" name="save_sections_form" onclick="prepareJsonData()" class="btn-action btn-view" style="font-size: 1rem; padding: 0.8rem 2rem;">
-                  <i class="bi bi-check-circle-fill"></i> Uložit všechny sekce a fotky
+                  <i class="bi bi-check-circle-fill"></i> Uložit všechny sekce, fotky a pořadí
                 </button>
                 <a href="landing_pages.php" class="btn-action btn-copy" style="margin-left: 1rem;">Zavřít editor</a>
               </div>
@@ -820,6 +871,58 @@ if ($editingSlug) {
       </div>
 
       <script>
+        // Default or saved section order
+        let currentSectionOrder = <?= json_encode($editingData['section_order'] ?? ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta', 'contact']) ?>;
+
+        const sectionLabels = {
+          'hero': '🚀 HERO (Úvodní obrazovka)',
+          'uvp': '💎 UVP (Proč toto učednictví)',
+          'master': '👑 MISTR (O mistrovi)',
+          'outcomes': '📚 CO SE NAUČÍŠ',
+          'timeline': '🗺️ POSTUP (Timeline 5 kroků)',
+          'portfolio': '🖼️ GALERIE FOTEK',
+          'testimonials': '💬 REFERENCE',
+          'faq': '❓ ČASTÉ OTÁZKY (FAQ)',
+          'cta': '🎯 PRIMARY CTA BOX',
+          'contact': '📱 KONTAKT A WHATSAPP'
+        };
+
+        function renderOrderList() {
+          const container = document.getElementById('order_list_container');
+          if (!container) return;
+          container.innerHTML = '';
+          currentSectionOrder.forEach((key, idx) => {
+            const div = document.createElement('div');
+            div.className = 'item-card';
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
+            div.style.alignItems = 'center';
+            div.style.padding = '0.8rem 1.2rem';
+            div.style.marginBottom = '0.6rem';
+            div.innerHTML = `
+              <span style="font-size:0.95rem;"><strong>${idx + 1}.</strong> ${sectionLabels[key] || key}</span>
+              <div style="display:flex; gap:0.4rem;">
+                <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-up"></i> Nahoru</button>
+                <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, 1)" ${idx === currentSectionOrder.length - 1 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-down"></i> Dolů</button>
+              </div>
+            `;
+            container.appendChild(div);
+          });
+        }
+
+        function moveSection(index, direction) {
+          const targetIndex = index + direction;
+          if (targetIndex < 0 || targetIndex >= currentSectionOrder.length) return;
+          const temp = currentSectionOrder[index];
+          currentSectionOrder[index] = currentSectionOrder[targetIndex];
+          currentSectionOrder[targetIndex] = temp;
+          renderOrderList();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          renderOrderList();
+        });
+
         function showTab(tabId) {
           document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
           document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -844,7 +947,6 @@ if ($editingSlug) {
               if (previewImgId && document.getElementById(previewImgId)) {
                 document.getElementById(previewImgId).src = data.admin_preview_url || data.url;
               }
-              // Refresh preview iframe
               const iframe = document.getElementById('livePreviewFrame');
               if (iframe) { iframe.src = iframe.src; }
               alert('Fotka byla úspěšně nahrána!');
@@ -863,6 +965,7 @@ if ($editingSlug) {
             master_name: document.getElementById('m_name').value,
             meta_title: document.getElementById('h_h1').value + ' | Svobodné Cechy',
             meta_desc: document.getElementById('h_sub').value,
+            section_order: currentSectionOrder,
             hero: {
               eyebrow: document.getElementById('h_eyebrow').value,
               h1: document.getElementById('h_h1').value,
@@ -984,7 +1087,7 @@ if ($editingSlug) {
             echo "<td style='font-family:monospace; color:var(--text-muted); font-size:0.85rem;'>" . htmlspecialchars($relPath) . "</td>";
             echo "<td>";
             echo "<div style='display:flex; gap:0.5rem;'>";
-            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce & fotky</a>";
+            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce, fotky & pořadí</a>";
             echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
             echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
             echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";
