@@ -74,43 +74,49 @@
     .cta-nav:hover { background: #d0640d; transform: scale(1.03); }
 
     /* Hero Section */
+    h1, h2, h3, h4 {
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
     .hero {
       display: grid;
       grid-template-columns: 1fr 1fr;
       align-items: center;
       gap: 3rem;
-      padding: 5rem 0 4rem;
-      min-height: 75vh;
+      padding: 4.5rem 0 3.5rem;
+      min-height: 70vh;
     }
     .hero-content { max-width: 620px; }
     .eyebrow {
       text-transform: uppercase;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       letter-spacing: 2px;
       color: var(--color-accent);
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
     .hero h1 {
       font-family: var(--font-heading);
-      font-size: 3.5rem;
+      font-size: clamp(1.8rem, 4.8vw, 3.2rem);
       color: var(--color-white);
-      margin-bottom: 1.2rem;
-      line-height: 1.1;
+      margin-bottom: 1rem;
     }
-    .subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .subtitle { font-size: clamp(1rem, 2.5vw, 1.15rem); color: var(--text-muted); margin-bottom: 1.8rem; line-height: 1.5; }
     .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem 1.8rem;
+      padding: 0.9rem 1.6rem;
       border-radius: 6px;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.95rem;
       text-decoration: none;
       transition: all .2s;
-      min-height: 52px;
+      min-height: 48px;
       cursor: pointer;
       border: none;
     }
@@ -120,28 +126,30 @@
     .btn-secondary:hover { background: rgba(232, 117, 22, 0.15); transform: translateY(-2px); }
     .hero-image img {
       width: 100%;
+      max-height: 460px;
+      object-fit: cover;
       border-radius: 12px;
       box-shadow: 0 12px 35px rgba(0,0,0,0.6);
       border: 1px solid var(--color-glass-border);
     }
 
     /* Section Titles */
-    .section-title { text-align: center; margin-bottom: 3.5rem; }
-    .section-title h2 { font-family: var(--font-heading); font-size: 2.8rem; color: var(--color-white); margin-bottom: 0.5rem; }
-    .section-title p { color: var(--text-muted); font-size: 1.1rem; max-width: 700px; margin: auto; }
+    .section-title { text-align: center; margin-bottom: 2.8rem; }
+    .section-title h2 { font-family: var(--font-heading); font-size: clamp(1.6rem, 4.2vw, 2.5rem); color: var(--color-white); margin-bottom: 0.5rem; }
+    .section-title p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 700px; margin: auto; }
 
     /* UVP Grid */
-    .uvp-section { padding: 5rem 0; }
-    .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.8rem; }
+    .uvp-section { padding: 4.5rem 0; }
+    .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
     .uvp-card {
       background: var(--color-glass);
       border: 1px solid var(--color-glass-border);
       border-radius: 12px;
-      padding: 2rem;
+      padding: 1.8rem;
       transition: border-color .3s;
     }
     .uvp-card:hover { border-color: var(--color-accent); }
-    .uvp-card h3 { font-family: var(--font-heading); font-size: 1.6rem; color: var(--color-accent); margin-bottom: 0.8rem; }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.3rem, 3vw, 1.6rem); color: var(--color-accent); margin-bottom: 0.6rem; }
 
     /* Master Section */
     .master-section { padding: 5rem 0; background: rgba(0,0,0,0.3); border-y: 1px solid var(--color-glass-border); }
