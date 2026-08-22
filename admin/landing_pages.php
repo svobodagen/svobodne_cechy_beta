@@ -640,9 +640,10 @@ HTML;
     .mobile-sticky-cta { display: {$stickyCtaDisplay}; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,10,8,0.95); border-top: 1px solid var(--color-accent); padding: 0.7rem 1rem; z-index: 999; transition: opacity 0.3s ease; }
     footer { border-top: 1px solid var(--color-glass-border); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
 
-    /* Mobile Responsive Custom Margins & Padding */
+    /* Mobile Responsive Organic Layout */
     @media (max-width: 900px) {
-      .container { padding-left: var(--mobile-side-padding) !important; padding-right: var(--mobile-side-padding) !important; }
+      .container { padding: 0 1.2rem; }
+      .portfolio-grid, .faq-list { padding-left: var(--mobile-side-padding); padding-right: var(--mobile-side-padding); }
       .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; padding: 2rem 0 1.5rem; min-height: auto; }
       .hero-content { max-width: 100%; }
       .hero-buttons { justify-content: center; }
@@ -1012,15 +1013,14 @@ if ($editingSlug) {
 
                 <!-- 2. MOBILE MARGINS & PADDING -->
                 <div class="item-card">
-                  <h4>📱 Celkové Okraje a Mezerování pro Mobilní Zobrazení</h4>
+                  <h4>📱 Jemné Okraje pro Fotogalerii a FAQ na Mobilu</h4>
                   <div class="form-group">
-                    <label>Boční odsazení celého obsahu od okrajů displeje na mobilu (Side Margins)</label>
+                    <label>Jemné odsazení fotogalerie a FAQ seznamu od okrajů displeje</label>
                     <select class="form-control" id="design_mobile_side_padding" onchange="liveUpdateDesign()">
-                      <option value="0.5rem" <?= $mobileSidePadVal === '0.5rem' ? 'selected' : '' ?>>Jemné malé okraje (0.5rem ~ 8px)</option>
-                      <option value="0.8rem" <?= $mobileSidePadVal === '0.8rem' ? 'selected' : '' ?>>Kompaktní okraje (0.8rem ~ 13px)</option>
-                      <option value="1.2rem" <?= $mobileSidePadVal === '1.2rem' ? 'selected' : '' ?>>Standardní okraje (1.2rem ~ 19px - Doporučeno)</option>
-                      <option value="1.6rem" <?= $mobileSidePadVal === '1.6rem' ? 'selected' : '' ?>>Větší okraje (1.6rem ~ 25px)</option>
-                      <option value="2.0rem" <?= $mobileSidePadVal === '2.0rem' ? 'selected' : '' ?>>Velkorysé okraje (2.0rem ~ 32px)</option>
+                      <option value="0rem" <?= $mobileSidePadVal === '0rem' ? 'selected' : '' ?>>Bez dodatečných okrajů (0px)</option>
+                      <option value="0.4rem" <?= $mobileSidePadVal === '0.4rem' || $mobileSidePadVal === '0.5rem' ? 'selected' : '' ?>>Jemné okraje (0.4rem ~ 6px - Doporučeno)</option>
+                      <option value="0.8rem" <?= $mobileSidePadVal === '0.8rem' ? 'selected' : '' ?>>Střední okraje (0.8rem ~ 13px)</option>
+                      <option value="1.2rem" <?= $mobileSidePadVal === '1.2rem' ? 'selected' : '' ?>>Větší okraje (1.2rem ~ 19px)</option>
                     </select>
                   </div>
                   <div class="form-group">
