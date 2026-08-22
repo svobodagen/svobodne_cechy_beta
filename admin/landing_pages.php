@@ -77,25 +77,95 @@ function getTypoCssValues($typo) {
     $body_step = $typo['body_text'] ?? 'step-3';
     $eyebrow_step = $typo['eyebrow'] ?? 'step-3';
 
-    // Map values with fallback for legacy data
-    $h1_val = $scales['hero_h1'][$h1_step] ?? $scales['hero_h1']['step-3'];
-    $h2_val = $scales['section_h2'][$h2_step] ?? $scales['section_h2']['step-3'];
-    $h3_val = $scales['card_h3'][$h3_step] ?? $scales['card_h3']['step-3'];
-    $body_val = $scales['body_text'][$body_step] ?? $scales['body_text']['step-3'];
-    $eyebrow_val = $scales['eyebrow'][$eyebrow_step] ?? $scales['eyebrow']['step-3'];
-
     return [
-        'h1' => $h1_val,
-        'h2' => $h2_val,
-        'h3' => $h3_val,
-        'body' => $body_val,
-        'eyebrow' => $eyebrow_val,
+        'h1' => $scales['hero_h1'][$h1_step] ?? $scales['hero_h1']['step-3'],
+        'h2' => $scales['section_h2'][$h2_step] ?? $scales['section_h2']['step-3'],
+        'h3' => $scales['card_h3'][$h3_step] ?? $scales['card_h3']['step-3'],
+        'body' => $scales['body_text'][$body_step] ?? $scales['body_text']['step-3'],
+        'eyebrow' => $scales['eyebrow'][$eyebrow_step] ?? $scales['eyebrow']['step-3'],
         'h1_step' => $h1_step,
         'h2_step' => $h2_step,
         'h3_step' => $h3_step,
         'body_step' => $body_step,
         'eyebrow_step' => $eyebrow_step
     ];
+}
+
+// 5 Curated Color Themes (Background, Accent, Cards, Text)
+function getThemeCssVariables($themeKey) {
+    $themes = [
+        'amber' => [
+            'name' => '🔥 Sklářský Žár (Tmavě oranžová & Jantar)',
+            'primary' => '#0B0A08',
+            'dark' => '#17120E',
+            'cream' => '#F4EFE7',
+            'white' => '#FFFDF8',
+            'accent' => '#E87516',
+            'glass' => 'rgba(255, 255, 255, 0.05)',
+            'glass_border' => 'rgba(255, 255, 255, 0.1)',
+            'text' => '#F4EFE7',
+            'text_muted' => '#A39B8E',
+            'btn_hover' => '#d0640d',
+            'body_bg' => 'linear-gradient(135deg, #0B0A08, #17120E)'
+        ],
+        'cyan' => [
+            'name' => '💎 Křišťálová Noc (Tmavě modrá & Tyrkys)',
+            'primary' => '#050B11',
+            'dark' => '#0C1622',
+            'cream' => '#E0F2FE',
+            'white' => '#FFFFFF',
+            'accent' => '#00D2C4',
+            'glass' => 'rgba(0, 210, 196, 0.06)',
+            'glass_border' => 'rgba(0, 210, 196, 0.2)',
+            'text' => '#E0F2FE',
+            'text_muted' => '#8BAAC4',
+            'btn_hover' => '#00b3a6',
+            'body_bg' => 'linear-gradient(135deg, #050B11, #0C1622)'
+        ],
+        'gold' => [
+            'name' => '👑 Zlatý Cech (Tmavé Antracitové & Zlato)',
+            'primary' => '#11100E',
+            'dark' => '#1C1A17',
+            'cream' => '#FBF7EE',
+            'white' => '#FFFFFF',
+            'accent' => '#D4AF37',
+            'glass' => 'rgba(212, 175, 55, 0.06)',
+            'glass_border' => 'rgba(212, 175, 55, 0.2)',
+            'text' => '#FBF7EE',
+            'text_muted' => '#B5A895',
+            'btn_hover' => '#b89628',
+            'body_bg' => 'linear-gradient(135deg, #11100E, #1C1A17)'
+        ],
+        'ruby' => [
+            'name' => '🍷 Královská Dílna (Rubínové & Měď)',
+            'primary' => '#120709',
+            'dark' => '#1E0D11',
+            'cream' => '#FFF0F2',
+            'white' => '#FFFFFF',
+            'accent' => '#E14D4D',
+            'glass' => 'rgba(225, 77, 77, 0.06)',
+            'glass_border' => 'rgba(225, 77, 77, 0.2)',
+            'text' => '#FFF0F2',
+            'text_muted' => '#C499A0',
+            'btn_hover' => '#c83b3b',
+            'body_bg' => 'linear-gradient(135deg, #120709, #1E0D11)'
+        ],
+        'light' => [
+            'name' => '☀️ Světlé Studio (Moderní Světlý Ateliér)',
+            'primary' => '#F8F6F0',
+            'dark' => '#EEEBE1',
+            'cream' => '#211E1B',
+            'white' => '#12100E',
+            'accent' => '#B85D0D',
+            'glass' => 'rgba(0, 0, 0, 0.04)',
+            'glass_border' => 'rgba(0, 0, 0, 0.12)',
+            'text' => '#211E1B',
+            'text_muted' => '#665F57',
+            'btn_hover' => '#9c4c07',
+            'body_bg' => 'linear-gradient(135deg, #F8F6F0, #EEEBE1)'
+        ]
+    ];
+    return $themes[$themeKey] ?? $themes['amber'];
 }
 
 // AJAX Image Upload Handler
@@ -123,20 +193,32 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
     exit;
 }
 
-// Function to generate full HTML from section data array with dynamic section ordering and step-based typography
+// Function to generate full HTML from section data array with dynamic section ordering and design customization
 function renderLandingPageHtml($data) {
     $slug = htmlspecialchars($data['slug'] ?? 'master');
     $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
     $metaTitle = htmlspecialchars($data['meta_title'] ?? $masterName . ' – Svobodné Cechy');
     $metaDesc = htmlspecialchars($data['meta_desc'] ?? '');
     
-    // Custom typography font sizes mapped from steps
+    // Typography Configuration
     $typoConf = getTypoCssValues($data['typography'] ?? []);
     $h1_clamp = $typoConf['h1'];
     $h2_clamp = $typoConf['h2'];
     $h3_clamp = $typoConf['h3'];
     $body_size = $typoConf['body'];
     $eyebrow_size = $typoConf['eyebrow'];
+
+    // Design Configuration (Themes, Mobile Margins, Sticky CTA)
+    $design = $data['design'] ?? [];
+    $themeKey = $design['color_theme'] ?? 'amber';
+    $tvars = getThemeCssVariables($themeKey);
+
+    $mobileSidePad = htmlspecialchars($design['mobile_side_padding'] ?? '1rem');
+    $mobileSecPad = htmlspecialchars($design['mobile_section_padding'] ?? '2.2rem');
+    
+    $stickyCtaEnabled = !isset($design['sticky_cta_enabled']) || $design['sticky_cta_enabled'] == true;
+    $hideInHero = isset($design['sticky_cta_hide_in_hero']) && $design['sticky_cta_hide_in_hero'] == true;
+    $hideInContact = isset($design['sticky_cta_hide_in_contact']) && $design['sticky_cta_hide_in_contact'] == true;
 
     // 1. Hero
     $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? 'UČEDNICTVÍ U MISTRA SKLÁŘE');
@@ -409,6 +491,10 @@ HTML;
         }
     }
 
+    $stickyCtaDisplay = $stickyCtaEnabled ? 'block' : 'none';
+    $hideInHeroJson = json_encode($hideInHero);
+    $hideInContactJson = json_encode($hideInContact);
+
     return <<<HTML
 <!DOCTYPE html>
 <html lang="cs">
@@ -425,15 +511,16 @@ HTML;
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --color-primary: #0B0A08;
-      --color-dark: #17120E;
-      --color-cream: #F4EFE7;
-      --color-white: #FFFDF8;
-      --color-accent: #E87516;
-      --color-glass: rgba(255, 255, 255, 0.05);
-      --color-glass-border: rgba(255, 255, 255, 0.1);
-      --text: #F4EFE7;
-      --text-muted: #A39B8E;
+      --color-primary: {$tvars['primary']};
+      --color-dark: {$tvars['dark']};
+      --color-cream: {$tvars['cream']};
+      --color-white: {$tvars['white']};
+      --color-accent: {$tvars['accent']};
+      --color-glass: {$tvars['glass']};
+      --color-glass-border: {$tvars['glass_border']};
+      --text: {$tvars['text']};
+      --text-muted: {$tvars['text_muted']};
+      --btn-hover: {$tvars['btn_hover']};
       --font-heading: 'Cormorant Garamond', serif;
       --font-body: 'Inter', sans-serif;
 
@@ -443,16 +530,20 @@ HTML;
       --card-h3-clamp: {$h3_clamp};
       --body-text-size: {$body_size};
       --eyebrow-size: {$eyebrow_size};
+
+      /* Mobile Layout Margins & Paddings */
+      --mobile-side-padding: {$mobileSidePad};
+      --mobile-section-padding: {$mobileSecPad};
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-dark)); color: var(--text); line-height: 1.5; font-size: var(--body-text-size); }
+    body { font-family: var(--font-body); background: {$tvars['body_bg']}; color: var(--text); line-height: 1.5; font-size: var(--body-text-size); }
     @media (min-width: 768px) { body { font-size: var(--body-text-size); } }
 
     .container { max-width: 1050px; margin: auto; padding: 0 1.2rem; }
 
     /* Sticky Header */
-    .site-header { position: sticky; top: 0; background: rgba(11, 10, 8, 0.92); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid rgba(232, 117, 22, 0.2); }
+    .site-header { position: sticky; top: 0; background: rgba(11, 10, 8, 0.92); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid var(--color-glass-border); }
     .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.2rem; max-width: 1050px; margin: auto; }
     .logo { font-family: var(--font-heading); font-size: clamp(1.05rem, 2.2vw, 1.3rem); font-weight: 700; color: var(--color-accent); text-decoration: none; letter-spacing: 1px; }
     .nav-menu { list-style: none; display: flex; gap: 1.2rem; align-items: center; }
@@ -477,6 +568,7 @@ HTML;
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.4rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
     .btn-primary { background: var(--color-accent); color: #fff; }
+    .btn-primary:hover { background: var(--btn-hover); }
     .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
     .hero-image img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
 
@@ -545,19 +637,20 @@ HTML;
     .form-group { margin-bottom: 0.9rem; }
     .form-control { width: 100%; padding: 0.7rem 0.85rem; background: rgba(0,0,0,0.5); border: 1px solid var(--color-glass-border); border-radius: 6px; color: #fff; font-size: 0.9rem; }
 
-    .mobile-sticky-cta { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,10,8,0.95); border-top: 1px solid var(--color-accent); padding: 0.7rem 1rem; z-index: 999; }
+    .mobile-sticky-cta { display: {$stickyCtaDisplay}; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,10,8,0.95); border-top: 1px solid var(--color-accent); padding: 0.7rem 1rem; z-index: 999; transition: opacity 0.3s ease; }
     footer { border-top: 1px solid var(--color-glass-border); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
 
-    /* Mobile Responsive Compact View */
+    /* Mobile Responsive Custom Margins & Padding */
     @media (max-width: 900px) {
+      .container { padding: 0 var(--mobile-side-padding); }
       .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; padding: 2rem 0 1.5rem; min-height: auto; }
       .hero-content { max-width: 100%; }
       .hero-buttons { justify-content: center; }
       .master-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .contact-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .nav-menu { display: none; }
-      .mobile-sticky-cta { display: block; }
-      .uvp-section, .master-section, .outcomes-section, .timeline-section, .portfolio-section, .testimonials-section, .faq-section { padding: 2.2rem 0; }
+      .mobile-sticky-cta { display: {$stickyCtaDisplay}; }
+      .uvp-section, .master-section, .outcomes-section, .timeline-section, .portfolio-section, .testimonials-section, .faq-section { padding: var(--mobile-section-padding) 0; }
       .section-title { margin-bottom: 1.5rem; }
       .primary-cta-box { padding: 1.8rem 1rem; margin: 1.8rem auto; }
       .timeline-step { grid-template-columns: 40px 1fr; gap: 0.8rem; padding: 0.9rem 1rem; }
@@ -587,6 +680,37 @@ HTML;
 
   <div class="mobile-sticky-cta"><a href="#kontakt" class="btn btn-primary" style="width:100%;">ZJISTIT, JESTLI JE TO PRO MĚ</a></div>
   <footer><div class="container"><p>© 2026 Svobodné Cechy. Všechna práva vyhrazena.</p></div></footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cta = document.querySelector('.mobile-sticky-cta');
+      if (!cta) return;
+      const hideInHero = {$hideInHeroJson};
+      const hideInContact = {$hideInContactJson};
+
+      function updateCtaVisibility() {
+        let hide = false;
+        if (hideInHero) {
+          const hero = document.querySelector('.hero');
+          if (hero) {
+            const rect = hero.getBoundingClientRect();
+            if (rect.bottom > 100) hide = true;
+          }
+        }
+        if (hideInContact) {
+          const contact = document.querySelector('#kontakt');
+          if (contact) {
+            const rect = contact.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 50) hide = true;
+          }
+        }
+        cta.style.display = hide ? 'none' : '{$stickyCtaDisplay}';
+      }
+
+      window.addEventListener('scroll', updateCtaVisibility, { passive: true });
+      updateCtaVisibility();
+    });
+  </script>
 </body>
 </html>
 HTML;
@@ -606,7 +730,7 @@ if (isset($_POST['save_sections_form'])) {
         file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $generatedHtml = renderLandingPageHtml($formData);
         file_put_contents($htmlPath, $generatedHtml);
-        $message = "Všechny sekce, fotky, pořadí a stupně fontů pro '{$slug}' byly úspěšně uloženy!";
+        $message = "Všechny sekce, fotky, pořadí, barevná témata a nastavení pro '{$slug}' byly úspěšně uloženy!";
     } else {
         $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
@@ -728,6 +852,7 @@ if ($editingSlug) {
     .tab-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
     .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .tab-btn.special-order { background: rgba(232,117,22,0.2); color: #fff; border-color: var(--accent); }
+    .tab-btn.special-design { background: rgba(59,130,246,0.2); color: #fff; border-color: #3b82f6; }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -736,6 +861,14 @@ if ($editingSlug) {
     .form-group label { display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.3rem; }
     .form-control { width: 100%; padding: 0.75rem 1rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
     textarea.form-control { min-height: 80px; resize: vertical; }
+
+    /* Theme Option Radio Cards */
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.5rem; }
+    .theme-card-option { border: 2px solid var(--border); border-radius: 8px; padding: 0.8rem 1rem; cursor: pointer; transition: all .2s; background: rgba(0,0,0,0.3); }
+    .theme-card-option:hover { border-color: var(--accent); }
+    .theme-card-option.selected { border-color: var(--accent); background: rgba(232,117,22,0.15); }
+    .theme-swatches { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+    .swatch { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
 
     /* Upload Box UI */
     .upload-row { display: flex; gap: 0.8rem; align-items: center; margin-top: 0.4rem; }
@@ -765,7 +898,7 @@ if ($editingSlug) {
     </div>
 
     <h1>Vizuální Editor Landing Pages</h1>
-    <p class="subtitle">Upravuj VŠECHNY texty, nahrávej fotky, měň pořadí sekcí v živém náhledu i nastavení stupňů fontů!</p>
+    <p class="subtitle">Upravuj obsah sekcí, 5 barevných schémat, mobilní okraje, plovoucí tlačítko i pořadí a fonty!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -785,7 +918,8 @@ if ($editingSlug) {
             <div>
               <div class="section-tab-nav">
                 <button type="button" class="tab-btn special-order active" onclick="showTab('tab-order')"><i class="bi bi-arrow-down-up"></i> ⚙️ POŘADÍ SEKCÍ</button>
-                <button type="button" class="tab-btn special-order" onclick="showTab('tab-typo')"><i class="bi bi-type"></i> 🎨 STUPNĚ FONTŮ</button>
+                <button type="button" class="tab-btn special-design" onclick="showTab('tab-design')"><i class="bi bi-palette"></i> 🎨 DESIGN & BARVY</button>
+                <button type="button" class="tab-btn special-order" onclick="showTab('tab-typo')"><i class="bi bi-type"></i> 🔤 STUPNĚ FONTŮ</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-hero')">1. HERO</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-uvp')">2. UVP</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-master')">3. MISTR</button>
@@ -805,6 +939,122 @@ if ($editingSlug) {
                   Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo. Změny se <strong>ihned projevují v živém náhledu vpravo</strong>.
                 </p>
                 <div id="order_list_container"></div>
+              </div>
+
+              <!-- TAB DESIGN: COLOR THEMES, MOBILE MARGINS & STICKY CTA -->
+              <div id="tab-design" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:0.5rem;">🎨 Barevná Schémata, Mobilní Okraje & Plovoucí Tlačítko</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                  Vyber si jedno z 5 barevných schémat, uprav boční okraje na mobilu a nastav chování plovoucího CTA tlačítka.
+                </p>
+
+                <?php 
+                $designData = $editingData['design'] ?? []; 
+                $currentTheme = $designData['color_theme'] ?? 'amber';
+                $mobileSidePadVal = $designData['mobile_side_padding'] ?? '1rem';
+                $mobileSecPadVal = $designData['mobile_section_padding'] ?? '2.2rem';
+                $stickyEnabled = !isset($designData['sticky_cta_enabled']) || $designData['sticky_cta_enabled'] == true;
+                $stickyHideHero = isset($designData['sticky_cta_hide_in_hero']) && $designData['sticky_cta_hide_in_hero'] == true;
+                $stickyHideContact = isset($designData['sticky_cta_hide_in_contact']) && $designData['sticky_cta_hide_in_contact'] == true;
+                ?>
+
+                <!-- 1. COLOR THEMES -->
+                <div class="item-card">
+                  <h4>🎨 Výběr Barevného Schématu (5 Palet)</h4>
+                  <div class="theme-grid">
+                    <div class="theme-card-option <?= $currentTheme === 'amber' ? 'selected' : '' ?>" onclick="selectTheme('amber')">
+                      <strong>🔥 Sklářský Žár</strong> (Default)
+                      <div class="theme-swatches">
+                        <div class="swatch" style="background:#0B0A08;"></div>
+                        <div class="swatch" style="background:#E87516;"></div>
+                        <div class="swatch" style="background:#F4EFE7;"></div>
+                      </div>
+                    </div>
+
+                    <div class="theme-card-option <?= $currentTheme === 'cyan' ? 'selected' : '' ?>" onclick="selectTheme('cyan')">
+                      <strong>💎 Křišťálová Noc</strong>
+                      <div class="theme-swatches">
+                        <div class="swatch" style="background:#050B11;"></div>
+                        <div class="swatch" style="background:#00D2C4;"></div>
+                        <div class="swatch" style="background:#E0F2FE;"></div>
+                      </div>
+                    </div>
+
+                    <div class="theme-card-option <?= $currentTheme === 'gold' ? 'selected' : '' ?>" onclick="selectTheme('gold')">
+                      <strong>👑 Zlatý Cech</strong>
+                      <div class="theme-swatches">
+                        <div class="swatch" style="background:#11100E;"></div>
+                        <div class="swatch" style="background:#D4AF37;"></div>
+                        <div class="swatch" style="background:#FBF7EE;"></div>
+                      </div>
+                    </div>
+
+                    <div class="theme-card-option <?= $currentTheme === 'ruby' ? 'selected' : '' ?>" onclick="selectTheme('ruby')">
+                      <strong>🍷 Královská Dílna</strong>
+                      <div class="theme-swatches">
+                        <div class="swatch" style="background:#120709;"></div>
+                        <div class="swatch" style="background:#E14D4D;"></div>
+                        <div class="swatch" style="background:#FFF0F2;"></div>
+                      </div>
+                    </div>
+
+                    <div class="theme-card-option <?= $currentTheme === 'light' ? 'selected' : '' ?>" onclick="selectTheme('light')">
+                      <strong>☀️ Světlé Studio</strong>
+                      <div class="theme-swatches">
+                        <div class="swatch" style="background:#F8F6F0;"></div>
+                        <div class="swatch" style="background:#B85D0D;"></div>
+                        <div class="swatch" style="background:#211E1B;"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="design_color_theme" value="<?= htmlspecialchars($currentTheme) ?>" />
+                </div>
+
+                <!-- 2. MOBILE MARGINS & PADDING -->
+                <div class="item-card">
+                  <h4>📱 Okraje a Mezerování pro Mobilní Zobrazení</h4>
+                  <div class="form-group">
+                    <label>Boční odsazení obsahu na mobilu (Container Side Padding)</label>
+                    <select class="form-control" id="design_mobile_side_padding" onchange="liveUpdateDesign()">
+                      <option value="0.6rem" <?= $mobileSidePadVal === '0.6rem' ? 'selected' : '' ?>>Úzké okraje (0.6rem ~ 10px - Více místa)</option>
+                      <option value="1rem" <?= $mobileSidePadVal === '1rem' ? 'selected' : '' ?>>Standardní okraje (1.0rem ~ 16px - Doporučeno)</option>
+                      <option value="1.5rem" <?= $mobileSidePadVal === '1.5rem' ? 'selected' : '' ?>>Prostorné okraje (1.5rem ~ 24px)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Svislé mezerování sekcí na mobilu (Section Vertical Padding)</label>
+                    <select class="form-control" id="design_mobile_section_padding" onchange="liveUpdateDesign()">
+                      <option value="1.5rem" <?= $mobileSecPadVal === '1.5rem' ? 'selected' : '' ?>>Kompaktní sekce (1.5rem ~ 24px)</option>
+                      <option value="2.2rem" <?= $mobileSecPadVal === '2.2rem' ? 'selected' : '' ?>>Vyvážené sekce (2.2rem ~ 35px - Doporučeno)</option>
+                      <option value="3.2rem" <?= $mobileSecPadVal === '3.2rem' ? 'selected' : '' ?>>Prostorné rozstupy sekcí (3.2rem ~ 51px)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- 3. FLOATING STICKY CTA BUTTON SWITCH & SECTION FILTERS -->
+                <div class="item-card">
+                  <h4>📌 Plovoucí Tlačítko na Mobilu (Sticky Mobile CTA)</h4>
+                  <div class="form-group" style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1rem;">
+                    <input type="checkbox" id="design_sticky_enabled" style="width:20px; height:20px; accent-color:var(--accent);" <?= $stickyEnabled ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
+                    <label for="design_sticky_enabled" style="font-size:1rem; color:#fff; cursor:pointer; margin:0;">Zobrazovat plovoucí tlačítko na mobilních telefonech</label>
+                  </div>
+
+                  <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:6px; border:1px solid var(--border);">
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">
+                      Nastav, ve kterých sekcích má plovoucí tlačítko automaticky mizet, aby nepřekáželo:
+                    </p>
+                    <div style="display:flex; flex-direction:column; gap:0.6rem;">
+                      <label style="color:#fff; font-weight:normal; cursor:pointer;">
+                        <input type="checkbox" id="design_sticky_hide_hero" style="accent-color:var(--accent);" <?= $stickyHideHero ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
+                        Skrýt tlačítko v úvodní sekce HERO (při nahoře)
+                      </label>
+                      <label style="color:#fff; font-weight:normal; cursor:pointer;">
+                        <input type="checkbox" id="design_sticky_hide_contact" style="accent-color:var(--accent);" <?= $stickyHideContact ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
+                        Skrýt tlačítko v sekci KONTAKT (aby nepřekrývalo formulář)
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- TAB TYPOGRAPHY: STEP-BASED FONT SIZE CONFIGURATION -->
@@ -1286,6 +1536,55 @@ if ($editingSlug) {
           }
         };
 
+        const themeVariables = {
+          amber: { primary: '#0B0A08', dark: '#17120E', cream: '#F4EFE7', accent: '#E87516', glass_border: 'rgba(255,255,255,0.1)', text: '#F4EFE7', body_bg: 'linear-gradient(135deg, #0B0A08, #17120E)' },
+          cyan: { primary: '#050B11', dark: '#0C1622', cream: '#E0F2FE', accent: '#00D2C4', glass_border: 'rgba(0,210,196,0.2)', text: '#E0F2FE', body_bg: 'linear-gradient(135deg, #050B11, #0C1622)' },
+          gold: { primary: '#11100E', dark: '#1C1A17', cream: '#FBF7EE', accent: '#D4AF37', glass_border: 'rgba(212,175,55,0.2)', text: '#FBF7EE', body_bg: 'linear-gradient(135deg, #11100E, #1C1A17)' },
+          ruby: { primary: '#120709', dark: '#1E0D11', cream: '#FFF0F2', accent: '#E14D4D', glass_border: 'rgba(225,77,77,0.2)', text: '#FFF0F2', body_bg: 'linear-gradient(135deg, #120709, #1E0D11)' },
+          light: { primary: '#F8F6F0', dark: '#EEEBE1', cream: '#211E1B', accent: '#B85D0D', glass_border: 'rgba(0,0,0,0.12)', text: '#211E1B', body_bg: 'linear-gradient(135deg, #F8F6F0, #EEEBE1)' }
+        };
+
+        function selectTheme(key) {
+          document.querySelectorAll('.theme-card-option').forEach(el => el.classList.remove('selected'));
+          event.currentTarget.classList.add('selected');
+          document.getElementById('design_color_theme').value = key;
+          liveUpdateDesign();
+        }
+
+        // Real-Time Live Design Updates (Themes, Mobile Margins, Sticky CTA)
+        function liveUpdateDesign() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
+          try {
+            const doc = iframe.contentDocument;
+            const root = doc.documentElement;
+            const body = doc.body;
+            if (!root || !body) return;
+
+            const themeKey = document.getElementById('design_color_theme').value || 'amber';
+            const tvars = themeVariables[themeKey] || themeVariables.amber;
+
+            root.style.setProperty('--color-primary', tvars.primary);
+            root.style.setProperty('--color-dark', tvars.dark);
+            root.style.setProperty('--color-cream', tvars.cream);
+            root.style.setProperty('--color-accent', tvars.accent);
+            root.style.setProperty('--color-glass-border', tvars.glass_border);
+            root.style.setProperty('--text', tvars.text);
+            body.style.background = tvars.body_bg;
+
+            const sidePad = document.getElementById('design_mobile_side_padding').value;
+            const secPad = document.getElementById('design_mobile_section_padding').value;
+            root.style.setProperty('--mobile-side-padding', sidePad);
+            root.style.setProperty('--mobile-section-padding', secPad);
+
+            const stickyEnabled = document.getElementById('design_sticky_enabled').checked;
+            const cta = doc.querySelector('.mobile-sticky-cta');
+            if (cta) {
+              cta.style.display = stickyEnabled ? 'block' : 'none';
+            }
+          } catch(e) { console.log('Design live update error:', e); }
+        }
+
         // Real-Time Live Typography Updates on iframe
         function liveUpdateTypography() {
           const iframe = document.getElementById('livePreviewFrame');
@@ -1354,7 +1653,10 @@ if ($editingSlug) {
             frame.className = 'preview-iframe';
             document.getElementById('btn_desktop').classList.add('active');
           }
-          setTimeout(liveUpdateTypography, 100);
+          setTimeout(() => {
+            liveUpdateTypography();
+            liveUpdateDesign();
+          }, 100);
         }
 
         function refreshPreview() {
@@ -1363,6 +1665,7 @@ if ($editingSlug) {
             iframe.src = iframe.src.split('?')[0] + '?v=' + Date.now(); 
             iframe.onload = () => {
               liveUpdateTypography();
+              liveUpdateDesign();
               liveReorderSectionsInIframe();
             };
           }
@@ -1407,6 +1710,7 @@ if ($editingSlug) {
           if (iframe) {
             iframe.onload = () => {
               liveUpdateTypography();
+              liveUpdateDesign();
               liveReorderSectionsInIframe();
             };
           }
@@ -1452,6 +1756,14 @@ if ($editingSlug) {
             meta_title: document.getElementById('h_h1').value + ' | Svobodné Cechy',
             meta_desc: document.getElementById('h_sub').value,
             section_order: currentSectionOrder,
+            design: {
+              color_theme: document.getElementById('design_color_theme').value,
+              mobile_side_padding: document.getElementById('design_mobile_side_padding').value,
+              mobile_section_padding: document.getElementById('design_mobile_section_padding').value,
+              sticky_cta_enabled: document.getElementById('design_sticky_enabled').checked,
+              sticky_cta_hide_in_hero: document.getElementById('design_sticky_hide_hero').checked,
+              sticky_cta_hide_in_contact: document.getElementById('design_sticky_hide_contact').checked
+            },
             typography: {
               hero_h1: document.getElementById('typo_hero_h1').value,
               section_h2: document.getElementById('typo_section_h2').value,
@@ -1580,7 +1892,7 @@ if ($editingSlug) {
             echo "<td style='font-family:monospace; color:var(--text-muted); font-size:0.85rem;'>" . htmlspecialchars($relPath) . "</td>";
             echo "<td>";
             echo "<div style='display:flex; gap:0.5rem;'>";
-            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce, fotky, fonty & pořadí</a>";
+            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce, fotky, fonty, témata & pořadí</a>";
             echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
             echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
             echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";
