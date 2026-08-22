@@ -193,7 +193,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
     exit;
 }
 
-// Function to generate full HTML from section data array with dynamic section ordering and design customization
+// Function to generate full HTML from section data array with dynamic section ordering, odd/even section margins, and themes
 function renderLandingPageHtml($data) {
     $slug = htmlspecialchars($data['slug'] ?? 'master');
     $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
@@ -208,14 +208,16 @@ function renderLandingPageHtml($data) {
     $body_size = $typoConf['body'];
     $eyebrow_size = $typoConf['eyebrow'];
 
-    // Design Configuration (Themes, Mobile Margins, Sticky CTA)
+    // Design Configuration (Themes, Odd/Even Margins, Sticky CTA)
     $design = $data['design'] ?? [];
     $themeKey = $design['color_theme'] ?? 'amber';
     $tvars = getThemeCssVariables($themeKey);
 
-    $mobileSidePad = htmlspecialchars($design['mobile_side_padding'] ?? '1rem');
-    $mobileSecPad = htmlspecialchars($design['mobile_section_padding'] ?? '2.2rem');
-    
+    $oddSidePad = htmlspecialchars($design['odd_side_padding'] ?? '1.2rem');
+    $oddVertPad = htmlspecialchars($design['odd_vert_padding'] ?? '2.8rem');
+    $evenSidePad = htmlspecialchars($design['even_side_padding'] ?? '0.6rem');
+    $evenVertPad = htmlspecialchars($design['even_vert_padding'] ?? '2.2rem');
+
     $stickyCtaEnabled = !isset($design['sticky_cta_enabled']) || $design['sticky_cta_enabled'] == true;
     $hideInHero = isset($design['sticky_cta_hide_in_hero']) && $design['sticky_cta_hide_in_hero'] == true;
     $hideInContact = isset($design['sticky_cta_hide_in_contact']) && $design['sticky_cta_hide_in_contact'] == true;
@@ -485,9 +487,17 @@ HTML;
     $order = $data['section_order'] ?? $defaultOrder;
 
     $renderedMain = "";
-    foreach ($order as $secKey) {
+    foreach ($order as $idx => $secKey) {
         if (isset($allSections[$secKey])) {
-            $renderedMain .= $allSections[$secKey] . "\n";
+            $isOdd = ($idx % 2 === 0);
+            $secClass = $isOdd ? 'section-odd' : 'section-even';
+            $block = $allSections[$secKey];
+            if (preg_match('/class=["\']([^"\']*)["\']/', $block)) {
+                $block = preg_replace('/class=["\']([^"\']*)["\']/', 'class="$1 ' . $secClass . '"', $block, 1);
+            } else {
+                $block = preg_replace('/<([a-z0-9]+)/i', '<$1 class="' . $secClass . '"', $block, 1);
+            }
+            $renderedMain .= $block . "\n";
         }
     }
 
@@ -531,9 +541,11 @@ HTML;
       --body-text-size: {$body_size};
       --eyebrow-size: {$eyebrow_size};
 
-      /* Mobile Layout Margins & Paddings */
-      --mobile-side-padding: {$mobileSidePad};
-      --mobile-section-padding: {$mobileSecPad};
+      /* Alternating Odd & Even Section Margins & Padding */
+      --odd-side-padding: {$oddSidePad};
+      --odd-vert-padding: {$oddVertPad};
+      --even-side-padding: {$evenSidePad};
+      --even-vert-padding: {$evenVertPad};
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -541,6 +553,21 @@ HTML;
     @media (min-width: 768px) { body { font-size: var(--body-text-size); } }
 
     .container { max-width: 1050px; margin: auto; padding: 0 1.2rem; }
+
+    /* Alternating Section Dynamics */
+    .section-odd {
+      padding-top: var(--odd-vert-padding);
+      padding-bottom: var(--odd-vert-padding);
+      padding-left: var(--odd-side-padding);
+      padding-right: var(--odd-side-padding);
+    }
+    .section-even {
+      padding-top: var(--even-vert-padding);
+      padding-bottom: var(--even-vert-padding);
+      padding-left: var(--even-side-padding);
+      padding-right: var(--even-side-padding);
+      background: rgba(0, 0, 0, 0.15);
+    }
 
     /* Sticky Header */
     .site-header { position: sticky; top: 0; background: rgba(11, 10, 8, 0.92); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid var(--color-glass-border); }
@@ -584,41 +611,34 @@ HTML;
     .master-info h3 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.5rem; }
     .section-title p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 680px; margin: auto; }
 
-    .uvp-section { padding: 3.5rem 0; }
     .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .uvp-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.5rem; }
     .uvp-card h3 { font-family: var(--font-heading); font-size: var(--card-h3-clamp); color: var(--color-accent); margin-bottom: 0.4rem; }
 
-    .master-section { padding: 3.5rem 0; background: rgba(0,0,0,0.3); }
     .master-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; align-items: center; }
     .master-photo img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 14px; border: 1px solid var(--color-accent); }
     .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; font-size: var(--eyebrow-size); }
     .quote-box { font-family: var(--font-heading); font-style: italic; font-size: clamp(1.05rem, 2.5vw, 1.25rem); color: var(--color-cream); border-left: 3px solid var(--color-accent); padding-left: 0.9rem; margin: 1rem 0; line-height: 1.3; }
 
-    .outcomes-section { padding: 3.5rem 0; }
     .outcomes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .outcome-item { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.25rem; }
     .outcome-item h4, .step-content h4 { font-family: var(--font-heading); font-size: var(--card-h3-clamp); color: var(--color-white); margin-bottom: 0.3rem; }
 
-    .timeline-section { padding: 3.5rem 0; background: rgba(0,0,0,0.2); }
     .timeline { display: flex; flex-direction: column; gap: 1rem; max-width: 850px; margin: auto; }
     .timeline-step { display: grid; grid-template-columns: 50px 1fr; gap: 1rem; background: var(--color-glass); border: 1px solid var(--color-glass-border); border-left: 4px solid var(--color-accent); border-radius: 8px; padding: 1rem 1.2rem; align-items: center; }
     .step-number { font-family: var(--font-heading); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: var(--color-accent); text-align: center; }
     .disclaimer-box { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 1.5rem; font-style: italic; }
 
-    .portfolio-section { padding: 3.5rem 0; }
     .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
     .portfolio-item { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--color-glass-border); }
     .portfolio-item img { width: 100%; height: 220px; object-fit: cover; display: block; }
     .portfolio-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 1rem 0.8rem 0.6rem; color: var(--color-white); font-weight: 600; font-size: 0.85rem; }
 
-    .testimonials-section { padding: 3.5rem 0; background: rgba(0,0,0,0.3); }
     .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .testimonial-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.5rem; }
     .quote-text { font-style: italic; margin-bottom: 0.8rem; color: var(--color-cream); font-size: 0.9rem; }
     .author-info strong { color: var(--color-accent); display: block; font-size: 0.9rem; }
 
-    .faq-section { padding: 3.5rem 0; }
     .faq-list { max-width: 800px; margin: auto; display: flex; flex-direction: column; gap: 0.7rem; }
     details { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 8px; padding: 0.9rem 1.1rem; }
     details[open] { border-color: var(--color-accent); background: rgba(232, 117, 22, 0.05); }
@@ -629,7 +649,6 @@ HTML;
     .primary-cta-box { background: linear-gradient(135deg, rgba(232,117,22,0.15), rgba(17,14,11,0.9)); border: 2px solid var(--color-accent); border-radius: 16px; padding: 2.5rem 1.2rem; text-align: center; margin: 2.5rem auto; max-width: 850px; }
     .primary-cta-box p { color: var(--text-muted); font-size: clamp(0.9rem, 1.8vw, 1.05rem); max-width: 620px; margin: 0 auto 1.2rem; }
 
-    .contact-section { padding: 3rem 0 4.5rem; }
     .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
     .contact-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 14px; padding: 1.8rem; }
     .btn-wa { background: #25D366; color: #fff; text-decoration: none; font-weight: 700; border-radius: 6px; padding: 0.8rem; text-align: center; display: flex; justify-content: center; gap: 0.5rem; font-size: 0.85rem; }
@@ -640,18 +659,27 @@ HTML;
     .mobile-sticky-cta { display: {$stickyCtaDisplay}; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,10,8,0.95); border-top: 1px solid var(--color-accent); padding: 0.7rem 1rem; z-index: 999; transition: opacity 0.3s ease; }
     footer { border-top: 1px solid var(--color-glass-border); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
 
-    /* Mobile Responsive Organic Layout */
+    /* Mobile Responsive Custom Margins & Padding */
     @media (max-width: 900px) {
-      .container { padding: 0 1.2rem; }
-      .portfolio-grid, .faq-list { padding-left: var(--mobile-side-padding); padding-right: var(--mobile-side-padding); }
-      .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; padding: 2rem 0 1.5rem; min-height: auto; }
+      .section-odd {
+        padding-top: calc(var(--odd-vert-padding) * 0.65);
+        padding-bottom: calc(var(--odd-vert-padding) * 0.65);
+        padding-left: var(--odd-side-padding);
+        padding-right: var(--odd-side-padding);
+      }
+      .section-even {
+        padding-top: calc(var(--even-vert-padding) * 0.65);
+        padding-bottom: calc(var(--even-vert-padding) * 0.65);
+        padding-left: var(--even-side-padding);
+        padding-right: var(--even-side-padding);
+      }
+      .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; min-height: auto; }
       .hero-content { max-width: 100%; }
       .hero-buttons { justify-content: center; }
       .master-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .contact-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .nav-menu { display: none; }
       .mobile-sticky-cta { display: {$stickyCtaDisplay}; }
-      .uvp-section, .master-section, .outcomes-section, .timeline-section, .portfolio-section, .testimonials-section, .faq-section { padding-top: var(--mobile-section-padding); padding-bottom: var(--mobile-section-padding); }
       .section-title { margin-bottom: 1.5rem; }
       .primary-cta-box { padding: 1.8rem 1rem; margin: 1.8rem auto; }
       .timeline-step { grid-template-columns: 40px 1fr; gap: 0.8rem; padding: 0.9rem 1rem; }
@@ -731,7 +759,7 @@ if (isset($_POST['save_sections_form'])) {
         file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $generatedHtml = renderLandingPageHtml($formData);
         file_put_contents($htmlPath, $generatedHtml);
-        $message = "Všechny sekce, fotky, pořadí, barevná témata a nastavení pro '{$slug}' byly úspěšně uloženy!";
+        $message = "Všechny sekce, fotky, pořadí, barevná témata a okraje lichých/sudých sekcí pro '{$slug}' byly úspěšně uloženy!";
     } else {
         $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
@@ -899,7 +927,7 @@ if ($editingSlug) {
     </div>
 
     <h1>Vizuální Editor Landing Pages</h1>
-    <p class="subtitle">Upravuj obsah sekcí, 5 barevných schémat, mobilní okraje, plovoucí tlačítko i pořadí a fonty!</p>
+    <p class="subtitle">Upravuj obsah sekcí, 5 barevných schémat, okraje lichých/sudých sekcí, plovoucí tlačítko i pořadí a fonty!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -937,23 +965,25 @@ if ($editingSlug) {
               <div id="tab-order" class="tab-content active">
                 <h3 style="color:#fff; margin-bottom:1rem;">⚙️ Měnění Pořadí Sekcí na Stránce</h3>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
-                  Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo. Změny se <strong>ihned projevují v živém náhledu vpravo</strong>.
+                  Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo. Sekce se automaticky přizpůsobí střídavým okrajům (Lichá / Sudá) v reálném čase.
                 </p>
                 <div id="order_list_container"></div>
               </div>
 
-              <!-- TAB DESIGN: COLOR THEMES, MOBILE MARGINS & STICKY CTA -->
+              <!-- TAB DESIGN: COLOR THEMES, ODD/EVEN MARGINS & STICKY CTA -->
               <div id="tab-design" class="tab-content">
-                <h3 style="color:#fff; margin-bottom:0.5rem;">🎨 Barevná Schémata, Mobilní Okraje & Plovoucí Tlačítko</h3>
+                <h3 style="color:#fff; margin-bottom:0.5rem;">🎨 Barevná Schémata, Střídavé Okraje & Plovoucí Tlačítko</h3>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
-                  Vyber si jedno z 5 barevných schémat, uprav boční okraje na mobilu a nastav chování plovoucího CTA tlačítka.
+                  Vyber si jedno z 5 barevných schémat, nastav střídavé okraje pro liché a sudé sekce a uprav plovoucí CTA tlačítko.
                 </p>
 
                 <?php 
                 $designData = $editingData['design'] ?? []; 
                 $currentTheme = $designData['color_theme'] ?? 'amber';
-                $mobileSidePadVal = $designData['mobile_side_padding'] ?? '1rem';
-                $mobileSecPadVal = $designData['mobile_section_padding'] ?? '2.2rem';
+                $oddSidePadVal = $designData['odd_side_padding'] ?? '1.2rem';
+                $oddVertPadVal = $designData['odd_vert_padding'] ?? '2.8rem';
+                $evenSidePadVal = $designData['even_side_padding'] ?? '0.6rem';
+                $evenVertPadVal = $designData['even_vert_padding'] ?? '2.2rem';
                 $stickyEnabled = !isset($designData['sticky_cta_enabled']) || $designData['sticky_cta_enabled'] == true;
                 $stickyHideHero = isset($designData['sticky_cta_hide_in_hero']) && $designData['sticky_cta_hide_in_hero'] == true;
                 $stickyHideContact = isset($designData['sticky_cta_hide_in_contact']) && $designData['sticky_cta_hide_in_contact'] == true;
@@ -1011,25 +1041,57 @@ if ($editingSlug) {
                   <input type="hidden" id="design_color_theme" value="<?= htmlspecialchars($currentTheme) ?>" />
                 </div>
 
-                <!-- 2. MOBILE MARGINS & PADDING -->
+                <!-- 2. ALTERNATING ODD & EVEN SECTION MARGINS & PADDING -->
                 <div class="item-card">
-                  <h4>📱 Jemné Okraje pro Fotogalerii a FAQ na Mobilu</h4>
-                  <div class="form-group">
-                    <label>Jemné odsazení fotogalerie a FAQ seznamu od okrajů displeje</label>
-                    <select class="form-control" id="design_mobile_side_padding" onchange="liveUpdateDesign()">
-                      <option value="0rem" <?= $mobileSidePadVal === '0rem' ? 'selected' : '' ?>>Bez dodatečných okrajů (0px)</option>
-                      <option value="0.4rem" <?= $mobileSidePadVal === '0.4rem' || $mobileSidePadVal === '0.5rem' ? 'selected' : '' ?>>Jemné okraje (0.4rem ~ 6px - Doporučeno)</option>
-                      <option value="0.8rem" <?= $mobileSidePadVal === '0.8rem' ? 'selected' : '' ?>>Střední okraje (0.8rem ~ 13px)</option>
-                      <option value="1.2rem" <?= $mobileSidePadVal === '1.2rem' ? 'selected' : '' ?>>Větší okraje (1.2rem ~ 19px)</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>Svislé mezerování sekcí na mobilu (Section Vertical Padding)</label>
-                    <select class="form-control" id="design_mobile_section_padding" onchange="liveUpdateDesign()">
-                      <option value="1.5rem" <?= $mobileSecPadVal === '1.5rem' ? 'selected' : '' ?>>Kompaktní sekce (1.5rem ~ 24px)</option>
-                      <option value="2.2rem" <?= $mobileSecPadVal === '2.2rem' ? 'selected' : '' ?>>Vyvážené sekce (2.2rem ~ 35px - Doporučeno)</option>
-                      <option value="3.2rem" <?= $mobileSecPadVal === '3.2rem' ? 'selected' : '' ?>>Prostorné rozstupy sekcí (3.2rem ~ 51px)</option>
-                    </select>
+                  <h4>⚖️ Střídavé Okraje Sekcí (Liché vs. Sudé Sekce)</h4>
+                  <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+                    Liché a sudé sekce se automaticky střídají podle pořadí nastaveného v záložce <strong>⚙️ POŘADÍ SEKCÍ</strong>.
+                  </p>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;">
+                    <!-- ODD SECTIONS -->
+                    <div style="background:rgba(232,117,22,0.08); border:1px solid var(--accent); padding:1rem; border-radius:8px;">
+                      <h5 style="color:var(--accent); margin-bottom:0.8rem;">🔹 Liché Sekce (1., 3., 5. v pořadí)</h5>
+                      <div class="form-group">
+                        <label>Boční odsazení lichých sekcí</label>
+                        <select class="form-control" id="design_odd_side_padding" onchange="liveUpdateDesign()">
+                          <option value="0rem" <?= $oddSidePadVal === '0rem' ? 'selected' : '' ?>>Plná šířka (0px - Full Bleed)</option>
+                          <option value="0.6rem" <?= $oddSidePadVal === '0.6rem' ? 'selected' : '' ?>>Jemné odsazení (0.6rem ~ 10px)</option>
+                          <option value="1.2rem" <?= $oddSidePadVal === '1.2rem' || $oddSidePadVal === '1.5rem' ? 'selected' : '' ?>>Standardní odsazení (1.2rem ~ 19px - Doporučeno)</option>
+                          <option value="2.0rem" <?= $oddSidePadVal === '2.0rem' || $oddSidePadVal === '2.2rem' ? 'selected' : '' ?>>Výrazně odsazené v rámu (2.0rem ~ 32px)</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Svislé výškové mezerování</label>
+                        <select class="form-control" id="design_odd_vert_padding" onchange="liveUpdateDesign()">
+                          <option value="1.8rem" <?= $oddVertPadVal === '1.8rem' ? 'selected' : '' ?>>Kompaktní výška (1.8rem ~ 29px)</option>
+                          <option value="2.8rem" <?= $oddVertPadVal === '2.8rem' ? 'selected' : '' ?>>Vyvážená výška (2.8rem ~ 45px - Doporučeno)</option>
+                          <option value="4.0rem" <?= $oddVertPadVal === '4.0rem' ? 'selected' : '' ?>>Prostorná výška (4.0rem ~ 64px)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- EVEN SECTIONS -->
+                    <div style="background:rgba(59,130,246,0.08); border:1px solid #3b82f6; padding:1rem; border-radius:8px;">
+                      <h5 style="color:#60a5fa; margin-bottom:0.8rem;">🔸 Sudé Sekce (2., 4., 6. v pořadí)</h5>
+                      <div class="form-group">
+                        <label>Boční odsazení sudých sekcí</label>
+                        <select class="form-control" id="design_even_side_padding" onchange="liveUpdateDesign()">
+                          <option value="0rem" <?= $evenSidePadVal === '0rem' ? 'selected' : '' ?>>Plná šířka (0px - Full Bleed)</option>
+                          <option value="0.6rem" <?= $evenSidePadVal === '0.6rem' ? 'selected' : '' ?>>Jemné odsazení (0.6rem ~ 10px - Doporučeno)</option>
+                          <option value="1.2rem" <?= $evenSidePadVal === '1.2rem' || $evenSidePadVal === '1.5rem' ? 'selected' : '' ?>>Standardní odsazení (1.2rem ~ 19px)</option>
+                          <option value="2.0rem" <?= $evenSidePadVal === '2.0rem' || $evenSidePadVal === '2.2rem' ? 'selected' : '' ?>>Výrazně odsazené v rámu (2.0rem ~ 32px)</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Svislé výškové mezerování</label>
+                        <select class="form-control" id="design_even_vert_padding" onchange="liveUpdateDesign()">
+                          <option value="1.8rem" <?= $evenVertPadVal === '1.8rem' ? 'selected' : '' ?>>Kompaktní výška (1.8rem ~ 29px)</option>
+                          <option value="2.2rem" <?= $evenVertPadVal === '2.2rem' ? 'selected' : '' ?>>Vyvážená výška (2.2rem ~ 35px - Doporučeno)</option>
+                          <option value="3.5rem" <?= $evenVertPadVal === '3.5rem' || $evenVertPadVal === '4.0rem' ? 'selected' : '' ?>>Prostorná výška (3.5rem ~ 56px)</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1048,7 +1110,7 @@ if ($editingSlug) {
                     <div style="display:flex; flex-direction:column; gap:0.6rem;">
                       <label style="color:#fff; font-weight:normal; cursor:pointer;">
                         <input type="checkbox" id="design_sticky_hide_hero" style="accent-color:var(--accent);" <?= $stickyHideHero ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
-                        Skrýt tlačítko v úvodní sekce HERO (při nahoře)
+                        Skrýt tlačítko v úvodní sekci HERO (při nahoře)
                       </label>
                       <label style="color:#fff; font-weight:normal; cursor:pointer;">
                         <input type="checkbox" id="design_sticky_hide_contact" style="accent-color:var(--accent);" <?= $stickyHideContact ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
@@ -1553,7 +1615,7 @@ if ($editingSlug) {
           liveUpdateDesign();
         }
 
-        // Real-Time Live Design Updates (Themes, Mobile Margins, Sticky CTA)
+        // Real-Time Live Design Updates (Themes, Odd/Even Margins, Sticky CTA)
         function liveUpdateDesign() {
           const iframe = document.getElementById('livePreviewFrame');
           if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
@@ -1579,10 +1641,15 @@ if ($editingSlug) {
             body.style.background = tvars.body_bg;
             body.style.color = tvars.text;
 
-            const sidePad = document.getElementById('design_mobile_side_padding').value;
-            const secPad = document.getElementById('design_mobile_section_padding').value;
-            root.style.setProperty('--mobile-side-padding', sidePad);
-            root.style.setProperty('--mobile-section-padding', secPad);
+            const oddSide = document.getElementById('design_odd_side_padding').value;
+            const oddVert = document.getElementById('design_odd_vert_padding').value;
+            const evenSide = document.getElementById('design_even_side_padding').value;
+            const evenVert = document.getElementById('design_even_vert_padding').value;
+
+            root.style.setProperty('--odd-side-padding', oddSide);
+            root.style.setProperty('--odd-vert-padding', oddVert);
+            root.style.setProperty('--even-side-padding', evenSide);
+            root.style.setProperty('--even-vert-padding', evenVert);
 
             const stickyEnabled = document.getElementById('design_sticky_enabled').checked;
             const cta = doc.querySelector('.mobile-sticky-cta');
@@ -1615,7 +1682,7 @@ if ($editingSlug) {
           } catch(e) { console.log('Live update error:', e); }
         }
 
-        // Real-Time Section Reordering in livePreviewFrame iframe DOM
+        // Real-Time Section Reordering in livePreviewFrame iframe DOM with Odd/Even class re-assignment
         function liveReorderSectionsInIframe() {
           const iframe = document.getElementById('livePreviewFrame');
           if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
@@ -1637,10 +1704,16 @@ if ($editingSlug) {
               'contact': doc.querySelector('#kontakt')
             };
 
-            currentSectionOrder.forEach(key => {
+            currentSectionOrder.forEach((key, idx) => {
               const el = sectionElements[key];
               if (el) {
                 main.appendChild(el);
+                el.classList.remove('section-odd', 'section-even');
+                if (idx % 2 === 0) {
+                  el.classList.add('section-odd');
+                } else {
+                  el.classList.add('section-even');
+                }
               }
             });
           } catch(e) { console.log('Reorder iframe error:', e); }
@@ -1690,8 +1763,9 @@ if ($editingSlug) {
             div.style.alignItems = 'center';
             div.style.padding = '0.8rem 1.2rem';
             div.style.marginBottom = '0.6rem';
+            const isOddText = (idx % 2 === 0) ? '<span style="color:var(--accent); font-size:0.8rem; margin-left:0.5rem;">[🔹 Lichá sekce]</span>' : '<span style="color:#60a5fa; font-size:0.8rem; margin-left:0.5rem;">[🔸 Sudá sekce]</span>';
             div.innerHTML = `
-              <span style="font-size:0.95rem;"><strong>${idx + 1}.</strong> ${sectionLabels[key] || key}</span>
+              <span style="font-size:0.95rem;"><strong>${idx + 1}.</strong> ${sectionLabels[key] || key} ${isOddText}</span>
               <div style="display:flex; gap:0.4rem;">
                 <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-up"></i> Nahoru</button>
                 <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, 1)" ${idx === currentSectionOrder.length - 1 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-down"></i> Dolů</button>
@@ -1765,8 +1839,10 @@ if ($editingSlug) {
             section_order: currentSectionOrder,
             design: {
               color_theme: document.getElementById('design_color_theme').value,
-              mobile_side_padding: document.getElementById('design_mobile_side_padding').value,
-              mobile_section_padding: document.getElementById('design_mobile_section_padding').value,
+              odd_side_padding: document.getElementById('design_odd_side_padding').value,
+              odd_vert_padding: document.getElementById('design_odd_vert_padding').value,
+              even_side_padding: document.getElementById('design_even_side_padding').value,
+              even_vert_padding: document.getElementById('design_even_vert_padding').value,
               sticky_cta_enabled: document.getElementById('design_sticky_enabled').checked,
               sticky_cta_hide_in_hero: document.getElementById('design_sticky_hide_hero').checked,
               sticky_cta_hide_in_contact: document.getElementById('design_sticky_hide_contact').checked
