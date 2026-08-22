@@ -5,3 +5,28 @@ php_value post_max_size 64M
 php_value upload_max_filesize 64M
 php_value memory_limit 256M
 php_value max_execution_time 300
+
+# =============================================================
+# CACHE CONTROL – HTML a PHP se nikdy nekešují
+# CSS, JS, obrázky se kešují (s verzováním přes ?v=...)
+# =============================================================
+<IfModule mod_headers.c>
+  # HTML soubory – žádná cache
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # PHP soubory – žádná cache
+  <FilesMatch "\.php$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # CSS, JS – dlouhá cache (verzujeme přes ?v=timestamp)
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
