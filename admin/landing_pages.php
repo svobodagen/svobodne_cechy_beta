@@ -816,7 +816,7 @@ HTML;
           <button type="submit" id="m_s2_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s2_btn}</button>
         </form>
         <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">
-          <a href="https://wa.me/{$wa_num}?text={$wa_msg}" target="_blank" class="btn-wa" style="width:100%;">{$m_s2_wa_text}</a>
+          <button type="button" onclick="submitStep2AndWhatsApp(event, 'https://wa.me/{$wa_num}?text={$wa_msg}')" class="btn-wa" style="width:100%; border:none; cursor:pointer;">{$m_s2_wa_text}</button>
         </div>
       </div>
 
@@ -899,6 +899,41 @@ HTML;
         document.getElementById('modalStep3').style.display = 'block';
       })
       .catch(err => {
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      });
+    }
+
+    function submitStep2AndWhatsApp(e, waUrl) {
+      if (e && e.preventDefault) e.preventDefault();
+
+      // Pre-open new tab to avoid popup blocker
+      const waWin = window.open('about:blank', '_blank');
+
+      const nameVal = document.getElementById('m_name').value.trim();
+      const msgVal = document.getElementById('m_msg').value.trim();
+
+      fetch('../api_landing_leads.php?action=update_lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: currentLeadId,
+          email: document.getElementById('m_email').value,
+          landing_slug: '{$slug}',
+          name: nameVal,
+          phone: document.getElementById('m_phone').value,
+          user_role: document.getElementById('m_role').value,
+          message: msgVal
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (waWin) waWin.location.href = waUrl;
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      })
+      .catch(err => {
+        if (waWin) waWin.location.href = waUrl;
         document.getElementById('modalStep2').style.display = 'none';
         document.getElementById('modalStep3').style.display = 'block';
       });
