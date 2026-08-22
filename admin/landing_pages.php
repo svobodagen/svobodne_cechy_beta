@@ -504,50 +504,13 @@ HTML;
     $cta_btn = htmlspecialchars($data['cta']['btn'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
 
     $ctaSection = <<<HTML
-    <div class="container">
+    <div class="container" id="kontakt">
       <div class="primary-cta-box">
         <h2>{$cta_title}</h2>
         <p>{$cta_text}</p>
         <button type="button" class="btn btn-primary" onclick="openLeadModal(event)">{$cta_btn}</button>
       </div>
     </div>
-HTML;
-
-    // 10. Contact Section
-    $c_eyebrow = htmlspecialchars($data['contact']['eyebrow'] ?? 'První krok');
-    $c_title = htmlspecialchars($data['contact']['title'] ?? 'NAVÁŽEME KONTAKT');
-    $c_sub = htmlspecialchars($data['contact']['subtitle'] ?? 'Zvol si způsob, který je pro tě nejsnadnější.');
-    $wa_num = htmlspecialchars($data['contact']['whatsapp_num'] ?? '420602763599');
-    $wa_msg = urlencode($data['contact']['whatsapp_msg'] ?? 'Dobrý den, mám zájem o učednictví.');
-    $ig_link = htmlspecialchars($data['contact']['instagram_link'] ?? 'https://instagram.com');
-    $phone_parent = htmlspecialchars($data['contact']['phone_parent'] ?? '+420 602 763 599');
-
-    $contactSection = <<<HTML
-    <section id="kontakt" class="contact-section container">
-      <div class="section-title">
-        <p class="eyebrow">{$c_eyebrow}</p>
-        <h2>{$c_title}</h2>
-        <p class="subtitle">{$c_sub}</p>
-      </div>
-      <div class="contact-grid" style="grid-template-columns:1fr; max-width:650px; margin:auto;">
-        <div class="contact-card" style="text-align:center;">
-          <h3>💬 Rychlý nezávazný kontakt</h3>
-          <p style="color:var(--text-muted); margin-bottom:1.5rem;">První krok je jednoduchý zanechat e-mail nebo napsat na WhatsApp.</p>
-          <div style="display:flex; flex-direction:column; gap:1rem; max-width:400px; margin:auto;">
-            <button type="button" class="btn btn-primary" onclick="openLeadModal(event)" style="width:100%; font-size:1rem;">
-              ✉️ ZANECHAT E-MAIL / DOTAZ
-            </button>
-            <a href="https://wa.me/{$wa_num}?text={$wa_msg}" class="btn-wa" target="_blank">NAPSAT NA WHATSAPP (+{$wa_num})</a>
-            <a href="{$ig_link}" class="btn-ig" target="_blank">NAPSAT NA INSTAGRAM</a>
-          </div>
-          <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--color-glass-border);">
-            <h4 style="font-family:var(--font-heading); font-size:1.15rem;">👨‍Wy‍👦 Jste rodič?</h4>
-            <p style="font-size:0.9rem; color:var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše vysvětlíme.</p>
-            <a href="tel:{$wa_num}" class="btn btn-secondary" style="margin-top:1rem; width:100%;">CHCI SI ZAVOLAT ({$phone_parent})</a>
-          </div>
-        </div>
-      </div>
-    </section>
 HTML;
 
     // Map section keys to HTML blocks
@@ -560,12 +523,11 @@ HTML;
         'portfolio' => $portfolioSection,
         'testimonials' => $testimonialsSection,
         'faq' => $faqSection,
-        'cta' => $ctaSection,
-        'contact' => $contactSection
+        'cta' => $ctaSection
     ];
 
     // Default order
-    $defaultOrder = ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta', 'contact'];
+    $defaultOrder = ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta'];
     $order = $data['section_order'] ?? $defaultOrder;
 
     $sectionVisibility = $data['section_visibility'] ?? [];
@@ -1311,8 +1273,7 @@ if ($editingSlug) {
                 <button type="button" class="tab-btn" onclick="showTab('tab-portfolio')">6. GALERIE FOTEK</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-testimonials')">7. REFERENCE</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-faq')">8. FAQ</button>
-                <button type="button" class="tab-btn" onclick="showTab('tab-cta')">9. CTA BOX</button>
-                <button type="button" class="tab-btn" onclick="showTab('tab-contact')">10. KONTAKT</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-cta')">9. ZÁVĚREČNÁ SEKCE S TLAČÍTKEM (CTA BOX)</button>
               </div>
 
               <!-- TAB ORDER: SECTIONS REORDERING -->
@@ -2170,7 +2131,7 @@ if ($editingSlug) {
 
               <!-- TAB 9: CTA BOX -->
               <div id="tab-cta" class="tab-content">
-                <h3 style="color:#fff; margin-bottom:1rem;">🎯 Sekce 9: Výrazný CTA Box</h3>
+                <h3 style="color:#fff; margin-bottom:1rem;">🎯 Sekce 9: Závěrečná sekce s tlačítkem (CTA Box)</h3>
                 <div class="form-group">
                   <label>Nadpis v CTA boxu <span class="badge-typo h2">📌 Nadpis H2</span></label>
                   <input type="text" class="form-control" id="cta_title" value="<?= htmlspecialchars($editingData['cta']['title'] ?? 'ZAJÍMÁ TĚ, JESTLI JE TO PRO TEBE?') ?>" />
@@ -2182,39 +2143,6 @@ if ($editingSlug) {
                 <div class="form-group">
                   <label>Text tlačítka v CTA boxu <span class="badge-typo body">📝 Běžný text</span></label>
                   <input type="text" class="form-control" id="cta_btn" value="<?= htmlspecialchars($editingData['cta']['btn'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ') ?>" />
-                </div>
-              </div>
-
-              <!-- TAB 10: KONTAKT -->
-              <div id="tab-contact" class="tab-content">
-                <h3 style="color:#fff; margin-bottom:1rem;">📱 Sekce 10: Kontakt a WhatsApp</h3>
-                <div class="form-group">
-                  <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
-                  <input type="text" class="form-control" id="c_eyebrow" value="<?= htmlspecialchars($editingData['contact']['eyebrow'] ?? 'První krok') ?>" />
-                </div>
-                <div class="form-group">
-                  <label>Nadpis sekce <span class="badge-typo h2">📌 Nadpis H2</span></label>
-                  <input type="text" class="form-control" id="c_title" value="<?= htmlspecialchars($editingData['contact']['title'] ?? 'NAVÁŽEME KONTAKT') ?>" />
-                </div>
-                <div class="form-group">
-                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
-                  <input type="text" class="form-control" id="c_sub" value="<?= htmlspecialchars($editingData['contact']['subtitle'] ?? 'Zvol si způsob, který je pro tě nejsnadnější.') ?>" />
-                </div>
-                <div class="form-group">
-                  <label>WhatsApp číslo (např. 420602763599 bez mezery)</label>
-                  <input type="text" class="form-control" id="c_wa_num" value="<?= htmlspecialchars($editingData['contact']['whatsapp_num'] ?? '') ?>" />
-                </div>
-                <div class="form-group">
-                  <label>Předvyplněná zpráva pro zájemce na WhatsApp</label>
-                  <textarea class="form-control" id="c_wa_msg"><?= htmlspecialchars($editingData['contact']['whatsapp_msg'] ?? '') ?></textarea>
-                </div>
-                <div class="form-group">
-                  <label>Instagram odkaz</label>
-                  <input type="text" class="form-control" id="c_ig_link" value="<?= htmlspecialchars($editingData['contact']['instagram_link'] ?? 'https://instagram.com') ?>" />
-                </div>
-                <div class="form-group">
-                  <label>Telefon pro rodiče</label>
-                  <input type="text" class="form-control" id="c_phone" value="<?= htmlspecialchars($editingData['contact']['phone_parent'] ?? '') ?>" />
                 </div>
               </div>
 
@@ -2247,7 +2175,7 @@ if ($editingSlug) {
       </div>
 
       <script>
-        let currentSectionOrder = <?= json_encode($editingData['section_order'] ?? ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta', 'contact']) ?>;
+        let currentSectionOrder = <?= json_encode($editingData['section_order'] ?? ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta']) ?>;
         let currentSectionVisibility = <?= json_encode($editingData['section_visibility'] ?? (object)[]) ?>;
 
         const sectionLabels = {
@@ -2259,8 +2187,7 @@ if ($editingSlug) {
           'portfolio': '🖼️ GALERIE FOTEK',
           'testimonials': '💬 REFERENCE',
           'faq': '❓ ČASTÉ OTÁZKY (FAQ)',
-          'cta': '🎯 PRIMARY CTA BOX',
-          'contact': '📱 KONTAKT A WHATSAPP'
+          'cta': '🎯 ZÁVĚREČNÁ SEKCE S TLAČÍTKEM (CTA BOX)'
         };
 
         const typoScales = {
@@ -2607,8 +2534,7 @@ if ($editingSlug) {
               'portfolio': doc.querySelector('#realizace'),
               'testimonials': doc.querySelector('#reference'),
               'faq': doc.querySelector('#faq'),
-              'cta': doc.querySelector('.primary-cta-box')?.parentElement || doc.querySelector('.primary-cta-box'),
-              'contact': doc.querySelector('#kontakt')
+              'cta': doc.querySelector('.primary-cta-box')?.parentElement || doc.querySelector('.primary-cta-box')
             };
 
             let visibleIdx = 0;
@@ -2971,8 +2897,7 @@ if ($editingSlug) {
           'tab-portfolio': '#realizace',
           'tab-testimonials': '#reference',
           'tab-faq': '#faq',
-          'tab-cta': '.primary-cta-box',
-          'tab-contact': '#kontakt'
+          'tab-cta': '.primary-cta-box'
         };
 
         function showTab(tabId, scrollBtn) {
@@ -3174,15 +3099,6 @@ if ($editingSlug) {
               title: document.getElementById('cta_title').value,
               text: document.getElementById('cta_text').value,
               btn: document.getElementById('cta_btn').value
-            },
-            contact: {
-              eyebrow: document.getElementById('c_eyebrow').value,
-              title: document.getElementById('c_title').value,
-              subtitle: document.getElementById('c_sub').value,
-              whatsapp_num: document.getElementById('c_wa_num').value,
-              whatsapp_msg: document.getElementById('c_wa_msg').value,
-              instagram_link: document.getElementById('c_ig_link').value,
-              phone_parent: document.getElementById('c_phone').value
             }
           };
 
