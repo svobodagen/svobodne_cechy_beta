@@ -248,17 +248,19 @@ function renderLandingPageHtml($data) {
     $h_img = htmlspecialchars(fixImgUrl($data['hero']['image'] ?? ''));
 
     $heroSection = <<<HTML
-    <section class="container hero">
-      <div class="hero-content">
-        <p class="eyebrow">{$h_eyebrow}</p>
-        <h1>{$h_h1}</h1>
-        <p class="subtitle">{$h_sub}</p>
-        <div class="hero-buttons">
-          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">{$h_btn1}</a>
-          {$h_btn2_html}
+    <section class="hero-wrapper">
+      <div class="container hero">
+        <div class="hero-content">
+          <p class="eyebrow">{$h_eyebrow}</p>
+          <h1>{$h_h1}</h1>
+          <p class="subtitle">{$h_sub}</p>
         </div>
+        <div class="hero-image"><img src="{$h_img}" alt="Fotografie z huti" /></div>
       </div>
-      <div class="hero-image"><img src="{$h_img}" alt="Fotografie z huti" /></div>
+      <div class="container hero-buttons-row">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">{$h_btn1}</a>
+        {$h_btn2_html}
+      </div>
     </section>
 HTML;
 
@@ -606,11 +608,13 @@ HTML;
       margin-bottom: 0.4rem;
     }
 
-    .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 2.5rem; min-height: 60vh; }
+    .hero-wrapper { padding-bottom: 2.5rem; }
+    .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 1.5rem; min-height: 55vh; }
     .hero-content { max-width: 580px; }
     .eyebrow { text-transform: uppercase; font-size: var(--eyebrow-size); letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
     .hero h1 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.8rem; }
-    .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
+    .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
+    .hero-buttons-row { display: flex; gap: 0.8rem; flex-wrap: wrap; padding-top: 1.8rem; }
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.4rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
     .btn-primary { background: var(--color-accent); color: #fff; }
@@ -736,6 +740,7 @@ HTML;
       }
       .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; min-height: auto; }
       .hero-content { max-width: 100%; }
+      .hero-buttons-row { justify-content: center; padding-top: 1.2rem; }
       .hero-buttons { justify-content: center; }
       .master-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .contact-grid { grid-template-columns: 1fr; gap: 1.5rem; }
@@ -1977,9 +1982,9 @@ if ($editingSlug) {
             }
 
             const heroBtn2Show = document.getElementById('h_btn2_show')?.checked ?? true;
-            const heroBtn2 = doc.querySelector('.hero .btn-secondary');
+            const heroBtn2 = doc.querySelector('.hero-buttons-row .btn-secondary');
             if (heroBtn2) {
-              heroBtn2.style.display = heroBtn2Show ? 'inline-block' : 'none';
+              heroBtn2.style.display = heroBtn2Show ? 'inline-flex' : 'none';
             }
           } catch(e) { console.log('Design live update error:', e); }
         }

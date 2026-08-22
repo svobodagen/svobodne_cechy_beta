@@ -92,14 +92,8 @@
       margin-bottom: 0.5rem;
     }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 2.5rem;
-      padding: 3.5rem 0 2.5rem;
-      min-height: 60vh;
-    }
+    .hero-wrapper { padding-bottom: 2.5rem; }
+    .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 1.5rem; min-height: 55vh; }
     .hero-content { max-width: 580px; }
     .eyebrow {
       text-transform: uppercase;
@@ -115,7 +109,8 @@
       color: var(--color-white);
       margin-bottom: 0.8rem;
     }
-    .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
+    .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
+    .hero-buttons-row { display: flex; gap: 0.8rem; flex-wrap: wrap; padding-top: 1.8rem; }
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn {
       display: inline-flex;
@@ -318,8 +313,9 @@
 
     /* Responsive */
     @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+      .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; min-height: auto; }
       .hero-content { max-width: 100%; }
+      .hero-buttons-row { justify-content: center; padding-top: 1.2rem; }
       .hero-buttons { justify-content: center; }
       .master-grid { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
@@ -350,18 +346,20 @@
 
   <main>
     <!-- Section 1: Hero -->
-    <section class="container hero">
-      <div class="hero-content">
-        <p class="eyebrow">UČEDNICTVÍ U MISTRA SKLÁŘE</p>
-        <h1>NAUČ SE ŘEMESLO PŘÍMO OD MISTRA</h1>
-        <p class="subtitle">Učednictví u Jiřího Pačinka pro mladé lidi (12–18 let / mladé dospělé), kteří chtějí poznat skutečné řemeslo, pracovat rukama a vytvořit si vlastní cestu.</p>
-        <div class="hero-buttons">
-          <a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a>
-          <a href="#realizace" class="btn btn-secondary">PODÍVAT SE, JAK SE PRACUJE SE SKLEM</a>
+    <section class="hero-wrapper">
+      <div class="container hero">
+        <div class="hero-content">
+          <p class="eyebrow">UČEDNICTVÍ U MISTRA SKLÁŘE</p>
+          <h1>NAUČ SE ŘEMESLO PŘÍMO OD MISTRA</h1>
+          <p class="subtitle">Učednictví u Jiřího Pačinka pro mladé lidi (12–18 let / mladé dospělé), kteří chtějí poznat skutečné řemeslo, pracovat rukama a vytvořit si vlastní cestu.</p>
+        </div>
+        <div class="hero-image">
+          <img src="../../images/sample_master.png" alt="Jiří Pačinek při práci s horkým sklem v huti" />
         </div>
       </div>
-      <div class="hero-image">
-        <img src="../../images/sample_master.png" alt="Jiří Pačinek při práci s horkým sklem v huti" />
+      <div class="container hero-buttons-row">
+        <a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        <a href="#realizace" class="btn btn-secondary">PODÍVAT SE, JAK SE PRACUJE SE SKLEM</a>
       </div>
     </section>
 
