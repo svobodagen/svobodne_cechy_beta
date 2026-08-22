@@ -1321,6 +1321,11 @@ if ($editingSlug) {
                 $currentTheme = $designData['color_theme'] ?? 'amber';
                 $btnSizeVal = $designData['btn_size'] ?? 'm';
                 $oddSidePadVal = $designData['odd_side_padding'] ?? '1.2rem';
+                /* Extract section CTA data for editor form population */
+                $editorSecCtaData = $editingData['section_cta'] ?? [];
+                $secCtaSameText = !isset($editorSecCtaData['same_text']) || $editorSecCtaData['same_text'] == true;
+                $secCtaVisibility = $editorSecCtaData['visibility'] ?? [];
+                $secCtaTexts = $editorSecCtaData['texts'] ?? [];
                 $oddVertPadVal = $designData['odd_vert_padding'] ?? '2.8rem';
                 $evenSidePadVal = $designData['even_side_padding'] ?? '0.6rem';
                 $evenVertPadVal = $designData['even_vert_padding'] ?? '2.2rem';
@@ -1581,6 +1586,7 @@ if ($editingSlug) {
                 $h3Step = $typoData['card_h3'] ?? 'step-3';
                 $bodyStep = $typoData['body_text'] ?? 'step-3';
                 $eyebrowStep = $typoData['eyebrow'] ?? 'step-3';
+                $subtitle_step = $typoData['subtitle'] ?? 'step-3';
                 ?>
 
                 <div class="item-card">
