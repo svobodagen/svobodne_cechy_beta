@@ -193,7 +193,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
     exit;
 }
 
-// Function to generate full HTML from section data array with dynamic section ordering, odd/even section margins, and themes
+// Function to generate full HTML from section data array with dynamic section ordering, odd/even section margins, themes, and 3-step modal contact form
 function renderLandingPageHtml($data) {
     $slug = htmlspecialchars($data['slug'] ?? 'master');
     $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
@@ -222,6 +222,21 @@ function renderLandingPageHtml($data) {
     $hideInHero = isset($design['sticky_cta_hide_in_hero']) && $design['sticky_cta_hide_in_hero'] == true;
     $hideInContact = isset($design['sticky_cta_hide_in_contact']) && $design['sticky_cta_hide_in_contact'] == true;
 
+    // 3-Phase Modal Contact Texts
+    $mc = $data['modal_contact'] ?? [];
+    $m_s1_title = htmlspecialchars($mc['step1_title'] ?? 'Zanechte nám svůj e-mail');
+    $m_s1_text = htmlspecialchars($mc['step1_text'] ?? 'Zašleme vám podrobné informace o učednictví a propojíme vás s mistrem.');
+    $m_s1_btn = htmlspecialchars($mc['step1_btn'] ?? 'POKRAČOVAT');
+
+    $m_s2_title = htmlspecialchars($mc['step2_title'] ?? 'Doplňující údaje (volitelné)');
+    $m_s2_text = htmlspecialchars($mc['step2_text'] ?? 'Chcete-li, abychom vám přímo zavolali nebo poslali zprávu, vyplňte vaše jméno a telefon.');
+    $m_s2_btn = htmlspecialchars($mc['step2_btn'] ?? 'ODESLAT VŠECHNO');
+    $m_s2_wa_text = htmlspecialchars($mc['step2_wa_text'] ?? 'NAPSAT ROVNOU NA WHATSAPP');
+
+    $m_s3_title = htmlspecialchars($mc['step3_title'] ?? 'Děkujeme za váš zájem!');
+    $m_s3_text = htmlspecialchars($mc['step3_text'] ?? 'Vaši zprávu jsme v pořádku přijali. Ozveme se vám do 24 hodin.');
+    $m_s3_btn = htmlspecialchars($mc['step3_btn'] ?? 'ZAVŘÍT');
+
     // 1. Hero
     $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? 'UČEDNICTVÍ U MISTRA SKLÁŘE');
     $h_h1 = htmlspecialchars($data['hero']['h1'] ?? 'NAUČ SE ŘEMESLO PŘÍMO OD MISTRA');
@@ -237,7 +252,7 @@ function renderLandingPageHtml($data) {
         <h1>{$h_h1}</h1>
         <p class="subtitle">{$h_sub}</p>
         <div class="hero-buttons">
-          <a href="#kontakt" class="btn btn-primary">{$h_btn1}</a>
+          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">{$h_btn1}</a>
           <a href="#realizace" class="btn btn-secondary">{$h_btn2}</a>
         </div>
       </div>
@@ -421,12 +436,12 @@ HTML;
       <div class="primary-cta-box">
         <h2>{$cta_title}</h2>
         <p>{$cta_text}</p>
-        <a href="#kontakt" class="btn btn-primary">{$cta_btn}</a>
+        <button type="button" class="btn btn-primary" onclick="openLeadModal(event)">{$cta_btn}</button>
       </div>
     </div>
 HTML;
 
-    // 10. Contact
+    // 10. Contact Section
     $c_eyebrow = htmlspecialchars($data['contact']['eyebrow'] ?? 'První krok');
     $c_title = htmlspecialchars($data['contact']['title'] ?? 'NAVÁŽEME KONTAKT');
     $c_sub = htmlspecialchars($data['contact']['subtitle'] ?? 'Zvol si způsob, který je pro tě nejsnadnější.');
@@ -442,10 +457,14 @@ HTML;
         <h2>{$c_title}</h2>
         <p>{$c_sub}</p>
       </div>
-      <div class="contact-grid">
-        <div class="contact-card">
-          <h3>💬 Rychlá zpráva (pro zájemce)</h3>
-          <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+      <div class="contact-grid" style="grid-template-columns:1fr; max-width:650px; margin:auto;">
+        <div class="contact-card" style="text-align:center;">
+          <h3>💬 Rychlý nezávazný kontakt</h3>
+          <p style="color:var(--text-muted); margin-bottom:1.5rem;">První krok je jednoduchý zanechat e-mail nebo napsat na WhatsApp.</p>
+          <div style="display:flex; flex-direction:column; gap:1rem; max-width:400px; margin:auto;">
+            <button type="button" class="btn btn-primary" onclick="openLeadModal(event)" style="width:100%; font-size:1rem;">
+              ✉️ ZANECHAT E-MAIL / DOTAZ
+            </button>
             <a href="https://wa.me/{$wa_num}?text={$wa_msg}" class="btn-wa" target="_blank">NAPSAT NA WHATSAPP (+{$wa_num})</a>
             <a href="{$ig_link}" class="btn-ig" target="_blank">NAPSAT NA INSTAGRAM</a>
           </div>
@@ -454,15 +473,6 @@ HTML;
             <p style="font-size:0.9rem; color:var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše vysvětlíme.</p>
             <a href="tel:{$wa_num}" class="btn btn-secondary" style="margin-top:1rem; width:100%;">CHCI SI ZAVOLAT ({$phone_parent})</a>
           </div>
-        </div>
-        <div class="contact-card">
-          <h3>📝 Kontaktní formulář</h3>
-          <form onsubmit="event.preventDefault(); alert('Děkujeme! Zprávu jsme přijali.');">
-            <div class="form-group"><label>Jméno</label><input type="text" class="form-control" placeholder="Jan Novák" required /></div>
-            <div class="form-group"><label>Jsem:</label><select class="form-control"><option>Budoucí učedník</option><option>Rodič</option></select></div>
-            <div class="form-group"><label>Kontakt</label><input type="text" class="form-control" placeholder="Telefon nebo e-mail" required /></div>
-            <button type="submit" class="btn btn-primary" style="width:100%;">ODESLAT DOTAZ</button>
-          </form>
         </div>
       </div>
     </section>
@@ -576,7 +586,7 @@ HTML;
     .nav-menu { list-style: none; display: flex; gap: 1.2rem; align-items: center; }
     .nav-menu a { color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: color .2s; }
     .nav-menu a:hover { color: var(--color-accent); }
-    .cta-nav { background: var(--color-accent); color: #fff !important; padding: 0.5rem 0.9rem; border-radius: 6px; font-weight: 700; }
+    .cta-nav { background: var(--color-accent); color: #fff !important; padding: 0.5rem 0.9rem; border-radius: 6px; font-weight: 700; cursor: pointer; }
 
     /* STRICT TIGHT LINE HEIGHTS & FLUID FONT SIZES FOR ALL HEADINGS */
     h1, h2, h3, h4 {
@@ -649,15 +659,57 @@ HTML;
     .primary-cta-box { background: linear-gradient(135deg, rgba(232,117,22,0.15), rgba(17,14,11,0.9)); border: 2px solid var(--color-accent); border-radius: 16px; padding: 2.5rem 1.2rem; text-align: center; margin: 2.5rem auto; max-width: 850px; }
     .primary-cta-box p { color: var(--text-muted); font-size: clamp(0.9rem, 1.8vw, 1.05rem); max-width: 620px; margin: 0 auto 1.2rem; }
 
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .contact-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 14px; padding: 1.8rem; }
+    .contact-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 14px; padding: 2rem; }
     .btn-wa { background: #25D366; color: #fff; text-decoration: none; font-weight: 700; border-radius: 6px; padding: 0.8rem; text-align: center; display: flex; justify-content: center; gap: 0.5rem; font-size: 0.85rem; }
     .btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff; text-decoration: none; font-weight: 700; border-radius: 6px; padding: 0.8rem; text-align: center; display: flex; justify-content: center; gap: 0.5rem; font-size: 0.85rem; }
-    .form-group { margin-bottom: 0.9rem; }
-    .form-control { width: 100%; padding: 0.7rem 0.85rem; background: rgba(0,0,0,0.5); border: 1px solid var(--color-glass-border); border-radius: 6px; color: #fff; font-size: 0.9rem; }
+    .form-group { margin-bottom: 1rem; text-align: left; }
+    .form-control { width: 100%; padding: 0.75rem 0.9rem; background: rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
+    textarea.form-control { min-height: 80px; resize: vertical; }
 
     .mobile-sticky-cta { display: {$stickyCtaDisplay}; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,10,8,0.95); border-top: 1px solid var(--color-accent); padding: 0.7rem 1rem; z-index: 999; transition: opacity 0.3s ease; }
     footer { border-top: 1px solid var(--color-glass-border); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+
+    /* Lead Modal Popup Styles */
+    .lead-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .lead-modal-box {
+      background: var(--color-dark);
+      border: 2px solid var(--color-accent);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      padding: 2.2rem 1.8rem;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+      color: var(--text);
+      animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(15px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .lead-modal-close {
+      position: absolute;
+      top: 0.8rem; right: 1rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.8rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .lead-modal-close:hover { color: var(--color-accent); }
+    .modal-step h3 { font-family: var(--font-heading); font-size: var(--section-h2-clamp); color: var(--color-white); margin-bottom: 0.5rem; text-align: center; }
+    .modal-step p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.4rem; text-align: center; line-height: 1.4; }
 
     /* Mobile Responsive Custom Margins & Padding */
     @media (max-width: 900px) {
@@ -698,7 +750,7 @@ HTML;
         <li><a href="#realizace">Realizace</a></li>
         <li><a href="#reference">Reference</a></li>
         <li><a href="#faq">FAQ</a></li>
-        <li><a href="#kontakt" class="cta-nav">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
+        <li><a href="#kontakt" class="cta-nav" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
       </ul>
     </div>
   </header>
@@ -707,37 +759,175 @@ HTML;
     {$renderedMain}
   </main>
 
-  <div class="mobile-sticky-cta"><a href="#kontakt" class="btn btn-primary" style="width:100%;">ZJISTIT, JESTLI JE TO PRO MĚ</a></div>
+  <div class="mobile-sticky-cta"><a href="#kontakt" class="btn btn-primary" style="width:100%;" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a></div>
   <footer><div class="container"><p>© 2026 Svobodné Cechy. Všechna práva vyhrazena.</p></div></footer>
 
+  <!-- LEAD CAPTURE POPUP MODAL (3 PHASES) -->
+  <div id="leadModal" class="lead-modal-overlay">
+    <div class="lead-modal-box">
+      <button type="button" class="lead-modal-close" onclick="closeLeadModal()">&times;</button>
+      
+      <!-- STEP 1: EMAIL CAPTURE -->
+      <div id="modalStep1" class="modal-step">
+        <h3>{$m_s1_title}</h3>
+        <p>{$m_s1_text}</p>
+        <form onsubmit="submitStep1(event)">
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Váš E-mail *</label>
+            <input type="email" id="m_email" name="email" autocomplete="email" class="form-control" placeholder="např. jan.novak@seznam.cz" required />
+          </div>
+          <button type="submit" id="m_s1_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s1_btn}</button>
+        </form>
+      </div>
+
+      <!-- STEP 2: ADDITIONAL DETAILS & WHATSAPP -->
+      <div id="modalStep2" class="modal-step" style="display:none;">
+        <h3>{$m_s2_title}</h3>
+        <p>{$m_s2_text}</p>
+        <form onsubmit="submitStep2(event)">
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jméno a příjmení</label>
+            <input type="text" id="m_name" name="name" autocomplete="name" class="form-control" placeholder="Jan Novák" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Telefon</label>
+            <input type="tel" id="m_phone" name="phone" autocomplete="tel" class="form-control" placeholder="+420 602 123 456" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jsem:</label>
+            <select id="m_role" class="form-control">
+              <option value="Budoucí učedník">Budoucí učedník</option>
+              <option value="Rodič">Rodič</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Zpráva nebo dotaz (volitelné)</label>
+            <textarea id="m_msg" class="form-control" placeholder="Mám zájem o bližší informace..."></textarea>
+          </div>
+          <button type="submit" id="m_s2_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s2_btn}</button>
+        </form>
+        <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">
+          <a href="https://wa.me/{$wa_num}?text={$wa_msg}" target="_blank" class="btn-wa" style="width:100%;">{$m_s2_wa_text}</a>
+        </div>
+      </div>
+
+      <!-- STEP 3: THANK YOU -->
+      <div id="modalStep3" class="modal-step" style="display:none;">
+        <h3>{$m_s3_title}</h3>
+        <p>{$m_s3_text}</p>
+        <button type="button" class="btn btn-primary" onclick="closeLeadModal()" style="width:100%; margin-top:1rem;">{$m_s3_btn}</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    let currentLeadId = null;
+
+    function openLeadModal(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const modal = document.getElementById('leadModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const emailInput = document.getElementById('m_email');
+        if (emailInput) setTimeout(() => emailInput.focus(), 100);
+      }
+    }
+
+    function closeLeadModal() {
+      const modal = document.getElementById('leadModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function submitStep1(e) {
+      e.preventDefault();
+      const btn = document.getElementById('m_s1_submit_btn');
+      if (btn) btn.disabled = true;
+
+      const email = document.getElementById('m_email').value;
+
+      fetch('../api_landing_leads.php?action=capture_email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          landing_slug: '{$slug}',
+          master_name: '{$masterName}'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.lead_id) currentLeadId = data.lead_id;
+        document.getElementById('modalStep1').style.display = 'none';
+        document.getElementById('modalStep2').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('modalStep1').style.display = 'none';
+        document.getElementById('modalStep2').style.display = 'block';
+      });
+    }
+
+    function submitStep2(e) {
+      e.preventDefault();
+      const btn = document.getElementById('m_s2_submit_btn');
+      if (btn) btn.disabled = true;
+
+      fetch('../api_landing_leads.php?action=update_lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: currentLeadId,
+          email: document.getElementById('m_email').value,
+          landing_slug: '{$slug}',
+          name: document.getElementById('m_name').value,
+          phone: document.getElementById('m_phone').value,
+          user_role: document.getElementById('m_role').value,
+          message: document.getElementById('m_msg').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       const cta = document.querySelector('.mobile-sticky-cta');
-      if (!cta) return;
-      const hideInHero = {$hideInHeroJson};
-      const hideInContact = {$hideInContactJson};
+      if (cta) {
+        const hideInHero = {$hideInHeroJson};
+        const hideInContact = {$hideInContactJson};
 
-      function updateCtaVisibility() {
-        let hide = false;
-        if (hideInHero) {
-          const hero = document.querySelector('.hero');
-          if (hero) {
-            const rect = hero.getBoundingClientRect();
-            if (rect.bottom > 100) hide = true;
+        function updateCtaVisibility() {
+          let hide = false;
+          if (hideInHero) {
+            const hero = document.querySelector('.hero');
+            if (hero) {
+              const rect = hero.getBoundingClientRect();
+              if (rect.bottom > 100) hide = true;
+            }
           }
-        }
-        if (hideInContact) {
-          const contact = document.querySelector('#kontakt');
-          if (contact) {
-            const rect = contact.getBoundingClientRect();
-            if (rect.top < window.innerHeight - 50) hide = true;
+          if (hideInContact) {
+            const contact = document.querySelector('#kontakt');
+            if (contact) {
+              const rect = contact.getBoundingClientRect();
+              if (rect.top < window.innerHeight - 50) hide = true;
+            }
           }
+          cta.style.display = hide ? 'none' : '{$stickyCtaDisplay}';
         }
-        cta.style.display = hide ? 'none' : '{$stickyCtaDisplay}';
+
+        window.addEventListener('scroll', updateCtaVisibility, { passive: true });
+        updateCtaVisibility();
       }
 
-      window.addEventListener('scroll', updateCtaVisibility, { passive: true });
-      updateCtaVisibility();
+      // Attach openLeadModal handler to all CTA links & buttons
+      document.querySelectorAll('a[href="#kontakt"], .cta-nav').forEach(el => {
+        el.addEventListener('click', openLeadModal);
+      });
     });
   </script>
 </body>
@@ -759,7 +949,7 @@ if (isset($_POST['save_sections_form'])) {
         file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $generatedHtml = renderLandingPageHtml($formData);
         file_put_contents($htmlPath, $generatedHtml);
-        $message = "Všechny sekce, fotky, pořadí, barevná témata a okraje lichých/sudých sekcí pro '{$slug}' byly úspěšně uloženy!";
+        $message = "Všechny sekce, fotky, pořadí, barevná témata a 3-fázový kontaktní formulář pro '{$slug}' byly úspěšně uloženy!";
     } else {
         $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
@@ -927,7 +1117,7 @@ if ($editingSlug) {
     </div>
 
     <h1>Vizuální Editor Landing Pages</h1>
-    <p class="subtitle">Upravuj obsah sekcí, 5 barevných schémat, okraje lichých/sudých sekcí, plovoucí tlačítko i pořadí a fonty!</p>
+    <p class="subtitle">Upravuj obsah sekcí, 5 barevných schémat, 3-fázový popup formulář, střídavé okraje i pořadí a fonty!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -948,6 +1138,7 @@ if ($editingSlug) {
               <div class="section-tab-nav">
                 <button type="button" class="tab-btn special-order active" onclick="showTab('tab-order')"><i class="bi bi-arrow-down-up"></i> ⚙️ POŘADÍ SEKCÍ</button>
                 <button type="button" class="tab-btn special-design" onclick="showTab('tab-design')"><i class="bi bi-palette"></i> 🎨 DESIGN & BARVY</button>
+                <button type="button" class="tab-btn special-design" onclick="showTab('tab-modal-contact')"><i class="bi bi-chat-square-dots"></i> 💬 POPUP FORMULÁŘ (3 FÁZE)</button>
                 <button type="button" class="tab-btn special-order" onclick="showTab('tab-typo')"><i class="bi bi-type"></i> 🔤 STUPNĚ FONTŮ</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-hero')">1. HERO</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-uvp')">2. UVP</button>
@@ -1117,6 +1308,85 @@ if ($editingSlug) {
                         Skrýt tlačítko v sekci KONTAKT (aby nepřekrývalo formulář)
                       </label>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB MODAL CONTACT: 3 PHASES -->
+              <div id="tab-modal-contact" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:0.5rem;">💬 Nastavení Textů 3-Fázového Popup Formuláře</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                  Tento formulář se zobrazí jako vyskakovací okno po kliknutí na jakékoliv tlačítko s výzvou na stránce.
+                </p>
+
+                <?php
+                $mc = $editingData['modal_contact'] ?? [];
+                $s1_title = $mc['step1_title'] ?? 'Zanechte nám svůj e-mail';
+                $s1_text = $mc['step1_text'] ?? 'Zašleme vám podrobné informace o učednictví u mistra a spojíme se s vámi.';
+                $s1_btn = $mc['step1_btn'] ?? 'POKRAČOVAT';
+
+                $s2_title = $mc['step2_title'] ?? 'Doplňující údaje (volitelné)';
+                $s2_text = $mc['step2_text'] ?? 'Chcete-li, abychom vám přímo zavolali nebo poslali zprávu, vyplňte vaše jméno a telefon.';
+                $s2_btn = $mc['step2_btn'] ?? 'ODESLAT VŠECHNO';
+                $s2_wa_text = $mc['step2_wa_text'] ?? 'NAPSAT ROVNOU NA WHATSAPP';
+
+                $s3_title = $mc['step3_title'] ?? 'Děkujeme za váš zájem!';
+                $s3_text = $mc['step3_text'] ?? 'Vaši zprávu jsme v pořádku přijali. Ozveme se vám do 24 hodin.';
+                $s3_btn = $mc['step3_btn'] ?? 'ZAVŘÍT';
+                ?>
+
+                <!-- FÁZE 1 -->
+                <div class="item-card" style="border-left:4px solid var(--accent);">
+                  <h4>Fáze 1: Zachycení E-mailu (Okamžité uložení do DB)</h4>
+                  <div class="form-group">
+                    <label>Nadpis 1. fáze <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                    <input type="text" class="form-control" id="mc_s1_title" value="<?= htmlspecialchars($s1_title) ?>" />
+                  </div>
+                  <div class="form-group">
+                    <label>Podtitul 1. fáze <span class="badge-typo body">📝 Běžný text</span></label>
+                    <textarea class="form-control" id="mc_s1_text"><?= htmlspecialchars($s1_text) ?></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Text tlačítka 1. fáze <span class="badge-typo body">📝 Běžný text</span></label>
+                    <input type="text" class="form-control" id="mc_s1_btn" value="<?= htmlspecialchars($s1_btn) ?>" />
+                  </div>
+                </div>
+
+                <!-- FÁZE 2 -->
+                <div class="item-card" style="border-left:4px solid #3b82f6;">
+                  <h4>Fáze 2: Doplňující údaje (Jméno, Telefon, Zpráva & WhatsApp)</h4>
+                  <div class="form-group">
+                    <label>Nadpis 2. fáze <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                    <input type="text" class="form-control" id="mc_s2_title" value="<?= htmlspecialchars($s2_title) ?>" />
+                  </div>
+                  <div class="form-group">
+                    <label>Podtitul 2. fáze <span class="badge-typo body">📝 Běžný text</span></label>
+                    <textarea class="form-control" id="mc_s2_text"><?= htmlspecialchars($s2_text) ?></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Text tlačítka pro odeslání 2. fáze <span class="badge-typo body">📝 Běžný text</span></label>
+                    <input type="text" class="form-control" id="mc_s2_btn" value="<?= htmlspecialchars($s2_btn) ?>" />
+                  </div>
+                  <div class="form-group">
+                    <label>Text tlačítka "Napsat na WhatsApp" <span class="badge-typo body">📝 Běžný text</span></label>
+                    <input type="text" class="form-control" id="mc_s2_wa_text" value="<?= htmlspecialchars($s2_wa_text) ?>" />
+                  </div>
+                </div>
+
+                <!-- FÁZE 3 -->
+                <div class="item-card" style="border-left:4px solid #25D366;">
+                  <h4>Fáze 3: Poděkování po odeslání</h4>
+                  <div class="form-group">
+                    <label>Nadpis poděkování <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                    <input type="text" class="form-control" id="mc_s3_title" value="<?= htmlspecialchars($s3_title) ?>" />
+                  </div>
+                  <div class="form-group">
+                    <label>Text poděkování <span class="badge-typo body">📝 Běžný text</span></label>
+                    <textarea class="form-control" id="mc_s3_text"><?= htmlspecialchars($s3_text) ?></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Text tlačítka pro zavření <span class="badge-typo body">📝 Běžný text</span></label>
+                    <input type="text" class="form-control" id="mc_s3_btn" value="<?= htmlspecialchars($s3_btn) ?>" />
                   </div>
                 </div>
               </div>
@@ -1846,6 +2116,18 @@ if ($editingSlug) {
               sticky_cta_enabled: document.getElementById('design_sticky_enabled').checked,
               sticky_cta_hide_in_hero: document.getElementById('design_sticky_hide_hero').checked,
               sticky_cta_hide_in_contact: document.getElementById('design_sticky_hide_contact').checked
+            },
+            modal_contact: {
+              step1_title: document.getElementById('mc_s1_title').value,
+              step1_text: document.getElementById('mc_s1_text').value,
+              step1_btn: document.getElementById('mc_s1_btn').value,
+              step2_title: document.getElementById('mc_s2_title').value,
+              step2_text: document.getElementById('mc_s2_text').value,
+              step2_btn: document.getElementById('mc_s2_btn').value,
+              step2_wa_text: document.getElementById('mc_s2_wa_text').value,
+              step3_title: document.getElementById('mc_s3_title').value,
+              step3_text: document.getElementById('mc_s3_text').value,
+              step3_btn: document.getElementById('mc_s3_btn').value
             },
             typography: {
               hero_h1: document.getElementById('typo_hero_h1').value,
