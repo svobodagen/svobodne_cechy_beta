@@ -642,7 +642,7 @@ HTML;
 
     /* Mobile Responsive Custom Margins & Padding */
     @media (max-width: 900px) {
-      .container { padding: 0 var(--mobile-side-padding); }
+      .container { padding-left: var(--mobile-side-padding) !important; padding-right: var(--mobile-side-padding) !important; }
       .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; padding: 2rem 0 1.5rem; min-height: auto; }
       .hero-content { max-width: 100%; }
       .hero-buttons { justify-content: center; }
@@ -650,7 +650,7 @@ HTML;
       .contact-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .nav-menu { display: none; }
       .mobile-sticky-cta { display: {$stickyCtaDisplay}; }
-      .uvp-section, .master-section, .outcomes-section, .timeline-section, .portfolio-section, .testimonials-section, .faq-section { padding: var(--mobile-section-padding) 0; }
+      .uvp-section, .master-section, .outcomes-section, .timeline-section, .portfolio-section, .testimonials-section, .faq-section { padding-top: var(--mobile-section-padding); padding-bottom: var(--mobile-section-padding); }
       .section-title { margin-bottom: 1.5rem; }
       .primary-cta-box { padding: 1.8rem 1rem; margin: 1.8rem auto; }
       .timeline-step { grid-template-columns: 40px 1fr; gap: 0.8rem; padding: 0.9rem 1rem; }
@@ -1012,13 +1012,15 @@ if ($editingSlug) {
 
                 <!-- 2. MOBILE MARGINS & PADDING -->
                 <div class="item-card">
-                  <h4>📱 Okraje a Mezerování pro Mobilní Zobrazení</h4>
+                  <h4>📱 Celkové Okraje a Mezerování pro Mobilní Zobrazení</h4>
                   <div class="form-group">
-                    <label>Boční odsazení obsahu na mobilu (Container Side Padding)</label>
+                    <label>Boční odsazení celého obsahu od okrajů displeje na mobilu (Side Margins)</label>
                     <select class="form-control" id="design_mobile_side_padding" onchange="liveUpdateDesign()">
-                      <option value="0.6rem" <?= $mobileSidePadVal === '0.6rem' ? 'selected' : '' ?>>Úzké okraje (0.6rem ~ 10px - Více místa)</option>
-                      <option value="1rem" <?= $mobileSidePadVal === '1rem' ? 'selected' : '' ?>>Standardní okraje (1.0rem ~ 16px - Doporučeno)</option>
-                      <option value="1.5rem" <?= $mobileSidePadVal === '1.5rem' ? 'selected' : '' ?>>Prostorné okraje (1.5rem ~ 24px)</option>
+                      <option value="0.5rem" <?= $mobileSidePadVal === '0.5rem' ? 'selected' : '' ?>>Jemné malé okraje (0.5rem ~ 8px)</option>
+                      <option value="0.8rem" <?= $mobileSidePadVal === '0.8rem' ? 'selected' : '' ?>>Kompaktní okraje (0.8rem ~ 13px)</option>
+                      <option value="1.2rem" <?= $mobileSidePadVal === '1.2rem' ? 'selected' : '' ?>>Standardní okraje (1.2rem ~ 19px - Doporučeno)</option>
+                      <option value="1.6rem" <?= $mobileSidePadVal === '1.6rem' ? 'selected' : '' ?>>Větší okraje (1.6rem ~ 25px)</option>
+                      <option value="2.0rem" <?= $mobileSidePadVal === '2.0rem' ? 'selected' : '' ?>>Velkorysé okraje (2.0rem ~ 32px)</option>
                     </select>
                   </div>
                   <div class="form-group">
@@ -1537,11 +1539,11 @@ if ($editingSlug) {
         };
 
         const themeVariables = {
-          amber: { primary: '#0B0A08', dark: '#17120E', cream: '#F4EFE7', accent: '#E87516', glass_border: 'rgba(255,255,255,0.1)', text: '#F4EFE7', body_bg: 'linear-gradient(135deg, #0B0A08, #17120E)' },
-          cyan: { primary: '#050B11', dark: '#0C1622', cream: '#E0F2FE', accent: '#00D2C4', glass_border: 'rgba(0,210,196,0.2)', text: '#E0F2FE', body_bg: 'linear-gradient(135deg, #050B11, #0C1622)' },
-          gold: { primary: '#11100E', dark: '#1C1A17', cream: '#FBF7EE', accent: '#D4AF37', glass_border: 'rgba(212,175,55,0.2)', text: '#FBF7EE', body_bg: 'linear-gradient(135deg, #11100E, #1C1A17)' },
-          ruby: { primary: '#120709', dark: '#1E0D11', cream: '#FFF0F2', accent: '#E14D4D', glass_border: 'rgba(225,77,77,0.2)', text: '#FFF0F2', body_bg: 'linear-gradient(135deg, #120709, #1E0D11)' },
-          light: { primary: '#F8F6F0', dark: '#EEEBE1', cream: '#211E1B', accent: '#B85D0D', glass_border: 'rgba(0,0,0,0.12)', text: '#211E1B', body_bg: 'linear-gradient(135deg, #F8F6F0, #EEEBE1)' }
+          amber: { primary: '#0B0A08', dark: '#17120E', cream: '#F4EFE7', white: '#FFFDF8', accent: '#E87516', glass: 'rgba(255, 255, 255, 0.05)', glass_border: 'rgba(255, 255, 255, 0.1)', text: '#F4EFE7', text_muted: '#A39B8E', btn_hover: '#d0640d', body_bg: 'linear-gradient(135deg, #0B0A08, #17120E)' },
+          cyan: { primary: '#050B11', dark: '#0C1622', cream: '#E0F2FE', white: '#FFFFFF', accent: '#00D2C4', glass: 'rgba(0, 210, 196, 0.06)', glass_border: 'rgba(0, 210, 196, 0.2)', text: '#E0F2FE', text_muted: '#8BAAC4', btn_hover: '#00b3a6', body_bg: 'linear-gradient(135deg, #050B11, #0C1622)' },
+          gold: { primary: '#11100E', dark: '#1C1A17', cream: '#FBF7EE', white: '#FFFFFF', accent: '#D4AF37', glass: 'rgba(212, 175, 55, 0.06)', glass_border: 'rgba(212, 175, 55, 0.2)', text: '#FBF7EE', text_muted: '#B5A895', btn_hover: '#b89628', body_bg: 'linear-gradient(135deg, #11100E, #1C1A17)' },
+          ruby: { primary: '#120709', dark: '#1E0D11', cream: '#FFF0F2', white: '#FFFFFF', accent: '#E14D4D', glass: 'rgba(225, 77, 77, 0.06)', glass_border: 'rgba(225, 77, 77, 0.2)', text: '#FFF0F2', text_muted: '#C499A0', btn_hover: '#c83b3b', body_bg: 'linear-gradient(135deg, #120709, #1E0D11)' },
+          light: { primary: '#F8F6F0', dark: '#EEEBE1', cream: '#211E1B', white: '#12100E', accent: '#B85D0D', glass: 'rgba(0, 0, 0, 0.04)', glass_border: 'rgba(0, 0, 0, 0.12)', text: '#211E1B', text_muted: '#665F57', btn_hover: '#9c4c07', body_bg: 'linear-gradient(135deg, #F8F6F0, #EEEBE1)' }
         };
 
         function selectTheme(key) {
@@ -1567,10 +1569,15 @@ if ($editingSlug) {
             root.style.setProperty('--color-primary', tvars.primary);
             root.style.setProperty('--color-dark', tvars.dark);
             root.style.setProperty('--color-cream', tvars.cream);
+            root.style.setProperty('--color-white', tvars.white);
             root.style.setProperty('--color-accent', tvars.accent);
+            root.style.setProperty('--color-glass', tvars.glass);
             root.style.setProperty('--color-glass-border', tvars.glass_border);
             root.style.setProperty('--text', tvars.text);
+            root.style.setProperty('--text-muted', tvars.text_muted);
+            root.style.setProperty('--btn-hover', tvars.btn_hover);
             body.style.background = tvars.body_bg;
+            body.style.color = tvars.text;
 
             const sidePad = document.getElementById('design_mobile_side_padding').value;
             const secPad = document.getElementById('design_mobile_section_padding').value;
