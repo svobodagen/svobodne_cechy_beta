@@ -668,9 +668,9 @@ HTML;
     .hero h1 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.8rem; }
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
     .hero-buttons-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center; padding-top: 1.8rem; width: 100%; text-align: center; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--btn-pad-v) var(--btn-pad-h); font-size: var(--btn-font-size); border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 42px; cursor: pointer; border: none; text-align: center; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: {$bS['pv']} {$bS['ph']}; font-size: {$bS['fs']}; border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 42px; cursor: pointer; border: none; text-align: center; }
     @media (max-width: 768px) {
-      .btn { padding: var(--btn-pad-v-mob) var(--btn-pad-h-mob); font-size: var(--btn-font-size-mob); }
+      .btn { padding: {$bS['pv_m']} {$bS['ph_m']} !important; font-size: {$bS['fs_m']} !important; }
     }
     .btn-primary { background: var(--color-accent); color: #fff; }
     .btn-primary:hover { background: var(--btn-hover); }
@@ -2248,6 +2248,11 @@ if ($editingSlug) {
             root.style.setProperty('--btn-pad-v-mob', bSize.pv_m);
             root.style.setProperty('--btn-pad-h-mob', bSize.ph_m);
             root.style.setProperty('--btn-font-size-mob', bSize.fs_m);
+            // PHP bakes sizes as literal values, not var() – so we MUST set inline style on each .btn for live preview
+            doc.querySelectorAll('.btn').forEach(btn => {
+              btn.style.setProperty('padding', activePv + ' ' + activePh, 'important');
+              btn.style.setProperty('font-size', activeFs, 'important');
+            });
 
             const oddSide = document.getElementById('design_odd_side_padding').value;
             const oddVert = document.getElementById('design_odd_vert_padding').value;
