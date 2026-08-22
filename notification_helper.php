@@ -45,6 +45,34 @@ function set_notification_email($email) {
     }
 }
 
+function get_smtp_secret_key() {
+    return hash('sha256', 'SC2_SMTP_SECRET_KEY_2026_BETA_' . (__DIR__));
+}
+
+function encrypt_smtp_pass($pass) {
+    if (empty($pass)) return '';
+    $key = get_smtp_secret_key();
+    $iv = openssl_random_pseudo_bytes(16);
+    $encrypted = openssl_encrypt($pass, 'AES-256-CBC', $key, 0, $iv);
+    return base64_encode($iv . '::' . $encrypted);
+}
+
+function decrypt_smtp_pass($cipherText) {
+    if (empty($cipherText)) return '';
+    $raw = @base64_decode($cipherText, true);
+    if ($raw && strpos($raw, '::') !== false) {
+        list($iv, $encrypted) = explode('::', $raw, 2);
+        if (strlen($iv) === 16) {
+            $key = get_smtp_secret_key();
+            $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
+            if ($decrypted !== false) {
+                return $decrypted;
+            }
+        }
+    }
+    return $cipherText;
+}
+
 function get_smtp_settings() {
     global $pdo;
     $defaults = [
@@ -65,6 +93,9 @@ function get_smtp_settings() {
                 $defaults[$k] = $rows['smtp_' . $k];
             }
         }
+        if (!empty($defaults['pass'])) {
+            $defaults['pass'] = decrypt_smtp_pass($defaults['pass']);
+        }
     } catch (\Exception $e) {}
     return $defaults;
 }
@@ -72,6 +103,15 @@ function get_smtp_settings() {
 function save_smtp_settings($settings) {
     global $pdo;
     try {
+        // If password is changed, encrypt it with AES-256
+        if (isset($settings['pass']) && $settings['pass'] !== '__UNCHANGED__') {
+            $settings['pass'] = encrypt_smtp_pass($settings['pass']);
+        } else if (isset($settings['pass']) && $settings['pass'] === '__UNCHANGED__') {
+            // Keep existing encrypted pass from DB
+            $current = get_smtp_settings();
+            $settings['pass'] = encrypt_smtp_pass($current['pass']);
+        }
+
         $stmt = $pdo->prepare("INSERT INTO site_content (key_name, content_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE content_value = VALUES(content_value)");
         foreach ($settings as $k => $v) {
             $stmt->execute(['smtp_' . $k, trim($v)]);

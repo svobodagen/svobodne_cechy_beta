@@ -217,9 +217,20 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
       <h3 style="color:var(--accent); margin-bottom:0.5rem; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;">
         <i class="bi bi-gear-wide-connected"></i> Nastavení SMTP Serveru (Seznam.cz / Active24 / Gmail)
       </h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1.2rem;">
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">
         Posílání přes přímý SMTP server garantuje 100% doručení bez zahazování e-mailů. Pro Seznam.cz stačí zadat vaše přihlašovací jméno (celý e-mail) a heslo ke schránce.
       </p>
+
+      <!-- SECURITY NOTICE BOX -->
+      <div style="background:rgba(37,211,102,0.06); border:1px solid rgba(37,211,102,0.3); border-radius:8px; padding:0.9rem 1.1rem; margin-bottom:1.5rem; font-size:0.85rem; color:#e2e8f0;">
+        <strong style="color:#25D366; display:flex; align-items:center; gap:0.4rem; font-size:0.9rem; margin-bottom:0.3rem;">
+          <i class="bi bi-shield-lock-fill"></i> Bezpečnost hesla & Ochrana účtu:
+        </strong>
+        <ul style="margin-left:1.2rem; line-height:1.5; color:#cbd5e1;">
+          <li><strong>AES-256 Šifrování:</strong> Uložené heslo se v databázi neukládá v čitelné podobě, ale šifruje se vojenským standardem AES-256-CBC.</li>
+          <li><strong>Heslo pro aplikace (Doporučeno Seznamem):</strong> Nemusíte zadávat vaše hlavní heslo k e-mailu. V Nastavení Seznamu (<em>Zabezpečení &rarr; Poštovní hesla pro aplikace</em>) si můžete vygenerovat samostatné heslo vyhrazené pouze pro posílání poštovních notifikací.</li>
+        </ul>
+      </div>
 
       <!-- Quick Preset Buttons -->
       <div style="margin-bottom:1.5rem; background:rgba(255,255,255,0.03); padding:0.8rem 1rem; border-radius:8px; border:1px solid var(--border); display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
