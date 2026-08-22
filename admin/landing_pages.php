@@ -1756,12 +1756,16 @@ if ($editingSlug) {
                 <div id="uvp_cards_container">
                   <?php foreach (($editingData['uvp']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card uvp-item-box">
-                      <h4>Karta #<?= $idx+1 ?></h4>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                        <h4 style="margin:0;">Karta #<?= $idx+1 ?></h4>
+                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.uvp-item-box')">🗑️ Odebrat</button>
+                      </div>
                       <div class="form-group"><label>Titulek karty <span class="badge-typo h3">🎴 Karta H3</span></label><input type="text" class="form-control uvp-item-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
                       <div class="form-group"><label>Popis karty <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <button type="button" class="btn-action btn-copy" style="margin-bottom:1rem; width:100%;" onclick="addUvpItem()">➕ Přidat kartu UVP</button>
                 <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
                   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                     <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
@@ -1856,13 +1860,17 @@ if ($editingSlug) {
                 <div id="outcomes_container">
                   <?php foreach (($editingData['outcomes']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card outcome-item-box">
-                      <h4>Dovednost #<?= $idx+1 ?></h4>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                        <h4 style="margin:0;">Dovednost #<?= $idx+1 ?></h4>
+                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.outcome-item-box')">🗑️ Odebrat</button>
+                      </div>
                       <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon" value="<?= htmlspecialchars($item['icon']) ?>" /></div>
                       <div class="form-group"><label>Název dovednosti <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control outcome-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
                       <div class="form-group"><label>Popis dovednosti <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control outcome-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <button type="button" class="btn-action btn-copy" style="margin-bottom:1rem; width:100%;" onclick="addOutcomeItem()">➕ Přidat dovednost</button>
                 <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
                   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                     <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
@@ -1900,13 +1908,17 @@ if ($editingSlug) {
                 <div id="timeline_container">
                   <?php foreach (($editingData['timeline']['steps'] ?? []) as $idx => $step): ?>
                     <div class="item-card timeline-step-box">
-                      <h4>Krok <?= htmlspecialchars($step['num']) ?></h4>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                        <h4 style="margin:0;">Krok <?= htmlspecialchars($step['num']) ?></h4>
+                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.timeline-step-box')">🗑️ Odebrat</button>
+                      </div>
                       <div class="form-group"><label>Číslo kroku</label><input type="text" class="form-control step-num" value="<?= htmlspecialchars($step['num']) ?>" /></div>
                       <div class="form-group"><label>Název kroku <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control step-title" value="<?= htmlspecialchars($step['title']) ?>" /></div>
                       <div class="form-group"><label>Popis kroku <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control step-desc"><?= htmlspecialchars($step['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <button type="button" class="btn-action btn-copy" style="margin-bottom:1rem; width:100%;" onclick="addTimelineStep()">➕ Přidat krok</button>
                 <div class="form-group" style="margin-top:1rem;">
                   <label>Poznámka pod postupem (Disclaimer) <span class="badge-typo body">📝 Běžný text</span></label>
                   <textarea class="form-control" id="t_disc"><?= htmlspecialchars($editingData['timeline']['disclaimer'] ?? '💡 Základní cesta vypadá takto. Konkrétní průběh se přizpůsobuje zájemci.') ?></textarea>
@@ -1948,7 +1960,10 @@ if ($editingSlug) {
                 <div id="portfolio_container">
                   <?php foreach (($editingData['portfolio']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card portfolio-item-box">
-                      <h4>Fotka #<?= $idx+1 ?></h4>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                        <h4 style="margin:0;">Fotka #<?= $idx+1 ?></h4>
+                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.portfolio-item-box')">🗑️ Odebrat</button>
+                      </div>
                       <div class="form-group">
                         <label>Fotka v galerii</label>
                         <div class="upload-row">
@@ -1964,6 +1979,7 @@ if ($editingSlug) {
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <button type="button" class="btn-action btn-copy" style="margin-bottom:1rem; width:100%;" onclick="addPortfolioItem()">➕ Přidat fotku</button>
                 <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
                   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                     <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
@@ -2001,13 +2017,17 @@ if ($editingSlug) {
                 <div id="testimonials_container">
                   <?php foreach (($editingData['testimonials']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card testimonial-item-box">
-                      <h4>Reference #<?= $idx+1 ?></h4>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                        <h4 style="margin:0;">Reference #<?= $idx+1 ?></h4>
+                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.testimonial-item-box')">🗑️ Odebrat</button>
+                      </div>
                       <div class="form-group"><label>Citace <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control ts-quote"><?= htmlspecialchars($item['quote']) ?></textarea></div>
                       <div class="form-group"><label>Jméno autora <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control ts-name" value="<?= htmlspecialchars($item['name']) ?>" /></div>
                       <div class="form-group"><label>Role / Vztah k dílně <span class="badge-typo eyebrow">🏷️ Štítek</span></label><input type="text" class="form-control ts-role" value="<?= htmlspecialchars($item['role']) ?>" /></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <button type="button" class="btn-action btn-copy" style="margin-bottom:1rem; width:100%;" onclick="addTestimonialItem()">➕ Přidat referenci</button>
                 <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
                   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                     <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
@@ -2045,12 +2065,16 @@ if ($editingSlug) {
                 <div id="faq_container">
                   <?php foreach (($editingData['faq']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card faq-item-box">
-                      <h4>Otázka #<?= $idx+1 ?></h4>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                        <h4 style="margin:0;">Otázka #<?= $idx+1 ?></h4>
+                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.faq-item-box')">🗑️ Odebrat</button>
+                      </div>
                       <div class="form-group"><label>Otázka <span class="badge-typo h3">🎴 Otázka H4</span></label><input type="text" class="form-control faq-q" value="<?= htmlspecialchars($item['q']) ?>" /></div>
                       <div class="form-group"><label>Odpověď <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control faq-a"><?= htmlspecialchars($item['a']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <button type="button" class="btn-action btn-copy" style="margin-bottom:1rem; width:100%;" onclick="addFaqItem()">➕ Přidat otázku</button>
                 <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
                   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                     <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
@@ -2595,6 +2619,101 @@ if ($editingSlug) {
             renderOrderList(); // Překreslí samotný order list s novým stavem tlačítka
           }
         }
+
+        // ── ADD/REMOVE ITEMS IN SECTIONS ──────────────────────────────────
+        function removeItem(btn, selector) {
+          const box = btn.closest(selector);
+          if (!box) return;
+          const container = box.parentElement;
+          if (container.querySelectorAll(selector).length <= 1) {
+            alert('Musí zůstat aspoň jedna položka.');
+            return;
+          }
+          box.remove();
+        }
+
+        function makeItemBox(cssClass, headerText, innerHtml) {
+          const div = document.createElement('div');
+          div.className = 'item-card ' + cssClass;
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <h4 style="margin:0;">${headerText}</h4>
+              <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.${cssClass}')">🗑️ Odebrat</button>
+            </div>
+            ${innerHtml}
+          `;
+          return div;
+        }
+
+        function addUvpItem() {
+          const container = document.getElementById('uvp_cards_container');
+          const n = container.querySelectorAll('.uvp-item-box').length + 1;
+          container.appendChild(makeItemBox('uvp-item-box', `Karta #${n}`, `
+            <div class="form-group"><label>Titulek karty</label><input type="text" class="form-control uvp-item-title" value="" /></div>
+            <div class="form-group"><label>Popis karty</label><textarea class="form-control uvp-item-desc"></textarea></div>
+          `));
+        }
+
+        function addOutcomeItem() {
+          const container = document.getElementById('outcomes_container');
+          const n = container.querySelectorAll('.outcome-item-box').length + 1;
+          container.appendChild(makeItemBox('outcome-item-box', `Dovednost #${n}`, `
+            <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon" value="🔥" /></div>
+            <div class="form-group"><label>Název dovednosti</label><input type="text" class="form-control outcome-title" value="" /></div>
+            <div class="form-group"><label>Popis dovednosti</label><textarea class="form-control outcome-desc"></textarea></div>
+          `));
+        }
+
+        function addTimelineStep() {
+          const container = document.getElementById('timeline_container');
+          const n = container.querySelectorAll('.timeline-step-box').length + 1;
+          const numStr = String(n).padStart(2, '0');
+          container.appendChild(makeItemBox('timeline-step-box', `Krok ${numStr}`, `
+            <div class="form-group"><label>Číslo kroku</label><input type="text" class="form-control step-num" value="${numStr}" /></div>
+            <div class="form-group"><label>Název kroku</label><input type="text" class="form-control step-title" value="" /></div>
+            <div class="form-group"><label>Popis kroku</label><textarea class="form-control step-desc"></textarea></div>
+          `));
+        }
+
+        function addPortfolioItem() {
+          const container = document.getElementById('portfolio_container');
+          const n = container.querySelectorAll('.portfolio-item-box').length + 1;
+          const uid = 'new_' + Date.now();
+          container.appendChild(makeItemBox('portfolio-item-box', `Fotka #${n}`, `
+            <div class="form-group">
+              <label>Fotka v galerii</label>
+              <div class="upload-row">
+                <img src="" id="prev_p_img_${uid}" class="thumb-preview" />
+                <input type="text" class="form-control p-img" id="p_img_${uid}" value="" />
+                <label class="upload-btn">
+                  <i class="bi bi-upload"></i> Nahrát fotku
+                  <input type="file" accept="image/*" style="display:none;" onchange="uploadImage(this, 'p_img_${uid}', 'prev_p_img_${uid}')" />
+                </label>
+              </div>
+            </div>
+            <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap" value="" /></div>
+          `));
+        }
+
+        function addTestimonialItem() {
+          const container = document.getElementById('testimonials_container');
+          const n = container.querySelectorAll('.testimonial-item-box').length + 1;
+          container.appendChild(makeItemBox('testimonial-item-box', `Reference #${n}`, `
+            <div class="form-group"><label>Citace</label><textarea class="form-control ts-quote"></textarea></div>
+            <div class="form-group"><label>Jméno autora</label><input type="text" class="form-control ts-name" value="" /></div>
+            <div class="form-group"><label>Role / Vztah k dílně</label><input type="text" class="form-control ts-role" value="" /></div>
+          `));
+        }
+
+        function addFaqItem() {
+          const container = document.getElementById('faq_container');
+          const n = container.querySelectorAll('.faq-item-box').length + 1;
+          container.appendChild(makeItemBox('faq-item-box', `Otázka #${n}`, `
+            <div class="form-group"><label>Otázka</label><input type="text" class="form-control faq-q" value="" /></div>
+            <div class="form-group"><label>Odpověď</label><textarea class="form-control faq-a"></textarea></div>
+          `));
+        }
+        // ──────────────────────────────────────────────────────────────────
 
         function moveSection(index, direction) {
           const targetIndex = index + direction;
