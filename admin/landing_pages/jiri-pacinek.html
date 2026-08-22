@@ -73,50 +73,51 @@
     }
     .cta-nav:hover { background: #d0640d; transform: scale(1.03); }
 
-    /* Hero Section */
+    /* Balanced & Compact Headings Across ALL Sections */
     h1, h2, h3, h4 {
-      line-height: 1.15;
-      letter-spacing: -0.01em;
+      line-height: 1.18;
+      letter-spacing: -0.015em;
       overflow-wrap: break-word;
       word-break: break-word;
+      margin-bottom: 0.4rem;
     }
 
     .hero {
       display: grid;
       grid-template-columns: 1fr 1fr;
       align-items: center;
-      gap: 3rem;
-      padding: 4.5rem 0 3.5rem;
-      min-height: 70vh;
+      gap: 2.5rem;
+      padding: 3.5rem 0 2.5rem;
+      min-height: 60vh;
     }
-    .hero-content { max-width: 620px; }
+    .hero-content { max-width: 580px; }
     .eyebrow {
       text-transform: uppercase;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       letter-spacing: 2px;
       color: var(--color-accent);
       font-weight: 700;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.6rem;
     }
     .hero h1 {
       font-family: var(--font-heading);
-      font-size: clamp(1.8rem, 4.8vw, 3.2rem);
+      font-size: clamp(1.4rem, 3.8vw, 2.4rem);
       color: var(--color-white);
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
-    .subtitle { font-size: clamp(1rem, 2.5vw, 1.15rem); color: var(--text-muted); margin-bottom: 1.8rem; line-height: 1.5; }
-    .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
+    .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0.9rem 1.6rem;
+      padding: 0.8rem 1.4rem;
       border-radius: 6px;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       text-decoration: none;
       transition: all .2s;
-      min-height: 48px;
+      min-height: 44px;
       cursor: pointer;
       border: none;
     }
@@ -126,30 +127,35 @@
     .btn-secondary:hover { background: rgba(232, 117, 22, 0.15); transform: translateY(-2px); }
     .hero-image img {
       width: 100%;
-      max-height: 460px;
+      max-height: 400px;
       object-fit: cover;
       border-radius: 12px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       border: 1px solid var(--color-glass-border);
     }
 
-    /* Section Titles */
-    .section-title { text-align: center; margin-bottom: 2.8rem; }
-    .section-title h2 { font-family: var(--font-heading); font-size: clamp(1.6rem, 4.2vw, 2.5rem); color: var(--color-white); margin-bottom: 0.5rem; }
-    .section-title p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 700px; margin: auto; }
+    /* Section Titles Across ALL Sections */
+    .section-title { text-align: center; margin-bottom: 2rem; }
+    .section-title h2, .primary-cta-box h2, .contact-card h3, .master-info h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.25rem, 3.2vw, 1.85rem);
+      color: var(--color-white);
+      margin-bottom: 0.4rem;
+    }
+    .section-title p { color: var(--text-muted); font-size: clamp(0.9rem, 1.8vw, 1.05rem); max-width: 680px; margin: auto; }
 
     /* UVP Grid */
-    .uvp-section { padding: 4.5rem 0; }
-    .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .uvp-section { padding: 3.5rem 0; }
+    .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .uvp-card {
       background: var(--color-glass);
       border: 1px solid var(--color-glass-border);
       border-radius: 12px;
-      padding: 1.8rem;
+      padding: 1.5rem;
       transition: border-color .3s;
     }
     .uvp-card:hover { border-color: var(--color-accent); }
-    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.3rem, 3vw, 1.6rem); color: var(--color-accent); margin-bottom: 0.6rem; }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.4vw, 1.35rem); color: var(--color-accent); margin-bottom: 0.4rem; }
 
     /* Master Section */
     .master-section { padding: 5rem 0; background: rgba(0,0,0,0.3); border-y: 1px solid var(--color-glass-border); }
