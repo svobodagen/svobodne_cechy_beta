@@ -10,23 +10,32 @@ php_value max_execution_time 300
 # CACHE CONTROL – HTML a PHP se nikdy nekešují
 # CSS, JS, obrázky se kešují (s verzováním přes ?v=...)
 # =============================================================
+
+# Metoda 1: mod_headers (pokud je dostupný)
 <IfModule mod_headers.c>
-  # HTML soubory – žádná cache
   <FilesMatch "\.(html|htm)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires "0"
   </FilesMatch>
-
-  # PHP soubory – žádná cache
   <FilesMatch "\.php$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires "0"
   </FilesMatch>
-
-  # CSS, JS – dlouhá cache (verzujeme přes ?v=timestamp)
   <FilesMatch "\.(css|js)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
+</IfModule>
+
+# Metoda 2: mod_expires (záloha pokud mod_headers není)
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # HTML a PHP – vyprší okamžitě (1 sekunda od přístupu)
+  ExpiresByType text/html "access plus 1 seconds"
+  ExpiresByType application/x-httpd-php "access plus 1 seconds"
+  # CSS a JS – vyprší za 1 rok (verzováno přes ?v=timestamp)
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
 </IfModule>

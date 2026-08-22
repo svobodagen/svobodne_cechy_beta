@@ -51,13 +51,20 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
     exit;
 }
 
-// Function to generate full HTML from section data array with dynamic section ordering and compact heading typography
+// Function to generate full HTML from section data array with dynamic section ordering and custom font typography
 function renderLandingPageHtml($data) {
     $slug = htmlspecialchars($data['slug'] ?? 'master');
     $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
     $metaTitle = htmlspecialchars($data['meta_title'] ?? $masterName . ' – Svobodné Cechy');
     $metaDesc = htmlspecialchars($data['meta_desc'] ?? '');
     
+    // Custom typography font sizes from configuration
+    $typo = $data['typography'] ?? [];
+    $h1_size = htmlspecialchars($typo['hero_h1'] ?? '2.8rem');
+    $h2_size = htmlspecialchars($typo['section_h2'] ?? '2.2rem');
+    $h3_size = htmlspecialchars($typo['card_h3'] ?? '1.3rem');
+    $body_size = htmlspecialchars($typo['body_text'] ?? '1rem');
+
     // 1. Hero
     $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? '');
     $h_h1 = htmlspecialchars($data['hero']['h1'] ?? '');
@@ -286,8 +293,8 @@ HTML;
             <a href="{$ig_link}" class="btn-ig" target="_blank">NAPSAT NA INSTAGRAM</a>
           </div>
           <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--color-glass-border);">
-            <h4 style="font-family:var(--font-heading); font-size:1.25rem;">👨‍👩‍👦 Jste rodič?</h4>
-            <p style="font-size:0.95rem; color:var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše vysvětlíme.</p>
+            <h4 style="font-family:var(--font-heading); font-size:1.15rem;">👨‍Wy‍👦 Jste rodič?</h4>
+            <p style="font-size:0.9rem; color:var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše vysvětlíme.</p>
             <a href="tel:{$wa_num}" class="btn btn-secondary" style="margin-top:1rem; width:100%;">CHCI SI ZAVOLAT ({$phone_parent})</a>
           </div>
         </div>
@@ -334,6 +341,9 @@ HTML;
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{$metaTitle}</title>
   <meta name="description" content="{$metaDesc}" />
@@ -353,27 +363,33 @@ HTML;
       --text-muted: #A39B8E;
       --font-heading: 'Cormorant Garamond', serif;
       --font-body: 'Inter', sans-serif;
+
+      /* User Configured Font Sizes */
+      --hero-h1-size: {$h1_size};
+      --section-h2-size: {$h2_size};
+      --card-h3-size: {$h3_size};
+      --body-text-size: {$body_size};
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-dark)); color: var(--text); line-height: 1.6; font-size: 15px; }
-    @media (min-width: 768px) { body { font-size: 17px; } }
+    body { font-family: var(--font-body); background: linear-gradient(135deg, var(--color-primary), var(--color-dark)); color: var(--text); line-height: 1.5; font-size: var(--body-text-size); }
+    @media (min-width: 768px) { body { font-size: var(--body-text-size); } }
 
-    .container { max-width: 1100px; margin: auto; padding: 0 1.25rem; }
+    .container { max-width: 1050px; margin: auto; padding: 0 1.2rem; }
 
     /* Sticky Header */
     .site-header { position: sticky; top: 0; background: rgba(11, 10, 8, 0.92); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid rgba(232, 117, 22, 0.2); }
-    .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1.25rem; max-width: 1100px; margin: auto; }
-    .logo { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.5vw, 1.4rem); font-weight: 700; color: var(--color-accent); text-decoration: none; letter-spacing: 1px; }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.2rem; max-width: 1050px; margin: auto; }
+    .logo { font-family: var(--font-heading); font-size: clamp(1.05rem, 2.2vw, 1.3rem); font-weight: 700; color: var(--color-accent); text-decoration: none; letter-spacing: 1px; }
     .nav-menu { list-style: none; display: flex; gap: 1.2rem; align-items: center; }
-    .nav-menu a { color: var(--text); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: color .2s; }
+    .nav-menu a { color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: color .2s; }
     .nav-menu a:hover { color: var(--color-accent); }
-    .cta-nav { background: var(--color-accent); color: #fff !important; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; }
+    .cta-nav { background: var(--color-accent); color: #fff !important; padding: 0.5rem 0.9rem; border-radius: 6px; font-weight: 700; }
 
-    /* Balanced & Compact Headings Across ALL Sections */
+    /* STRICT TIGHT LINE HEIGHTS & FLUID FONT SIZES FOR ALL HEADINGS */
     h1, h2, h3, h4 {
-      line-height: 1.18;
-      letter-spacing: -0.015em;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
       overflow-wrap: break-word;
       word-break: break-word;
       margin-bottom: 0.4rem;
@@ -382,7 +398,7 @@ HTML;
     .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 2.5rem; min-height: 60vh; }
     .hero-content { max-width: 580px; }
     .eyebrow { text-transform: uppercase; font-size: 0.78rem; letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
-    .hero h1 { font-family: var(--font-heading); font-size: clamp(1.8rem, 4.5vw, 3rem); color: var(--color-white); margin-bottom: 0.8rem; }
+    .hero h1 { font-family: var(--font-heading); font-size: clamp(1.6rem, 4.5vw, var(--hero-h1-size)); color: var(--color-white); margin-bottom: 0.8rem; }
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.4rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
@@ -390,23 +406,22 @@ HTML;
     .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
     .hero-image img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
 
-    .section-title { text-align: center; margin-bottom: 2rem; }
     .section-title { text-align: center; margin-bottom: 2.5rem; }
     .section-title h2 {
       font-family: var(--font-heading);
-      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-size: clamp(1.4rem, 3.5vw, var(--section-h2-size));
       color: var(--color-white);
       margin-bottom: 0.5rem;
     }
-    .primary-cta-box h2 { font-family: var(--font-heading); font-size: clamp(1.6rem, 3.5vw, 2.4rem); color: var(--color-white); margin-bottom: 1rem; }
-    .contact-card h3 { font-family: var(--font-heading); font-size: clamp(1.3rem, 2.8vw, 1.8rem); color: var(--color-white); margin-bottom: 1rem; }
-    .master-info h3 { font-family: var(--font-heading); font-size: clamp(1.8rem, 4vw, 2.8rem); color: var(--color-white); margin-bottom: 0.5rem; }
+    .primary-cta-box h2 { font-family: var(--font-heading); font-size: clamp(1.4rem, 3.5vw, var(--section-h2-size)); color: var(--color-white); margin-bottom: 1rem; }
+    .contact-card h3 { font-family: var(--font-heading); font-size: clamp(1.2rem, 2.8vw, var(--section-h2-size)); color: var(--color-white); margin-bottom: 1rem; }
+    .master-info h3 { font-family: var(--font-heading); font-size: clamp(1.6rem, 4vw, var(--hero-h1-size)); color: var(--color-white); margin-bottom: 0.5rem; }
     .section-title p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 680px; margin: auto; }
 
     .uvp-section { padding: 3.5rem 0; }
     .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .uvp-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.5rem; }
-    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.5rem); color: var(--color-accent); margin-bottom: 0.4rem; }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.5vw, var(--card-h3-size)); color: var(--color-accent); margin-bottom: 0.4rem; }
 
     .master-section { padding: 3.5rem 0; background: rgba(0,0,0,0.3); }
     .master-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; align-items: center; }
@@ -417,7 +432,7 @@ HTML;
     .outcomes-section { padding: 3.5rem 0; }
     .outcomes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .outcome-item { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.25rem; }
-    .outcome-item h4, .step-content h4 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.2vw, 1.4rem); color: var(--color-white); margin-bottom: 0.3rem; }
+    .outcome-item h4, .step-content h4 { font-family: var(--font-heading); font-size: clamp(1.05rem, 2.2vw, var(--card-h3-size)); color: var(--color-white); margin-bottom: 0.3rem; }
 
     .timeline-section { padding: 3.5rem 0; background: rgba(0,0,0,0.2); }
     .timeline { display: flex; flex-direction: column; gap: 1rem; max-width: 850px; margin: auto; }
@@ -441,7 +456,7 @@ HTML;
     .faq-list { max-width: 800px; margin: auto; display: flex; flex-direction: column; gap: 0.7rem; }
     details { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 8px; padding: 0.9rem 1.1rem; }
     details[open] { border-color: var(--color-accent); background: rgba(232, 117, 22, 0.05); }
-    summary { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.2vw, 1.4rem); font-weight: 600; color: var(--color-white); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; line-height: 1.15; }
+    summary { font-family: var(--font-heading); font-size: clamp(1.05rem, 2.2vw, var(--card-h3-size)); font-weight: 600; color: var(--color-white); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; line-height: 1.15; }
     summary::after { content: '+'; font-size: 1.3rem; color: var(--color-accent); margin-left: 0.5rem; }
     details[open] summary::after { content: '−'; }
 
@@ -517,7 +532,7 @@ if (isset($_POST['save_sections_form'])) {
         file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $generatedHtml = renderLandingPageHtml($formData);
         file_put_contents($htmlPath, $generatedHtml);
-        $message = "Všechny sekce pro '{$slug}' byly úspěšně uloženy s kompaktní typografií!";
+        $message = "Všechny sekce, fotky, pořadí a nastavení fontů pro '{$slug}' byly úspěšně uloženy!";
     } else {
         $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
@@ -640,7 +655,16 @@ if ($editingSlug) {
     .item-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
     .item-card h4 { font-size: 0.9rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.4rem; }
 
-    .preview-iframe { width: 100%; height: 750px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+    /* Live Preview Controls & Frame Styles */
+    .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; }
+    .device-switcher { display: flex; gap: 0.4rem; background: rgba(0,0,0,0.4); padding: 0.3rem; border-radius: 8px; border: 1px solid var(--border); }
+    .device-btn { background: transparent; color: var(--text-muted); border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; transition: all .2s; }
+    .device-btn.active { background: var(--accent); color: #fff; }
+
+    .preview-wrapper { width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1rem 0; border: 1px solid var(--border); }
+    .preview-iframe { width: 100%; height: 780px; border: 1px solid var(--border); border-radius: 8px; background: #fff; transition: width 0.3s ease, border-radius 0.3s ease; }
+    .preview-iframe.device-mobile { width: 375px; height: 750px; border: 8px solid #222; border-radius: 36px; box-shadow: 0 12px 30px rgba(0,0,0,0.8); }
+    .preview-iframe.device-tablet { width: 430px; height: 750px; border: 8px solid #222; border-radius: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.8); }
   </style>
 </head>
 <body>
@@ -650,7 +674,7 @@ if ($editingSlug) {
     </div>
 
     <h1>Vizuální Editor Landing Pages</h1>
-    <p class="subtitle">Upravuj obsah sekcí, nahrávej fotky a měň pořadí sekcí – s kompaktní a vyváženou typografií nadpisů!</p>
+    <p class="subtitle">Upravuj obsah sekcí, nahrávej fotky, měň pořadí sekcí, nastavuj velikosti fontů i mobilní náhled!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -670,6 +694,7 @@ if ($editingSlug) {
             <div>
               <div class="section-tab-nav">
                 <button type="button" class="tab-btn special-order active" onclick="showTab('tab-order')"><i class="bi bi-arrow-down-up"></i> ⚙️ POŘADÍ SEKCÍ</button>
+                <button type="button" class="tab-btn special-order" onclick="showTab('tab-typo')"><i class="bi bi-fonts"></i> 🎨 VELIKOSTI FONTŮ</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-hero')">1. HERO</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-uvp')">2. UVP</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-master')">3. MISTR</button>
@@ -688,6 +713,75 @@ if ($editingSlug) {
                   Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo.
                 </p>
                 <div id="order_list_container"></div>
+              </div>
+
+              <!-- TAB TYPOGRAPHY: FONT SIZE CONFIGURATION -->
+              <div id="tab-typo" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">🎨 Nastavení Velikostí Fontů (Typografie)</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                  Vyber nebo zadej požadované velikosti fontů pro jednotlivé úrovně nadpisů a odstavců.
+                </p>
+
+                <?php 
+                $typoData = $editingData['typography'] ?? []; 
+                $heroH1Val = $typoData['hero_h1'] ?? '2.8rem';
+                $secH2Val = $typoData['section_h2'] ?? '2.2rem';
+                $cardH3Val = $typoData['card_h3'] ?? '1.3rem';
+                $bodyVal = $typoData['body_text'] ?? '1rem';
+                ?>
+
+                <div class="item-card">
+                  <h4>🚀 Hlavní nadpis Hero (H1)</h4>
+                  <div class="form-group">
+                    <label>Velikost pro Desktop (např. 2.4rem, 2.8rem, 3.2rem)</label>
+                    <select class="form-control" id="typo_hero_h1">
+                      <option value="2.2rem" <?= $heroH1Val === '2.2rem' ? 'selected' : '' ?>>Kompaktní (2.2rem ~ 35px)</option>
+                      <option value="2.5rem" <?= $heroH1Val === '2.5rem' ? 'selected' : '' ?>>Střední (2.5rem ~ 40px)</option>
+                      <option value="2.8rem" <?= $heroH1Val === '2.8rem' ? 'selected' : '' ?>>Doporučeno (2.8rem ~ 45px)</option>
+                      <option value="3.2rem" <?= $heroH1Val === '3.2rem' ? 'selected' : '' ?>>Výrazné (3.2rem ~ 51px)</option>
+                      <option value="3.6rem" <?= $heroH1Val === '3.6rem' ? 'selected' : '' ?>>Velké (3.6rem ~ 58px)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="item-card">
+                  <h4>📌 Nadpisy sekcí (H2)</h4>
+                  <div class="form-group">
+                    <label>Velikost pro nadpisy UVP, Mistr, Postup, Galerie, FAQ, Kontakt (H2)</label>
+                    <select class="form-control" id="typo_section_h2">
+                      <option value="1.8rem" <?= $secH2Val === '1.8rem' ? 'selected' : '' ?>>Kompaktní (1.8rem ~ 29px)</option>
+                      <option value="2.0rem" <?= $secH2Val === '2.0rem' ? 'selected' : '' ?>>Střední (2.0rem ~ 32px)</option>
+                      <option value="2.2rem" <?= $secH2Val === '2.2rem' ? 'selected' : '' ?>>Doporučeno (2.2rem ~ 35px)</option>
+                      <option value="2.5rem" <?= $secH2Val === '2.5rem' ? 'selected' : '' ?>>Výrazné (2.5rem ~ 40px)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="item-card">
+                  <h4>🎴 Nadpisy karet a dovedností (H3 & H4)</h4>
+                  <div class="form-group">
+                    <label>Velikost pro nadpisy v kartách a seznamu (H3/H4)</label>
+                    <select class="form-control" id="typo_card_h3">
+                      <option value="1.1rem" <?= $cardH3Val === '1.1rem' ? 'selected' : '' ?>>Kompaktní (1.1rem ~ 18px)</option>
+                      <option value="1.25rem" <?= $cardH3Val === '1.25rem' ? 'selected' : '' ?>>Střední (1.25rem ~ 20px)</option>
+                      <option value="1.35rem" <?= $cardH3Val === '1.35rem' ? 'selected' : '' ?>>Doporučeno (1.35rem ~ 22px)</option>
+                      <option value="1.5rem" <?= $cardH3Val === '1.5rem' ? 'selected' : '' ?>>Výrazné (1.5rem ~ 24px)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="item-card">
+                  <h4>📝 Běžný text a odstavce (Body text)</h4>
+                  <div class="form-group">
+                    <label>Základní velikost textu (Odstavce, popisy)</label>
+                    <select class="form-control" id="typo_body_text">
+                      <option value="0.95rem" <?= $bodyVal === '0.95rem' ? 'selected' : '' ?>>Menší (0.95rem ~ 15px)</option>
+                      <option value="1rem" <?= $bodyVal === '1rem' ? 'selected' : '' ?>>Standardní (1rem ~ 16px)</option>
+                      <option value="1.05rem" <?= $bodyVal === '1.05rem' ? 'selected' : '' ?>>Větší čitelné (1.05rem ~ 17px)</option>
+                      <option value="1.1rem" <?= $bodyVal === '1.1rem' ? 'selected' : '' ?>>Prostorné (1.1rem ~ 18px)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               <!-- TAB 1: HERO -->
@@ -889,10 +983,21 @@ if ($editingSlug) {
               </div>
             </div>
 
-            <!-- RIGHT: LIVE PREVIEW IFRAME -->
+            <!-- RIGHT: LIVE PREVIEW IFRAME & DEVICE SWITCHER -->
             <div>
-              <h3 style="color:#fff; margin-bottom: 0.5rem;"><i class="bi bi-eye"></i> Živý Náhled Stránky</h3>
-              <iframe id="livePreviewFrame" class="preview-iframe" src="landing_pages/<?= htmlspecialchars($editingSlug) ?>.html"></iframe>
+              <div class="preview-header">
+                <h3 style="color:#fff; margin:0;"><i class="bi bi-eye"></i> Živý Náhled Stránky</h3>
+                <div class="device-switcher">
+                  <button type="button" class="device-btn active" id="btn_desktop" onclick="setPreviewDevice('desktop')"><i class="bi bi-display"></i> Desktop</button>
+                  <button type="button" class="device-btn" id="btn_tablet" onclick="setPreviewDevice('tablet')"><i class="bi bi-tablet"></i> Tablet (430px)</button>
+                  <button type="button" class="device-btn" id="btn_mobile" onclick="setPreviewDevice('mobile')"><i class="bi bi-phone"></i> Mobil (375px)</button>
+                  <button type="button" class="device-btn" onclick="refreshPreview()"><i class="bi bi-arrow-clockwise"></i> Obnovit</button>
+                </div>
+              </div>
+
+              <div class="preview-wrapper">
+                <iframe id="livePreviewFrame" class="preview-iframe" src="landing_pages/<?= htmlspecialchars($editingSlug) ?>.html"></iframe>
+              </div>
             </div>
           </div>
         </form>
@@ -913,6 +1018,27 @@ if ($editingSlug) {
           'cta': '🎯 PRIMARY CTA BOX',
           'contact': '📱 KONTAKT A WHATSAPP'
         };
+
+        function setPreviewDevice(device) {
+          const frame = document.getElementById('livePreviewFrame');
+          document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('active'));
+          
+          if (device === 'mobile') {
+            frame.className = 'preview-iframe device-mobile';
+            document.getElementById('btn_mobile').classList.add('active');
+          } else if (device === 'tablet') {
+            frame.className = 'preview-iframe device-tablet';
+            document.getElementById('btn_tablet').classList.add('active');
+          } else {
+            frame.className = 'preview-iframe';
+            document.getElementById('btn_desktop').classList.add('active');
+          }
+        }
+
+        function refreshPreview() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (iframe) { iframe.src = iframe.src; }
+        }
 
         function renderOrderList() {
           const container = document.getElementById('order_list_container');
@@ -973,8 +1099,7 @@ if ($editingSlug) {
               if (previewImgId && document.getElementById(previewImgId)) {
                 document.getElementById(previewImgId).src = data.admin_preview_url || data.url;
               }
-              const iframe = document.getElementById('livePreviewFrame');
-              if (iframe) { iframe.src = iframe.src; }
+              refreshPreview();
               alert('Fotka byla úspěšně nahrána!');
             } else {
               alert('Chyba při nahrávání: ' + (data.message || 'Neznámá chyba'));
@@ -992,6 +1117,12 @@ if ($editingSlug) {
             meta_title: document.getElementById('h_h1').value + ' | Svobodné Cechy',
             meta_desc: document.getElementById('h_sub').value,
             section_order: currentSectionOrder,
+            typography: {
+              hero_h1: document.getElementById('typo_hero_h1').value,
+              section_h2: document.getElementById('typo_section_h2').value,
+              card_h3: document.getElementById('typo_card_h3').value,
+              body_text: document.getElementById('typo_body_text').value
+            },
             hero: {
               eyebrow: document.getElementById('h_eyebrow').value,
               h1: document.getElementById('h_h1').value,
@@ -1113,7 +1244,7 @@ if ($editingSlug) {
             echo "<td style='font-family:monospace; color:var(--text-muted); font-size:0.85rem;'>" . htmlspecialchars($relPath) . "</td>";
             echo "<td>";
             echo "<div style='display:flex; gap:0.5rem;'>";
-            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce, fotky & pořadí</a>";
+            echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce, fotky, fonty & pořadí</a>";
             echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
             echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
             echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";

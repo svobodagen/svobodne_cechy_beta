@@ -2,6 +2,9 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Učednictví u Jiřího Pačinka | Nauč se sklářské řemeslo – Svobodné Cechy</title>
   <meta name="description" content="Zajímá tě sklářské řemeslo? Poznej učednictví přímo v dílně Jiřího Pačinka v Kunraticích u Cvikova. Zjisti, jak učednictví probíhá a jestli je pro tebe." />
@@ -21,6 +24,12 @@
       --text-muted: #A39B8E;
       --font-heading: 'Cormorant Garamond', serif;
       --font-body: 'Inter', sans-serif;
+
+      /* User Configured Font Sizes */
+      --hero-h1-size: 2.8rem;
+      --section-h2-size: 2.2rem;
+      --card-h3-size: 1.35rem;
+      --body-text-size: 1rem;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,8 +38,8 @@
       font-family: var(--font-body);
       background: linear-gradient(135deg, var(--color-primary), var(--color-dark));
       color: var(--text);
-      line-height: 1.6;
-      font-size: 18px;
+      line-height: 1.5;
+      font-size: var(--body-text-size);
     }
 
     .container { max-width: 1200px; margin: auto; padding: 0 1.5rem; }
