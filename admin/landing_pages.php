@@ -2235,9 +2235,16 @@ if ($editingSlug) {
 
             const bSizeKey = document.getElementById('design_btn_size')?.value || 'm';
             const bSize = btnSizes[bSizeKey] || btnSizes.m;
-            root.style.setProperty('--btn-pad-v', bSize.pv);
-            root.style.setProperty('--btn-pad-h', bSize.ph);
-            root.style.setProperty('--btn-font-size', bSize.fs);
+            // Detect preview device – iframe @media query NEVER fires inside editor (iframe viewport = full editor width)
+            // So we manually apply desktop or mobile sizes based on the active device button
+            const isMobile = (currentPreviewDevice === 'mobile' || currentPreviewDevice === 'tablet');
+            const activePv = isMobile ? bSize.pv_m : bSize.pv;
+            const activePh = isMobile ? bSize.ph_m : bSize.ph;
+            const activeFs = isMobile ? bSize.fs_m : bSize.fs;
+            root.style.setProperty('--btn-pad-v', activePv);
+            root.style.setProperty('--btn-pad-h', activePh);
+            root.style.setProperty('--btn-font-size', activeFs);
+            // Also set mob vars so real device visitors use correct sizes via @media
             root.style.setProperty('--btn-pad-v-mob', bSize.pv_m);
             root.style.setProperty('--btn-pad-h-mob', bSize.ph_m);
             root.style.setProperty('--btn-font-size-mob', bSize.fs_m);
@@ -2394,10 +2401,12 @@ if ($editingSlug) {
           } catch(e) { console.log('Reorder iframe error:', e); }
         }
 
+        let currentPreviewDevice = 'desktop';
+
         function setPreviewDevice(device) {
           const frame = document.getElementById('livePreviewFrame');
           document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('active'));
-          
+          currentPreviewDevice = device;
           if (device === 'mobile') {
             frame.className = 'preview-iframe device-mobile';
             document.getElementById('btn_mobile').classList.add('active');
