@@ -6,6 +6,7 @@ require_once __DIR__ . '/../notification_helper.php';
 // Handle Actions
 $msg = '';
 $msgType = 'info';
+$diagResults = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -20,11 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save_smtp') {
         $smtpData = [
             'enabled' => isset($_POST['smtp_enabled']) ? '1' : '0',
-            'host' => trim($_POST['smtp_host'] ?? 'email.active24.com'),
-            'port' => trim($_POST['smtp_port'] ?? '587'),
+            'host' => trim($_POST['smtp_host'] ?? 'smtp.seznam.cz'),
+            'port' => trim($_POST['smtp_port'] ?? '465'),
             'user' => trim($_POST['smtp_user'] ?? ''),
             'pass' => trim($_POST['smtp_pass'] ?? ''),
-            'secure' => trim($_POST['smtp_secure'] ?? 'tls'),
+            'secure' => trim($_POST['smtp_secure'] ?? 'ssl'),
             'from' => trim($_POST['smtp_from'] ?? 'info@svobodnecechy.cz'),
             'from_name' => trim($_POST['smtp_from_name'] ?? 'Svobodné Cechy')
         ];
@@ -58,9 +59,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $msg = "Testovací e-mail byl úspěšně odeslán! Zkontrolujte schránku {$testRecipient} (i složku SPAM).";
                 $msgType = "success";
             } else {
-                $msg = "Odeslání testovacího e-mailu selhalo. Podrobnosti naleznete v tabulce logů níže.";
+                $msg = "Odeslání testovacího e-mailu selhalo. Spusťte hloubkovou diagnostiku níže pro zjištění příčiny.";
                 $msgType = "error";
             }
+        }
+    }
+
+    if ($action === 'run_deep_diagnostics') {
+        $diagEmail = trim($_POST['diag_email'] ?? get_notification_email());
+        if (empty($diagEmail)) {
+            $msg = "Zadejte e-mail pro spuštění diagnostiky.";
+            $msgType = "error";
+        } else {
+            $diagResults = run_email_diagnostics($diagEmail);
+            $msg = "Hloubková diagnostika doručitelnosti byla dokončena.";
+            $msgType = "info";
         }
     }
 
@@ -159,6 +172,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
     .badge-no_recipient { background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid #fbbf24; }
 
     .code-box { font-family: monospace; font-size: 0.82rem; background: rgba(0,0,0,0.4); padding: 0.4rem 0.6rem; border-radius: 4px; color: #a7f3d0; word-break: break-all; }
+    .console-log { font-family: monospace; font-size: 0.8rem; background: #07090e; padding: 1rem; border-radius: 8px; border: 1px solid #1e293b; color: #a7f3d0; white-space: pre-wrap; max-height: 250px; overflow-y: auto; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
@@ -168,7 +182,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
     </div>
 
     <h1>📧 Správa Notifikací a Diagnostika E-mailů</h1>
-    <p class="subtitle">Evidence odeslaných e-mailových notifikací, kontrola doručení, nastavení SMTP a testování.</p>
+    <p class="subtitle">Evidence odeslaných e-mailových notifikací, hloubková diagnostika serverů a nastavení SMTP.</p>
 
     <?php if ($msg): ?>
       <div class="alert alert-<?= $msgType ?>">
@@ -196,12 +210,12 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
         </form>
       </div>
 
-      <!-- CARD 2: Testovací Odeslání -->
+      <!-- CARD 2: Testování & Diagnostika -->
       <div class="card" style="margin-bottom:0;">
         <h3 style="color:var(--accent); margin-bottom:1rem; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
-          <i class="bi bi-send-check"></i> Odeslat Testovací E-mail Hned
+          <i class="bi bi-send-check"></i> Test a Hloubková Diagnostika
         </h3>
-        <form method="post">
+        <form method="post" style="margin-bottom:1rem;">
           <input type="hidden" name="action" value="send_test" />
           <div class="form-group">
             <label>Testovací příjemce</label>
@@ -209,8 +223,46 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
           </div>
           <button type="submit" class="btn btn-secondary" style="width:100%;"><i class="bi bi-paperplane-fill"></i> Odeslat testovací zprávu hned</button>
         </form>
+
+        <form method="post">
+          <input type="hidden" name="action" value="run_deep_diagnostics" />
+          <input type="hidden" name="diag_email" value="<?= htmlspecialchars($currentEmail) ?>" />
+          <button type="submit" class="btn" style="width:100%; background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6;"><i class="bi bi-search"></i> Spustit hloubkovou diagnostiku serverů</button>
+        </form>
       </div>
     </div>
+
+    <!-- DEEP DIAGNOSTICS RESULTS DISPLAY -->
+    <?php if ($diagResults): ?>
+      <div class="card" style="border-color:#3b82f6; background:rgba(15,23,42,0.9);">
+        <h3 style="color:#60a5fa; margin-bottom:1rem; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;">
+          <i class="bi bi-terminal-fill"></i> Výsledky Hloubkové Diagnostiky Odesílání E-mailů
+        </h3>
+        <p style="color:#cbd5e1; font-size:0.9rem; margin-bottom:1.2rem;">
+          Testovací režim: <strong><?= htmlspecialchars($diagResults['current_mode']) ?></strong>
+        </p>
+
+        <?php foreach ($diagResults as $key => $res): ?>
+          <?php if (!is_array($res)) continue; ?>
+          <div style="margin-bottom:1.2rem; background:rgba(0,0,0,0.5); padding:1rem; border-radius:8px; border:1px solid <?= $res['success'] ? '#25D366' : '#ef4444' ?>;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+              <strong style="color:#fff; font-size:0.95rem;"><?= htmlspecialchars($res['name']) ?></strong>
+              <?php if ($res['success']): ?>
+                <span class="badge badge-success"><i class="bi bi-check-lg"></i> DORUČITELNÉ (OK)</span>
+              <?php else: ?>
+                <span class="badge badge-failed"><i class="bi bi-x-lg"></i> CHYBA DORUČENÍ</span>
+              <?php endif; ?>
+            </div>
+            <p style="color:<?= $res['success'] ? '#a7f3d0' : '#f87171' ?>; font-size:0.88rem;">
+              <?= htmlspecialchars($res['message']) ?>
+            </p>
+            <?php if (!empty($res['transcript'])): ?>
+              <div class="console-log"><?= htmlspecialchars($res['transcript']) ?></div>
+            <?php endif; ?>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
 
     <!-- SMTP SERVER CONFIGURATION CARD -->
     <div class="card">
@@ -283,7 +335,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
           </div>
           <div class="form-group">
             <label>SMTP Heslo</label>
-            <input type="password" name="smtp_pass" value="<?= htmlspecialchars($smtp['pass']) ?>" class="form-control" placeholder="Heslo ke schránce Seznam" />
+            <input type="password" name="smtp_pass" value="<?= !empty($smtp['pass']) ? '__UNCHANGED__' : '' ?>" class="form-control" placeholder="<?= !empty($smtp['pass']) ? '•••••••• (Uloženo v AES-256)' : 'Heslo ke schránce Seznam' ?>" />
           </div>
           <div class="form-group">
             <label>Adresa odesílatele (From Email)</label>
@@ -392,7 +444,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
               <th style="width:200px;">Příjemce</th>
               <th>Předmět a náhled</th>
               <th style="width:110px;">Status</th>
-              <th>Detail / Odezva serveru</th>
+              <th>Detail / Odezva serveru / Transkript</th>
             </tr>
           </thead>
           <tbody>
@@ -427,7 +479,9 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
                   <?php endif; ?>
                 </td>
                 <td style="font-size:0.82rem; color: #d1d5db;">
-                  <?= htmlspecialchars($log['error_info'] ?: 'OK') ?>
+                  <div style="max-height:120px; overflow-y:auto; white-space:pre-wrap; font-family:monospace; background:rgba(0,0,0,0.3); padding:0.4rem; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+                    <?= htmlspecialchars($log['error_info'] ?: 'OK') ?>
+                  </div>
                 </td>
               </tr>
             <?php endforeach; ?>

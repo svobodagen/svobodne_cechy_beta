@@ -147,7 +147,7 @@ function log_notification($recipient, $subject, $bodySnippet, $status, $errorInf
 
 /**
  * Lightweight Pure PHP SMTP Socket Mailer Class
- * Zero dependencies, direct socket connection with real SMTP error codes.
+ * Zero dependencies, direct socket connection with raw transcript debugging.
  */
 class SimpleSmtpMailer {
     private $host;
@@ -155,17 +155,38 @@ class SimpleSmtpMailer {
     private $username;
     private $password;
     private $encryption;
-    private $timeout = 12;
+    private $timeout = 10;
+    private $transcript = [];
 
     public function __construct($host, $port = 587, $username = '', $password = '', $encryption = 'tls') {
         $this->host = $host;
         $this->port = (int)$port;
-        $this->username = $username;
-        $this->password = $password;
-        $this->encryption = strtolower($encryption);
+        $this->username = trim($username);
+        $this->password = trim($password);
+        $this->encryption = strtolower(trim($encryption));
+    }
+
+    public function getTranscript() {
+        return implode("\n", $this->transcript);
+    }
+
+    private function log($msg) {
+        $this->transcript[] = "[" . date('H:i:s') . "] " . $msg;
     }
 
     public function send($fromEmail, $fromName, $toEmail, $subject, $bodyHtml) {
+        $this->transcript = [];
+        $this->log("Iniciace spojení k SMTP: {$this->host}:{$this->port} (Šifrování: {$this->encryption})");
+
+        // Seznam.cz & strict SMTP providers requirement: MAIL FROM must match logged in user account!
+        $actualFrom = $fromEmail;
+        if (!empty($this->username) && filter_var($this->username, FILTER_VALIDATE_EMAIL)) {
+            $actualFrom = $this->username;
+            if ($actualFrom !== $fromEmail) {
+                $this->log("Upozornění: Odesílatel opraven z '{$fromEmail}' na přihlašovací účet '{$actualFrom}' pro splnění striktních pravidel Seznam/SMTP serveru.");
+            }
+        }
+
         $socketHost = $this->host;
         if ($this->encryption === 'ssl') {
             $socketHost = 'ssl://' . $this->host;
@@ -173,21 +194,27 @@ class SimpleSmtpMailer {
 
         $socket = @fsockopen($socketHost, $this->port, $errno, $errstr, $this->timeout);
         if (!$socket) {
-            return ['success' => false, 'error' => "Nelze se připojit k SMTP serveru {$this->host}:{$this->port} ($errstr)"];
+            $err = "Nelze se připojit k SMTP serveru {$this->host}:{$this->port} (Chyba #{$errno}: {$errstr}). Poskytovatel hostingu (Active24) možná blokuje odchozí socket spojení.";
+            $this->log("CHYBA: " . $err);
+            return ['success' => false, 'error' => $err, 'transcript' => $this->getTranscript()];
         }
 
         stream_set_timeout($socket, $this->timeout);
         $res = $this->readResponse($socket);
+        $this->log("S: " . $res);
 
         // EHLO
-        $this->cmd($socket, "EHLO " . gethostname());
+        $res = $this->cmd($socket, "EHLO " . gethostname());
+        if (strpos($res, '250') !== 0) {
+            $res = $this->cmd($socket, "HELO " . gethostname());
+        }
 
         // STARTTLS
         if ($this->encryption === 'tls') {
             $res = $this->cmd($socket, "STARTTLS");
             if (strpos($res, '220') !== 0) {
                 fclose($socket);
-                return ['success' => false, 'error' => "SMTP STARTTLS selhalo: " . $res];
+                return ['success' => false, 'error' => "SMTP STARTTLS odmítnuto: " . $res, 'transcript' => $this->getTranscript()];
             }
             $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
             if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
@@ -196,8 +223,9 @@ class SimpleSmtpMailer {
             $crypto = @stream_socket_enable_crypto($socket, true, $cryptoMethod);
             if (!$crypto) {
                 fclose($socket);
-                return ['success' => false, 'error' => "Šifrování TLS selhalo při vyjednávání spojení se serverem {$this->host}."];
+                return ['success' => false, 'error' => "Šifrování TLS selhalo při vyjednávání spojení se serverem {$this->host}.", 'transcript' => $this->getTranscript()];
             }
+            $this->log("TLS Šifrování navázáno.");
             $this->cmd($socket, "EHLO " . gethostname());
         }
 
@@ -206,39 +234,40 @@ class SimpleSmtpMailer {
             $res = $this->cmd($socket, "AUTH LOGIN");
             if (strpos($res, '334') !== 0) {
                 fclose($socket);
-                return ['success' => false, 'error' => "SMTP AUTH LOGIN odmítnuto: " . $res];
+                return ['success' => false, 'error' => "SMTP AUTH LOGIN odmítnuto serverem: " . $res, 'transcript' => $this->getTranscript()];
             }
-            $res = $this->cmd($socket, base64_encode($this->username));
+            $res = $this->cmd($socket, base64_encode($this->username), "[C: BASE64_USER]");
             if (strpos($res, '334') !== 0) {
                 fclose($socket);
-                return ['success' => false, 'error' => "SMTP Uživatelské jméno odmítnuto: " . $res];
+                return ['success' => false, 'error' => "SMTP Uživatelské jméno '{$this->username}' odmítnuto: " . $res, 'transcript' => $this->getTranscript()];
             }
-            $res = $this->cmd($socket, base64_encode($this->password));
+            $res = $this->cmd($socket, base64_encode($this->password), "[C: BASE64_PASS]");
             if (strpos($res, '235') !== 0) {
                 fclose($socket);
-                return ['success' => false, 'error' => "SMTP Autentizace selhala (špatné heslo nebo jméno): " . $res];
+                return ['success' => false, 'error' => "SMTP Autentizace selhala (špatné heslo nebo uživatelské jméno pro {$this->username}): " . $res, 'transcript' => $this->getTranscript()];
             }
+            $this->log("Autentizace pro uživatele '{$this->username}' byla ÚSPĚŠNÁ!");
         }
 
         // MAIL FROM
-        $res = $this->cmd($socket, "MAIL FROM:<{$fromEmail}>");
+        $res = $this->cmd($socket, "MAIL FROM:<{$actualFrom}>");
         if (strpos($res, '250') !== 0) {
             fclose($socket);
-            return ['success' => false, 'error' => "SMTP MAIL FROM odmítnut serverem: " . $res];
+            return ['success' => false, 'error' => "SMTP MAIL FROM <{$actualFrom}> odmítnut: " . $res, 'transcript' => $this->getTranscript()];
         }
 
         // RCPT TO
         $res = $this->cmd($socket, "RCPT TO:<{$toEmail}>");
         if (strpos($res, '250') !== 0 && strpos($res, '251') !== 0) {
             fclose($socket);
-            return ['success' => false, 'error' => "SMTP RCPT TO odmítnut pro příjemce {$toEmail}: " . $res];
+            return ['success' => false, 'error' => "SMTP RCPT TO odmítnut pro příjemce <{$toEmail}>: " . $res, 'transcript' => $this->getTranscript()];
         }
 
         // DATA
         $res = $this->cmd($socket, "DATA");
         if (strpos($res, '354') !== 0) {
             fclose($socket);
-            return ['success' => false, 'error' => "SMTP DATA příkaz odmítnut: " . $res];
+            return ['success' => false, 'error' => "SMTP DATA příkaz odmítnut: " . $res, 'transcript' => $this->getTranscript()];
         }
 
         // Prepare MIME headers & message body
@@ -247,29 +276,32 @@ class SimpleSmtpMailer {
 
         $mime = "MIME-Version: 1.0\r\n";
         $mime .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $mime .= "From: {$encodedFromName} <{$fromEmail}>\r\n";
-        $mime .= "Reply-To: <{$fromEmail}>\r\n";
+        $mime .= "From: {$encodedFromName} <{$actualFrom}>\r\n";
+        $mime .= "Reply-To: <{$actualFrom}>\r\n";
         $mime .= "To: <{$toEmail}>\r\n";
         $mime .= "Subject: {$encodedSubject}\r\n";
         $mime .= "Date: " . date('r') . "\r\n";
-        $mime .= "X-Mailer: Svobodne Cechy Direct SMTP Mailer\r\n\r\n";
+        $mime .= "X-Mailer: Svobodne Cechy SMTP Mailer\r\n\r\n";
         $mime .= $bodyHtml . "\r\n.";
 
-        $res = $this->cmd($socket, $mime);
+        $res = $this->cmd($socket, $mime, "[SENDING MAIL MIME BODY]");
         if (strpos($res, '250') !== 0) {
             fclose($socket);
-            return ['success' => false, 'error' => "SMTP Odeslání zprávy selhalo: " . $res];
+            return ['success' => false, 'error' => "SMTP Odeslání zprávy selhalo: " . $res, 'transcript' => $this->getTranscript()];
         }
 
         $this->cmd($socket, "QUIT");
         fclose($socket);
 
-        return ['success' => true, 'info' => "Zpráva doručena na SMTP server ({$res})"];
+        return ['success' => true, 'info' => "Zpráva byla přijata poštovním serverem ({$res})", 'transcript' => $this->getTranscript()];
     }
 
-    private function cmd($socket, $command) {
+    private function cmd($socket, $command, $displayCmd = null) {
+        $this->log("C: " . ($displayCmd !== null ? $displayCmd : $command));
         fwrite($socket, $command . "\r\n");
-        return $this->readResponse($socket);
+        $res = $this->readResponse($socket);
+        $this->log("S: " . $res);
+        return $res;
     }
 
     private function readResponse($socket) {
@@ -335,7 +367,7 @@ function send_admin_notification($subject, $bodyHtml, $overrideRecipient = null)
             log_notification($to, $subject, $bodyHtml, 'success', '[SMTP OK] ' . $res['info']);
             return true;
         } else {
-            log_notification($to, $subject, $bodyHtml, 'failed', '[SMTP CHYBA] ' . $res['error']);
+            log_notification($to, $subject, $bodyHtml, 'failed', '[SMTP CHYBA] ' . $res['error'] . "\n\nTranskript:\n" . ($res['transcript'] ?? ''));
             return false;
         }
     }
@@ -373,11 +405,68 @@ function send_admin_notification($subject, $bodyHtml, $overrideRecipient = null)
 
     $lastErr = error_get_last();
     if (!$sent) {
-        $errMessage = $lastErr ? $lastErr['message'] : 'Funkce mail() vrátila false. Poštovní server lokálně odmítl odeslat e-mail. Doporučujeme v administraci zapnout SMTP server (Active24 SMTP, Seznam, Gmail apod.).';
+        $errMessage = $lastErr ? $lastErr['message'] : 'Funkce mail() vrátila false. Lokální poštovní fronta odmítla odeslat e-mail.';
         log_notification($to, $subject, $bodyHtml, 'failed', '[PHP mail() CHYBA] ' . $errMessage);
         return false;
     } else {
         log_notification($to, $subject, $bodyHtml, 'success', '[PHP mail() OK] E-mail byl předán lokální poštovní frontě.');
         return true;
     }
+}
+
+/**
+ * Deep Multi-Transport Mail Diagnostic Tool
+ * Tests PHP mail(), Seznam SMTP, Active24 SMTP, and Custom Configured SMTP.
+ */
+function run_email_diagnostics($targetEmail) {
+    $results = [];
+
+    // Test 1: Active Configuration
+    $smtp = get_smtp_settings();
+    $results['current_mode'] = ($smtp['enabled'] === '1') ? "Přímé SMTP ({$smtp['host']}:{$smtp['port']})" : "Standardní PHP mail()";
+
+    if ($smtp['enabled'] === '1' && !empty($smtp['host'])) {
+        $mailer = new SimpleSmtpMailer($smtp['host'], $smtp['port'], $smtp['user'], $smtp['pass'], $smtp['secure']);
+        $testSubject = "🧪 Diagnostický test (" . date('H:i:s') . ")";
+        $testBody = "<p>Testovací diagnostická zpráva přes nastavené SMTP serveru {$smtp['host']}.</p>";
+        $res = $mailer->send($smtp['from'], $smtp['from_name'], $targetEmail, $testSubject, $testBody);
+        $results['custom_smtp'] = [
+            'name' => "Vaše aktivní SMTP nastavení ({$smtp['host']}:{$smtp['port']})",
+            'success' => $res['success'],
+            'message' => $res['success'] ? $res['info'] : $res['error'],
+            'transcript' => $mailer->getTranscript()
+        ];
+    }
+
+    // Test 2: Active24 Local Relay Socket Test (email.active24.com:587)
+    $a24Mailer = new SimpleSmtpMailer('email.active24.com', 587, '', '', 'tls');
+    $a24Res = $a24Mailer->send('info@svobodnecechy.cz', 'Svobodné Cechy', $targetEmail, "🧪 Test Active24 SMTP", "<p>Test spojení na Active24 SMTP relay.</p>");
+    $results['active24_smtp'] = [
+        'name' => "Active24 SMTP Relay (email.active24.com:587)",
+        'success' => $a24Res['success'],
+        'message' => $a24Res['success'] ? $a24Res['info'] : $a24Res['error'],
+        'transcript' => $a24Mailer->getTranscript()
+    ];
+
+    // Test 3: PHP mail() function
+    if (function_exists('mail')) {
+        @error_clear_last();
+        $mailSent = @mail($targetEmail, "=?UTF-8?B?" . base64_encode("🧪 Test PHP mail()") . "?=", "Test PHP mail()", "From: info@svobodnecechy.cz\nContent-Type: text/plain; charset=UTF-8\n");
+        $err = error_get_last();
+        $results['php_mail'] = [
+            'name' => "Standardní PHP mail()",
+            'success' => $mailSent,
+            'message' => $mailSent ? "Funkce mail() vrátila true (předáno lokální frontě)" : ($err ? $err['message'] : "mail() vrátila false"),
+            'transcript' => "PHP mail() execution"
+        ];
+    } else {
+        $results['php_mail'] = [
+            'name' => "Standardní PHP mail()",
+            'success' => false,
+            'message' => "Funkce mail() je na tomto serveru zakázána.",
+            'transcript' => "N/A"
+        ];
+    }
+
+    return $results;
 }
