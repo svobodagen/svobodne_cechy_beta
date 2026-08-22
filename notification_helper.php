@@ -439,12 +439,20 @@ function run_email_diagnostics($targetEmail) {
     }
 
     // Test 2: Active24 Local Relay Socket Test (email.active24.com:587)
-    $a24Mailer = new SimpleSmtpMailer('email.active24.com', 587, '', '', 'tls');
-    $a24Res = $a24Mailer->send('info@svobodnecechy.cz', 'Svobodné Cechy', $targetEmail, "🧪 Test Active24 SMTP", "<p>Test spojení na Active24 SMTP relay.</p>");
+    $a24User = $smtp['user'] ?? '';
+    $a24Pass = $smtp['pass'] ?? '';
+    $a24Mailer = new SimpleSmtpMailer('email.active24.com', 587, $a24User, $a24Pass, 'tls');
+    $a24Res = $a24Mailer->send($smtp['from'] ?: 'info@svobodnecechy.cz', 'Svobodné Cechy', $targetEmail, "🧪 Test Active24 SMTP", "<p>Test spojení na Active24 SMTP relay.</p>");
+    
+    $a24Msg = $a24Res['success'] ? $a24Res['info'] : $a24Res['error'];
+    if (!$a24Res['success'] && strpos($a24Res['error'], '554 5.7.1') !== false) {
+        $a24Msg .= "\n💡 Vysvětlení: Poštovní server vyžaduje přihlášení (AUTH LOGIN). Bez zadaného uživatelského jména a hesla odmítne odeslat e-mail neznámému příjemci.";
+    }
+
     $results['active24_smtp'] = [
         'name' => "Active24 SMTP Relay (email.active24.com:587)",
         'success' => $a24Res['success'],
-        'message' => $a24Res['success'] ? $a24Res['info'] : $a24Res['error'],
+        'message' => $a24Msg,
         'transcript' => $a24Mailer->getTranscript()
     ];
 
@@ -456,7 +464,7 @@ function run_email_diagnostics($targetEmail) {
         $results['php_mail'] = [
             'name' => "Standardní PHP mail()",
             'success' => $mailSent,
-            'message' => $mailSent ? "Funkce mail() vrátila true (předáno lokální frontě)" : ($err ? $err['message'] : "mail() vrátila false"),
+            'message' => $mailSent ? "Funkce mail() vrátila true (předáno lokální frontě na serveru)" : ($err ? $err['message'] : "mail() vrátila false"),
             'transcript' => "PHP mail() execution"
         ];
     } else {
