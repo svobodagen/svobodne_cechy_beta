@@ -1992,7 +1992,7 @@ if ($editingSlug) {
                     <div class="form-group" style="margin-bottom:0;">
                       <label>Poměr stran fotek (Aspect Ratio)</label>
                       <?php $currRatio = $editingData['portfolio']['aspect_ratio'] ?? '4/3'; ?>
-                      <select class="form-control" id="p_aspect_ratio">
+                      <select class="form-control" id="p_aspect_ratio" onchange="liveUpdatePortfolio()">
                         <option value="4/3" <?= $currRatio === '4/3' ? 'selected' : '' ?>>🖼️ 4:3 (Standardní fotka)</option>
                         <option value="16/9" <?= $currRatio === '16/9' ? 'selected' : '' ?>>📺 16:9 (Širokoúhlá)</option>
                         <option value="1/1" <?= $currRatio === '1/1' ? 'selected' : '' ?>>🔲 1:1 (Čtverec)</option>
@@ -2004,7 +2004,7 @@ if ($editingSlug) {
                     <div class="form-group" style="margin-bottom:0;">
                       <label>Způsob ořezu / přizpůsobení</label>
                       <?php $currFit = $editingData['portfolio']['object_fit'] ?? 'cover'; ?>
-                      <select class="form-control" id="p_object_fit">
+                      <select class="form-control" id="p_object_fit" onchange="liveUpdatePortfolio()">
                         <option value="cover" <?= $currFit === 'cover' ? 'selected' : '' ?>>✂️ Oříznout a vyplnit (Cover - bez mezer)</option>
                         <option value="contain" <?= $currFit === 'contain' ? 'selected' : '' ?>>🔍 Zobrazit celou fotku (Contain - bez ořezu)</option>
                       </select>
@@ -2034,12 +2034,12 @@ if ($editingSlug) {
                           </label>
                         </div>
                       </div>
-                      <div class="form-group"><label>Popisek pod fotkou <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
+                      <div class="form-group"><label>Popisek pod fotkou <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" oninput="liveUpdatePortfolio()" /></div>
                       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom:0;">
                         <div class="form-group" style="margin-bottom:0;">
                           <label>Poměr stran této fotky</label>
                           <?php $itemRatio = $item['aspect_ratio'] ?? ($editingData['portfolio']['aspect_ratio'] ?? '4/3'); ?>
-                          <select class="form-control p-ratio">
+                          <select class="form-control p-ratio" onchange="liveUpdatePortfolio()">
                             <option value="4/3" <?= $itemRatio === '4/3' ? 'selected' : '' ?>>🖼️ 4:3</option>
                             <option value="16/9" <?= $itemRatio === '16/9' ? 'selected' : '' ?>>📺 16:9</option>
                             <option value="1/1" <?= $itemRatio === '1/1' ? 'selected' : '' ?>>🔲 1:1</option>
@@ -2051,7 +2051,7 @@ if ($editingSlug) {
                         <div class="form-group" style="margin-bottom:0;">
                           <label>Pozice výřezu (Crop Alignment)</label>
                           <?php $itemPos = $item['object_position'] ?? 'center'; ?>
-                          <select class="form-control p-pos">
+                          <select class="form-control p-pos" onchange="liveUpdatePortfolio()">
                             <option value="center" <?= $itemPos === 'center' ? 'selected' : '' ?>>🎯 Střed</option>
                             <option value="top" <?= $itemPos === 'top' ? 'selected' : '' ?>>⬆️ Horní část</option>
                             <option value="bottom" <?= $itemPos === 'bottom' ? 'selected' : '' ?>>⬇️ Spodní část</option>
@@ -2511,6 +2511,41 @@ if ($editingSlug) {
           });
         }
 
+        // Real-Time Live Portfolio Updates on iframe (aspect ratio, object fit, position)
+        function liveUpdatePortfolio() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+          const globalRatio = document.getElementById('p_aspect_ratio')?.value || '4/3';
+          const globalFit = document.getElementById('p_object_fit')?.value || 'cover';
+
+          const itemBoxes = document.querySelectorAll('.portfolio-item-box');
+          const iframeItems = doc.querySelectorAll('#realizace .portfolio-item');
+
+          itemBoxes.forEach((box, idx) => {
+            if (iframeItems[idx]) {
+              const img = iframeItems[idx].querySelector('img');
+              const cap = iframeItems[idx].querySelector('.portfolio-caption');
+              const itemRatio = box.querySelector('.p-ratio')?.value || globalRatio;
+              const itemPos = box.querySelector('.p-pos')?.value || 'center';
+              const pImgVal = box.querySelector('.p-img')?.value;
+              const pCapVal = box.querySelector('.p-cap')?.value;
+
+              if (img) {
+                img.style.aspectRatio = itemRatio;
+                img.style.objectFit = globalFit;
+                img.style.objectPosition = itemPos;
+                if (pImgVal !== undefined && pImgVal !== '') {
+                  img.src = pImgVal;
+                }
+              }
+              if (cap && pCapVal !== undefined) {
+                cap.textContent = pCapVal;
+              }
+            }
+          });
+        }
+
         // Real-Time Live Typography Updates on iframe
         function liveUpdateTypography() {
           const iframe = document.getElementById('livePreviewFrame');
@@ -2802,7 +2837,7 @@ if ($editingSlug) {
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom:0;">
               <div class="form-group" style="margin-bottom:0;">
                 <label>Poměr stran této fotky</label>
-                <select class="form-control p-ratio">
+                <select class="form-control p-ratio" onchange="liveUpdatePortfolio()">
                   <option value="4/3" selected>🖼️ 4:3</option>
                   <option value="16/9">📺 16:9</option>
                   <option value="1/1">🔲 1:1</option>
@@ -2813,7 +2848,7 @@ if ($editingSlug) {
               </div>
               <div class="form-group" style="margin-bottom:0;">
                 <label>Pozice výřezu (Crop Alignment)</label>
-                <select class="form-control p-pos">
+                <select class="form-control p-pos" onchange="liveUpdatePortfolio()">
                   <option value="center" selected>🎯 Střed</option>
                   <option value="top">⬆️ Horní část</option>
                   <option value="bottom">⬇️ Spodní část</option>
@@ -2874,6 +2909,7 @@ if ($editingSlug) {
               liveReorderSectionsInIframe();
               liveUpdateSecCtaVisibility();
               liveUpdateSecCtaTexts();
+              liveUpdatePortfolio();
 
               // Scroll iframe preview to current active tab section once iframe content is fully loaded
               const currentTabId = document.getElementById('active_tab')?.value || 'tab-order';
