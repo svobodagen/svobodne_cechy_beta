@@ -54,6 +54,8 @@ function getTypoCssValues($typo) {
             'step-6' => 'clamp(1.65rem, 3.2vw, 2.1rem)',
         ],
         'body_text' => [
+            'step-minus-2' => '0.75rem',
+            'step-minus-1' => '0.85rem',
             'step-1' => '0.95rem',
             'step-2' => '1rem',
             'step-3' => '1.05rem',
@@ -68,6 +70,14 @@ function getTypoCssValues($typo) {
             'step-4' => '0.95rem',
             'step-5' => '1.05rem',
             'step-6' => '1.15rem',
+        ],
+        'subtitle' => [
+            'step-1' => 'clamp(0.85rem, 1.8vw, 0.95rem)',
+            'step-2' => 'clamp(0.9rem, 1.9vw, 1.05rem)',
+            'step-3' => 'clamp(0.95rem, 2vw, 1.1rem)',
+            'step-4' => 'clamp(1.05rem, 2.2vw, 1.25rem)',
+            'step-5' => 'clamp(1.15rem, 2.5vw, 1.4rem)',
+            'step-6' => 'clamp(1.25rem, 2.8vw, 1.55rem)',
         ]
     ];
 
@@ -76,6 +86,7 @@ function getTypoCssValues($typo) {
     $h3_step = $typo['card_h3'] ?? 'step-3';
     $body_step = $typo['body_text'] ?? 'step-3';
     $eyebrow_step = $typo['eyebrow'] ?? 'step-3';
+    $subtitle_step = $typo['subtitle'] ?? 'step-3';
 
     return [
         'h1' => $scales['hero_h1'][$h1_step] ?? $scales['hero_h1']['step-3'],
@@ -83,11 +94,13 @@ function getTypoCssValues($typo) {
         'h3' => $scales['card_h3'][$h3_step] ?? $scales['card_h3']['step-3'],
         'body' => $scales['body_text'][$body_step] ?? $scales['body_text']['step-3'],
         'eyebrow' => $scales['eyebrow'][$eyebrow_step] ?? $scales['eyebrow']['step-3'],
+        'subtitle' => $scales['subtitle'][$subtitle_step] ?? $scales['subtitle']['step-3'],
         'h1_step' => $h1_step,
         'h2_step' => $h2_step,
         'h3_step' => $h3_step,
         'body_step' => $body_step,
-        'eyebrow_step' => $eyebrow_step
+        'eyebrow_step' => $eyebrow_step,
+        'subtitle_step' => $subtitle_step
     ];
 }
 
@@ -207,6 +220,7 @@ function renderLandingPageHtml($data) {
     $h3_clamp = $typoConf['h3'];
     $body_size = $typoConf['body'];
     $eyebrow_size = $typoConf['eyebrow'];
+    $subtitle_size = $typoConf['subtitle'];
 
     // Design Configuration (Themes, Odd/Even Margins, Sticky CTA, Button Sizes)
     $design = $data['design'] ?? [];
@@ -606,6 +620,7 @@ HTML;
       --card-h3-clamp: {$h3_clamp};
       --body-text-size: {$body_size};
       --eyebrow-size: {$eyebrow_size};
+      --subtitle-size: {$subtitle_size};
 
       /* Alternating Odd & Even Section Margins & Padding */
       --odd-side-padding: {$oddSidePad};
@@ -666,7 +681,7 @@ HTML;
     .hero-content { max-width: 580px; }
     .eyebrow { text-transform: uppercase; font-size: var(--eyebrow-size); letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
     .hero h1 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.8rem; }
-    .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
+    .subtitle { font-size: var(--subtitle-size); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
     .hero-buttons-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center; padding-top: 1.8rem; width: 100%; text-align: center; }
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: {$bS['pv']} {$bS['ph']}; font-size: {$bS['fs']}; border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 42px; cursor: pointer; border: none; text-align: center; }
     @media (max-width: 768px) {
@@ -1140,6 +1155,7 @@ if ($editingSlug) {
       --text: #f4efe7;
       --text-muted: #a39b8e;
       --border: rgba(255,255,255,0.1);
+      --subtitle-size: 0.95rem;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 2rem 1rem; }
@@ -1149,7 +1165,7 @@ if ($editingSlug) {
     .btn-back { color: var(--accent); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; }
     
     h1 { font-family: 'Bungee', cursive; font-size: 1.8rem; color: var(--accent); margin-bottom: 0.3rem; }
-    p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+    p.subtitle { color: var(--text-muted); font-size: var(--subtitle-size); margin-bottom: 2rem; }
 
     .msg { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 600; }
     .msg.success { background: rgba(37, 211, 102, 0.15); border: 1px solid #25D366; color: #25D366; }
@@ -1617,12 +1633,29 @@ if ($editingSlug) {
                   <div class="form-group">
                     <label>Stupeň základní velikosti textu (odstavce, popisy, citace)</label>
                     <select class="form-control typo-select" id="typo_body_text" onchange="liveUpdateTypography()">
+                      <option value="step-minus-2" <?= $bodyStep === 'step-minus-2' ? 'selected' : '' ?>>Stupeň -2 – Extrémně drobný text</option>
+                      <option value="step-minus-1" <?= $bodyStep === 'step-minus-1' ? 'selected' : '' ?>>Stupeň -1 – Drobný text</option>
                       <option value="step-1" <?= $bodyStep === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Jemný text</option>
                       <option value="step-2" <?= $bodyStep === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní text</option>
                       <option value="step-3" <?= $bodyStep === 'step-3' ? 'selected' : '' ?>>Stupeň 3 – Čitelný (Doporučeno)</option>
                       <option value="step-4" <?= $bodyStep === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Větší text</option>
                       <option value="step-5" <?= $bodyStep === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Prostorný text</option>
                       <option value="step-6" <?= $bodyStep === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Maxi text</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="item-card">
+                  <h4>📄 Podtituly (Dlouhý popis nabídky) <span class="badge-typo body" style="font-size:0.95rem;">📄 Podtitul</span></h4>
+                  <div class="form-group">
+                    <label>Stupeň velikosti pro dlouhé popisy a podtituly pod hlavními nadpisy</label>
+                    <select class="form-control typo-select" id="typo_subtitle" onchange="liveUpdateTypography()">
+                      <option value="step-1" <?= $subtitle_step === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Jemný</option>
+                      <option value="step-2" <?= $subtitle_step === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní</option>
+                      <option value="step-3" <?= $subtitle_step === 'step-3' ? 'selected' : '' ?>>Stupeň 3 – Výrazný (Doporučeno)</option>
+                      <option value="step-4" <?= $subtitle_step === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Velký</option>
+                      <option value="step-5" <?= $subtitle_step === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Extra velký</option>
+                      <option value="step-6" <?= $subtitle_step === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Maxi</option>
                     </select>
                   </div>
                 </div>
@@ -2152,6 +2185,8 @@ if ($editingSlug) {
             'step-6': 'clamp(1.65rem, 3.2vw, 2.1rem)'
           },
           body_text: {
+            'step-minus-2': '0.75rem',
+            'step-minus-1': '0.85rem',
             'step-1': '0.95rem',
             'step-2': '1rem',
             'step-3': '1.05rem',
@@ -2166,6 +2201,14 @@ if ($editingSlug) {
             'step-4': '0.95rem',
             'step-5': '1.05rem',
             'step-6': '1.15rem'
+          },
+          subtitle: {
+            'step-1': 'clamp(0.85rem, 1.8vw, 0.95rem)',
+            'step-2': 'clamp(0.9rem, 1.9vw, 1.05rem)',
+            'step-3': 'clamp(0.95rem, 2vw, 1.1rem)',
+            'step-4': 'clamp(1.05rem, 2.2vw, 1.25rem)',
+            'step-5': 'clamp(1.15rem, 2.5vw, 1.4rem)',
+            'step-6': 'clamp(1.25rem, 2.8vw, 1.55rem)'
           }
         };
 
@@ -2359,12 +2402,14 @@ if ($editingSlug) {
             const h3Step = document.getElementById('typo_card_h3').value;
             const bodyStep = document.getElementById('typo_body_text').value;
             const eyebrowStep = document.getElementById('typo_eyebrow').value;
+            const subtitleStep = document.getElementById('typo_subtitle').value;
 
             root.style.setProperty('--hero-h1-clamp', typoScales.hero_h1[h1Step] || typoScales.hero_h1['step-3']);
             root.style.setProperty('--section-h2-clamp', typoScales.section_h2[h2Step] || typoScales.section_h2['step-3']);
             root.style.setProperty('--card-h3-clamp', typoScales.card_h3[h3Step] || typoScales.card_h3['step-3']);
             root.style.setProperty('--body-text-size', typoScales.body_text[bodyStep] || typoScales.body_text['step-3']);
             root.style.setProperty('--eyebrow-size', typoScales.eyebrow[eyebrowStep] || typoScales.eyebrow['step-3']);
+            root.style.setProperty('--subtitle-size', typoScales.subtitle[subtitleStep] || typoScales.subtitle['step-3']);
           } catch(e) { console.log('Live update error:', e); }
         }
 
@@ -2669,7 +2714,8 @@ if ($editingSlug) {
               section_h2: document.getElementById('typo_section_h2').value,
               card_h3: document.getElementById('typo_card_h3').value,
               body_text: document.getElementById('typo_body_text').value,
-              eyebrow: document.getElementById('typo_eyebrow').value
+              eyebrow: document.getElementById('typo_eyebrow').value,
+              subtitle: document.getElementById('typo_subtitle').value
             },
             hero: {
               eyebrow: document.getElementById('h_eyebrow').value,
