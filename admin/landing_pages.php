@@ -496,10 +496,16 @@ HTML;
     $defaultOrder = ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta', 'contact'];
     $order = $data['section_order'] ?? $defaultOrder;
 
+    $sectionVisibility = $data['section_visibility'] ?? [];
     $renderedMain = "";
+    $visibleIdx = 0; // count only visible sections for odd/even assignment
     foreach ($order as $idx => $secKey) {
+        // Skip hidden sections
+        if (isset($sectionVisibility[$secKey]) && $sectionVisibility[$secKey] === false) {
+            continue;
+        }
         if (isset($allSections[$secKey])) {
-            $isOdd = ($idx % 2 === 0);
+            $isOdd = ($visibleIdx % 2 === 0);
             $secClass = $isOdd ? 'section-odd' : 'section-even';
             $block = $allSections[$secKey];
             if (preg_match('/class=["\']([^"\']*)["\']/', $block)) {
@@ -508,6 +514,7 @@ HTML;
                 $block = preg_replace('/<([a-z0-9]+)/i', '<$1 class="' . $secClass . '"', $block, 1);
             }
             $renderedMain .= $block . "\n";
+            $visibleIdx++;
         }
     }
 
@@ -1813,6 +1820,7 @@ if ($editingSlug) {
 
       <script>
         let currentSectionOrder = <?= json_encode($editingData['section_order'] ?? ['hero', 'uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq', 'cta', 'contact']) ?>;
+        let currentSectionVisibility = <?= json_encode($editingData['section_visibility'] ?? (object)[]) ?>;
 
         const sectionLabels = {
           'hero': '🚀 HERO (Úvodní obrazovka)',
@@ -1974,16 +1982,17 @@ if ($editingSlug) {
               'contact': doc.querySelector('#kontakt')
             };
 
+            let visibleIdx = 0;
             currentSectionOrder.forEach((key, idx) => {
               const el = sectionElements[key];
-              if (el) {
+              if (!el) return;
+              const isVisible = currentSectionVisibility[key] !== false;
+              el.style.display = isVisible ? '' : 'none';
+              if (isVisible) {
                 main.appendChild(el);
                 el.classList.remove('section-odd', 'section-even');
-                if (idx % 2 === 0) {
-                  el.classList.add('section-odd');
-                } else {
-                  el.classList.add('section-even');
-                }
+                el.classList.add(visibleIdx % 2 === 0 ? 'section-odd' : 'section-even');
+                visibleIdx++;
               }
             });
           } catch(e) { console.log('Reorder iframe error:', e); }
@@ -2025,24 +2034,64 @@ if ($editingSlug) {
           const container = document.getElementById('order_list_container');
           if (!container) return;
           container.innerHTML = '';
+
+          // Count visible sections only (for odd/even badge display)
+          let visibleCount = 0;
+          const visibleIndexMap = {};
+          currentSectionOrder.forEach((key) => {
+            const isVisible = currentSectionVisibility[key] !== false;
+            if (isVisible) { visibleIndexMap[key] = visibleCount++; }
+          });
+
           currentSectionOrder.forEach((key, idx) => {
+            const isVisible = currentSectionVisibility[key] !== false;
+            const visIdx = visibleIndexMap[key];
+            const isOddText = (isVisible && visIdx % 2 === 0)
+              ? '<span style="color:var(--accent); font-size:0.8rem; margin-left:0.5rem;">[🔹 Lichá sekce]</span>'
+              : (isVisible ? '<span style="color:#60a5fa; font-size:0.8rem; margin-left:0.5rem;">[🔸 Sudá sekce]</span>' : '<span style="color:#6b7280; font-size:0.8rem; margin-left:0.5rem;">[👁️ Skryta]</span>');
+
             const div = document.createElement('div');
             div.className = 'item-card';
-            div.style.display = 'flex';
-            div.style.justifyContent = 'space-between';
-            div.style.alignItems = 'center';
-            div.style.padding = '0.8rem 1.2rem';
-            div.style.marginBottom = '0.6rem';
-            const isOddText = (idx % 2 === 0) ? '<span style="color:var(--accent); font-size:0.8rem; margin-left:0.5rem;">[🔹 Lichá sekce]</span>' : '<span style="color:#60a5fa; font-size:0.8rem; margin-left:0.5rem;">[🔸 Sudá sekce]</span>';
+            div.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:0.8rem 1.2rem; margin-bottom:0.6rem; opacity:${isVisible ? '1' : '0.45'}; border-color:${isVisible ? '' : '#374151'};`;
+
+            // Toggle switch HTML
+            const toggleId = `sec_vis_${key}`;
             div.innerHTML = `
-              <span style="font-size:0.95rem;"><strong>${idx + 1}.</strong> ${sectionLabels[key] || key} ${isOddText}</span>
-              <div style="display:flex; gap:0.4rem;">
-                <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-up"></i> Nahoru</button>
-                <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, 1)" ${idx === currentSectionOrder.length - 1 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-down"></i> Dolů</button>
+              <div style="display:flex; align-items:center; gap:0.8rem; flex:1; min-width:0;">
+                <label class="sec-vis-toggle" title="${isVisible ? 'Skrýt sekci' : 'Zobrazit sekci'}" style="cursor:pointer; flex-shrink:0;">
+                  <input type="checkbox" id="${toggleId}" ${isVisible ? 'checked' : ''}
+                    onchange="toggleSectionVisibility('${key}')" style="display:none;" />
+                  <span style="
+                    display:inline-flex; align-items:center; justify-content:center;
+                    width:42px; height:24px; border-radius:12px; transition:all .2s;
+                    background:${isVisible ? 'var(--accent)' : '#374151'};
+                    position:relative;
+                  ">
+                    <span style="
+                      position:absolute; width:18px; height:18px; border-radius:50%; background:#fff;
+                      transition:transform .2s; transform:translateX(${isVisible ? '9px' : '-9px'});
+                      box-shadow:0 1px 3px rgba(0,0,0,0.4);
+                    "></span>
+                  </span>
+                </label>
+                <span style="font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                  <strong>${idx + 1}.</strong> ${sectionLabels[key] || key} ${isOddText}
+                </span>
+              </div>
+              <div style="display:flex; gap:0.4rem; flex-shrink:0; margin-left:0.6rem;">
+                <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-up"></i></button>
+                <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, 1)" ${idx === currentSectionOrder.length - 1 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-down"></i></button>
               </div>
             `;
             container.appendChild(div);
           });
+        }
+
+        function toggleSectionVisibility(key) {
+          const isCurrentlyVisible = currentSectionVisibility[key] !== false;
+          currentSectionVisibility[key] = !isCurrentlyVisible;
+          renderOrderList();
+          liveReorderSectionsInIframe();
         }
 
         function moveSection(index, direction) {
@@ -2107,6 +2156,7 @@ if ($editingSlug) {
             meta_title: document.getElementById('h_h1').value + ' | Svobodné Cechy',
             meta_desc: document.getElementById('h_sub').value,
             section_order: currentSectionOrder,
+            section_visibility: currentSectionVisibility,
             design: {
               color_theme: document.getElementById('design_color_theme').value,
               odd_side_padding: document.getElementById('design_odd_side_padding').value,
