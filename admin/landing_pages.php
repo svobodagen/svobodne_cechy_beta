@@ -2466,6 +2466,8 @@ if ($editingSlug) {
             div.className = 'item-card';
             div.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:0.8rem 1.2rem; margin-bottom:0.6rem; opacity:${isVisible ? '1' : '0.45'}; border-color:${isVisible ? '' : '#374151'};`;
 
+            // Toggle switch HTML
+            const toggleId = `sec_vis_${key}`;
             const hasCtaCheckbox = document.getElementById('sec_cta_show_' + key);
             const ctaIsVisible = hasCtaCheckbox ? hasCtaCheckbox.checked : false;
 
