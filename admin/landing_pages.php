@@ -324,7 +324,7 @@ HTML;
       <div class="section-title">
         <p class="eyebrow">{$uvp_eyebrow}</p>
         <h2>{$uvp_title}</h2>
-        <p>{$uvp_sub}</p>
+        <p class="subtitle">{$uvp_sub}</p>
       </div>
       <div class="uvp-grid">{$uvp_cards_html}</div>
       {$uvpCtaHtml}
@@ -378,7 +378,7 @@ HTML;
       <div class="section-title">
         <p class="eyebrow">{$o_eyebrow}</p>
         <h2>{$o_title}</h2>
-        <p>{$o_sub}</p>
+        <p class="subtitle">{$o_sub}</p>
       </div>
       <div class="outcomes-grid">{$outcomes_html}</div>
       {$outcomesCtaHtml}
@@ -405,7 +405,7 @@ HTML;
         <div class="section-title">
           <p class="eyebrow">{$t_eyebrow}</p>
           <h2>{$t_title}</h2>
-          <p>{$t_sub}</p>
+          <p class="subtitle">{$t_sub}</p>
         </div>
         <div class="timeline">{$timeline_html}</div>
         <p class="disclaimer-box">{$t_disc}</p>
@@ -431,7 +431,7 @@ HTML;
       <div class="section-title">
         <p class="eyebrow">{$p_eyebrow}</p>
         <h2>{$p_title}</h2>
-        <p>{$p_sub}</p>
+        <p class="subtitle">{$p_sub}</p>
       </div>
       <div class="portfolio-grid">{$portfolio_html}</div>
       {$portfolioCtaHtml}
@@ -457,7 +457,7 @@ HTML;
         <div class="section-title">
           <p class="eyebrow">{$ts_eyebrow}</p>
           <h2>{$ts_title}</h2>
-          <p>{$ts_sub}</p>
+          <p class="subtitle">{$ts_sub}</p>
         </div>
         <div class="testimonials-grid">{$testimonials_html}</div>
         {$testimonialsCtaHtml}
@@ -482,7 +482,7 @@ HTML;
       <div class="section-title">
         <p class="eyebrow">{$f_eyebrow}</p>
         <h2>{$f_title}</h2>
-        <p>{$f_sub}</p>
+        <p class="subtitle">{$f_sub}</p>
       </div>
       <div class="faq-list">{$faq_html}</div>
       {$faqCtaHtml}
@@ -518,7 +518,7 @@ HTML;
       <div class="section-title">
         <p class="eyebrow">{$c_eyebrow}</p>
         <h2>{$c_title}</h2>
-        <p>{$c_sub}</p>
+        <p class="subtitle">{$c_sub}</p>
       </div>
       <div class="contact-grid" style="grid-template-columns:1fr; max-width:650px; margin:auto;">
         <div class="contact-card" style="text-align:center;">
