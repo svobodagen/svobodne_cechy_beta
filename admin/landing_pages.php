@@ -243,6 +243,8 @@ function renderLandingPageHtml($data) {
     $h_sub = htmlspecialchars($data['hero']['subtitle'] ?? '');
     $h_btn1 = htmlspecialchars($data['hero']['btn_primary'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
     $h_btn2 = htmlspecialchars($data['hero']['btn_secondary'] ?? 'PODÍVAT SE, JAK SE PRACUJE SE SKLEM');
+    $h_btn2_show = $data['hero']['btn_secondary_show'] ?? true;
+    $h_btn2_html = $h_btn2_show ? "<a href=\"#realizace\" class=\"btn btn-secondary\">{$h_btn2}</a>" : "";
     $h_img = htmlspecialchars(fixImgUrl($data['hero']['image'] ?? ''));
 
     $heroSection = <<<HTML
@@ -253,7 +255,7 @@ function renderLandingPageHtml($data) {
         <p class="subtitle">{$h_sub}</p>
         <div class="hero-buttons">
           <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">{$h_btn1}</a>
-          <a href="#realizace" class="btn btn-secondary">{$h_btn2}</a>
+          {$h_btn2_html}
         </div>
       </div>
       <div class="hero-image"><img src="{$h_img}" alt="Fotografie z huti" /></div>
@@ -1513,6 +1515,10 @@ if ($editingSlug) {
                   <label>Text druhého tlačítka <span class="badge-typo body">📝 Běžný text</span></label>
                   <input type="text" class="form-control" id="h_btn2" value="<?= htmlspecialchars($editingData['hero']['btn_secondary'] ?? 'PODÍVAT SE, JAK SE PRACUJE SE SKLEM') ?>" />
                 </div>
+                <div class="form-group" style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.2rem; background:rgba(255,255,255,0.03); padding:0.8rem 1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                  <input type="checkbox" id="h_btn2_show" style="width:20px; height:20px; accent-color:var(--accent); cursor:pointer;" <?= ($editingData['hero']['btn_secondary_show'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
+                  <label for="h_btn2_show" style="margin:0; cursor:pointer; font-weight:600;">Zobrazit druhé tlačítko v HERO sekci</label>
+                </div>
                 <div class="form-group">
                   <label>Fotka v huti (Hero Obrázek)</label>
                   <div class="upload-row">
@@ -1934,6 +1940,12 @@ if ($editingSlug) {
             if (cta) {
               cta.style.display = stickyEnabled ? 'block' : 'none';
             }
+
+            const heroBtn2Show = document.getElementById('h_btn2_show')?.checked ?? true;
+            const heroBtn2 = doc.querySelector('.hero .btn-secondary');
+            if (heroBtn2) {
+              heroBtn2.style.display = heroBtn2Show ? 'inline-block' : 'none';
+            }
           } catch(e) { console.log('Design live update error:', e); }
         }
 
@@ -2192,6 +2204,7 @@ if ($editingSlug) {
               subtitle: document.getElementById('h_sub').value,
               btn_primary: document.getElementById('h_btn1').value,
               btn_secondary: document.getElementById('h_btn2').value,
+              btn_secondary_show: document.getElementById('h_btn2_show').checked,
               image: document.getElementById('h_img').value
             },
             uvp: {

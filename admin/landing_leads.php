@@ -1,6 +1,16 @@
 <?php
 // admin/landing_leads.php
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../notification_helper.php';
+
+// Handle notification email setting
+if (isset($_POST['action']) && $_POST['action'] === 'save_notification_email') {
+    $nEmail = trim($_POST['notification_email'] ?? '');
+    set_notification_email($nEmail);
+    header("Location: landing_leads.php?msg=notif_saved");
+    exit;
+}
+$notifEmail = get_notification_email();
 
 // Auto-create database table if not exists
 try {
@@ -165,6 +175,29 @@ $resolvedLeadsCount = $pdo->query("SELECT COUNT(*) FROM landing_leads WHERE stat
         <div class="stat-val" style="color:#25D366;"><?= $resolvedLeadsCount ?></div>
         <div class="stat-lbl">Vyřešené kontakty</div>
       </div>
+    </div>
+
+    <!-- NOTIFICATION EMAIL SETTINGS CARD -->
+    <div class="card" style="padding:1.2rem 1.6rem; margin-bottom:2rem; background:rgba(232,117,22,0.06); border:1px solid rgba(232,117,22,0.3);">
+      <form method="post" action="landing_leads.php" style="display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; justify-content:space-between;">
+        <input type="hidden" name="action" value="save_notification_email" />
+        <div style="display:flex; align-items:center; gap:1rem; flex:1; min-width:280px;">
+          <div style="width:42px; height:42px; border-radius:50%; background:rgba(232,117,22,0.2); display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:1.3rem;">
+            <i class="bi bi-envelope-check"></i>
+          </div>
+          <div>
+            <strong style="color:var(--text); font-size:1rem;">E-mail pro notifikace zpráv z webu i landing pages</strong>
+            <p style="color:var(--text-muted); font-size:0.83rem; margin-top:0.15rem;">Při každé nové zprávě nebo vyplnění kontaktů přijde e-mail s kopií zprávy a odkazem do administrace.</p>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.6rem; flex:1; min-width:280px; max-width:480px;">
+          <input type="email" name="notification_email" value="<?= htmlspecialchars($notifEmail) ?>" placeholder="např. notifikace@svobodnecechy.cz" class="form-control" style="flex:1;" required />
+          <button type="submit" class="btn-action" style="background:var(--accent); color:#fff; padding:0.65rem 1.3rem; white-space:nowrap;"><i class="bi bi-save"></i> Uložit e-mail</button>
+        </div>
+      </form>
+      <?php if (isset($_GET['msg']) && $_GET['msg'] === 'notif_saved'): ?>
+        <div style="margin-top:0.8rem; color:#25D366; font-size:0.85rem; font-weight:600;"><i class="bi bi-check-circle"></i> E-mail pro notifikace byl úspěšně uložen!</div>
+      <?php endif; ?>
     </div>
 
     <div class="card">

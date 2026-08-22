@@ -2,6 +2,7 @@
 // api.php
 header('Content-Type: application/json');
 require_once 'db.php';
+require_once __DIR__ . '/notification_helper.php';
 
 $action = $_GET['action'] ?? '';
 $rawData = file_get_contents('php://input');
@@ -227,6 +228,36 @@ try {
                 ]);
             }
             $pdo->commit();
+
+            // Send Notification Email if there is a non-deleted message
+            if (is_array($data) && count($data) > 0) {
+                $latestMsg = end($data);
+                if (!empty($latestMsg['text']) && empty($latestMsg['deletedByAdmin'])) {
+                    $adminUrl = get_base_url() . '/admin-messages.html';
+                    $uName = htmlspecialchars($latestMsg['userName'] ?? 'Neznámý uživatel');
+                    $uEmail = htmlspecialchars($latestMsg['from'] ?? 'Neznámý e-mail');
+                    $uPhone = htmlspecialchars($latestMsg['userPhone'] ?? '-');
+                    $uMaster = htmlspecialchars($latestMsg['toMaster'] ?? '-');
+                    $uText = htmlspecialchars($latestMsg['text'] ?? '');
+
+                    $subject = "Nová zpráva z webu od: " . $uName;
+                    $bodyHtml = "
+                      <h3 style='color:#f8fafc; margin-top:0;'>Přišla nová zpráva z hlavního webu!</h3>
+                      <table style='width:100%; border-collapse:collapse; color:#cbd5e1; font-size:14px; margin-bottom:20px;'>
+                        <tr><td style='padding:8px 0; border-bottom:1px solid #334155; width:140px; color:#94a3b8;'><strong>Jméno:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$uName}</td></tr>
+                        <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>E-mail:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'><a href='mailto:{$uEmail}' style='color:#60a5fa;'>{$uEmail}</a></td></tr>
+                        <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Telefon:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'><a href='tel:{$uPhone}' style='color:#60a5fa;'>{$uPhone}</a></td></tr>
+                        <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Komu (Mistr ID):</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$uMaster}</td></tr>
+                        <tr><td style='padding:8px 0; color:#94a3b8;'><strong>Zpráva:</strong></td><td style='padding:8px 0; white-space:pre-wrap;'>{$uText}</td></tr>
+                      </table>
+                      <div>
+                        <a href='{$adminUrl}' style='display:inline-block; background:#ff7b1c; color:#ffffff; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:700; font-size:14px;'>Zobrazit přehled zpráv v administraci →</a>
+                      </div>
+                    ";
+                    send_admin_notification($subject, $bodyHtml);
+                }
+            }
+
             echo json_encode(['status' => 'success']);
             break;
 
@@ -333,7 +364,37 @@ try {
                 (int) ($data['max_distance'] ?? 0),
                 $data['note'] ?? ''
             ]);
-            echo json_encode(['status' => 'success', 'id' => $pdo->lastInsertId()]);
+            $reqId = $pdo->lastInsertId();
+
+            // Send notification email
+            $adminUrl = get_base_url() . '/admin-requests.html';
+            $rName = htmlspecialchars($data['name'] ?? 'Neznámé jméno');
+            $rEmail = htmlspecialchars($data['email'] ?? '');
+            $rPhone = htmlspecialchars($data['phone'] ?? '');
+            $rAge = htmlspecialchars($data['age'] ?? '');
+            $rNote = htmlspecialchars($data['note'] ?? '');
+            $rCrafts = is_array($data['crafts'] ?? null) ? implode(', ', $data['crafts']) : htmlspecialchars($data['crafts'] ?? '');
+            $rCities = is_array($data['cities'] ?? null) ? implode(', ', $data['cities']) : htmlspecialchars($data['cities'] ?? '');
+
+            $subject = "Nová žádost o mistra: " . $rName;
+            $bodyHtml = "
+              <h3 style='color:#f8fafc; margin-top:0;'>Přišla nová žádost o hledání mistra!</h3>
+              <table style='width:100%; border-collapse:collapse; color:#cbd5e1; font-size:14px; margin-bottom:20px;'>
+                <tr><td style='padding:8px 0; border-bottom:1px solid #334155; width:140px; color:#94a3b8;'><strong>Jméno:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$rName}</td></tr>
+                <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>E-mail:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'><a href='mailto:{$rEmail}' style='color:#60a5fa;'>{$rEmail}</a></td></tr>
+                <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Telefon:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'><a href='tel:{$rPhone}' style='color:#60a5fa;'>{$rPhone}</a></td></tr>
+                <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Věk:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$rAge} let</td></tr>
+                <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Řemesla:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$rCrafts}</td></tr>
+                <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Města:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$rCities}</td></tr>
+                <tr><td style='padding:8px 0; color:#94a3b8;'><strong>Poznámka:</strong></td><td style='padding:8px 0; white-space:pre-wrap;'>{$rNote}</td></tr>
+              </table>
+              <div>
+                <a href='{$adminUrl}' style='display:inline-block; background:#ff7b1c; color:#ffffff; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:700; font-size:14px;'>Zobrazit přehled žádostí v administraci →</a>
+              </div>
+            ";
+            send_admin_notification($subject, $bodyHtml);
+
+            echo json_encode(['status' => 'success', 'id' => $reqId]);
             break;
 
         case 'load_master_requests':
@@ -458,6 +519,14 @@ try {
                 http_response_code(500);
                 echo json_encode(['error' => 'Chyba databáze: ' . $e->getMessage()]);
             }
+            case 'get_notification_email':
+            echo json_encode(['email' => get_notification_email()]);
+            break;
+
+        case 'save_notification_email':
+            $eVal = trim($data['email'] ?? $_POST['email'] ?? '');
+            set_notification_email($eVal);
+            echo json_encode(['status' => 'success', 'email' => $eVal]);
             break;
 
         default:

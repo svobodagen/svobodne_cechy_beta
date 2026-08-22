@@ -3,6 +3,7 @@
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../notification_helper.php';
 
 // Auto-create database table if not exists
 try {
@@ -44,6 +45,25 @@ if ($action === 'capture_email') {
         $stmt->execute([$slug, $masterName, $email]);
         $leadId = $pdo->lastInsertId();
 
+        // Send Email Notification
+        $adminUrl = get_base_url() . '/admin/landing_leads.php';
+        $safeEmail = htmlspecialchars($email);
+        $safeMaster = htmlspecialchars($masterName ?: $slug);
+
+        $subject = "Nová zájemce z Landing Page: " . $safeEmail . ($masterName ? " ({$masterName})" : "");
+        $bodyHtml = "
+          <h3 style='color:#f8fafc; margin-top:0;'>Byl zachycen nový e-mail na Landing Page!</h3>
+          <table style='width:100%; border-collapse:collapse; color:#cbd5e1; font-size:14px; margin-bottom:20px;'>
+            <tr><td style='padding:8px 0; border-bottom:1px solid #334155; width:140px; color:#94a3b8;'><strong>E-mail:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'><a href='mailto:{$safeEmail}' style='color:#60a5fa;'>{$safeEmail}</a></td></tr>
+            <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Mistr / Kampaň:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$safeMaster} ({$slug})</td></tr>
+            <tr><td style='padding:8px 0; color:#94a3b8;'><strong>Fáze:</strong></td><td style='padding:8px 0;'>Fáze 1 (Zatiaľ zadaný e-mail)</td></tr>
+          </table>
+          <div>
+            <a href='{$adminUrl}' style='display:inline-block; background:#ff7b1c; color:#ffffff; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:700; font-size:14px;'>Zobrazit zájemce v administraci →</a>
+          </div>
+        ";
+        send_admin_notification($subject, $bodyHtml);
+
         echo json_encode([
             'success' => true,
             'lead_id' => $leadId,
@@ -72,6 +92,31 @@ if ($action === 'update_lead') {
             $stmt = $pdo->prepare("UPDATE landing_leads SET name = ?, phone = ?, user_role = ?, message = ? WHERE email = ? AND landing_slug = ? ORDER BY id DESC LIMIT 1");
             $stmt->execute([$name, $phone, $role, $message, $email, $slug]);
         }
+
+        // Send Email Notification for updated info
+        $adminUrl = get_base_url() . '/admin/landing_leads.php';
+        $safeName = htmlspecialchars($name ?: 'Nezadané');
+        $safeEmail = htmlspecialchars($email ?: '-');
+        $safePhone = htmlspecialchars($phone ?: '-');
+        $safeRole = htmlspecialchars($role ?: '-');
+        $safeMsg = htmlspecialchars($message ?: '-');
+
+        $subject = "Doplněné údaje od zájemce: " . ($safeName !== 'Nezadané' ? $safeName : $safeEmail);
+        $bodyHtml = "
+          <h3 style='color:#f8fafc; margin-top:0;'>Zájemce doplnil své kontaktní údaje (Fáze 2)!</h3>
+          <table style='width:100%; border-collapse:collapse; color:#cbd5e1; font-size:14px; margin-bottom:20px;'>
+            <tr><td style='padding:8px 0; border-bottom:1px solid #334155; width:140px; color:#94a3b8;'><strong>Jméno:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$safeName}</td></tr>
+            <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>E-mail:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'><a href='mailto:{$safeEmail}' style='color:#60a5fa;'>{$safeEmail}</a></td></tr>
+            <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Telefon:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'><a href='tel:{$safePhone}' style='color:#60a5fa;'>{$safePhone}</a></td></tr>
+            <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Role:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155;'>{$safeRole}</td></tr>
+            <tr><td style='padding:8px 0; border-bottom:1px solid #334155; color:#94a3b8;'><strong>Zpráva:</strong></td><td style='padding:8px 0; border-bottom:1px solid #334155; white-space:pre-wrap;'>{$safeMsg}</td></tr>
+            <tr><td style='padding:8px 0; color:#94a3b8;'><strong>Kampaň:</strong></td><td style='padding:8px 0;'>{$slug}</td></tr>
+          </table>
+          <div>
+            <a href='{$adminUrl}' style='display:inline-block; background:#ff7b1c; color:#ffffff; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:700; font-size:14px;'>Zobrazit všechny zprávy v administraci →</a>
+          </div>
+        ";
+        send_admin_notification($subject, $bodyHtml);
 
         echo json_encode(['success' => true, 'message' => 'Údaje byly doplněny.']);
     } catch (\Exception $e) {

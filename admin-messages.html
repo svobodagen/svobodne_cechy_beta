@@ -43,9 +43,62 @@
       </div>
 
       <div class="form-card" id="messages-panel" style="display:none;">
-        <h2>Zprávy</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2>Zprávy z webu</h2>
+          <a href="admin.html" class="btn ghost" style="padding: 6px 14px; font-size: 13px;">Zpět do rozcestníku</a>
+        </div>
+
+        <!-- Notification Email Card -->
+        <div style="padding:1.2rem; margin-bottom:1.5rem; background:rgba(232,117,22,0.06); border:1px solid rgba(232,117,22,0.3); border-radius:10px;">
+          <form id="notif-email-form" style="display:flex; flex-wrap:wrap; align-items:center; gap:1rem; justify-content:space-between;">
+            <div style="flex:1; min-width:240px;">
+              <strong style="color:var(--accent); font-size:0.95rem;">📧 E-mail pro notifikace zpráv z webu i landing pages</strong>
+              <p style="color:#94a3b8; font-size:0.82rem; margin-top:2px;">Kopie každé nové zprávy a kontaktního formuláře bude zaslána na tento e-mail.</p>
+            </div>
+            <div style="display:flex; gap:8px; flex:1; min-width:260px; max-width:440px;">
+              <input type="email" id="notif_email_input" placeholder="např. notifikace@svobodnecechy.cz" class="input" style="flex:1; padding:8px 12px; font-size:14px; background:#0f172a; color:#fff; border:1px solid #334155; border-radius:6px;" required />
+              <button type="submit" class="btn primary" style="padding:8px 16px; font-size:13px; white-space:nowrap;">Uložit e-mail</button>
+            </div>
+          </form>
+          <div id="notif-status-msg" style="display:none; margin-top:8px; font-size:13px; color:#4ade80; font-weight:600;">✓ E-mail byl úspěšně uložen!</div>
+        </div>
+
         <div class="admin-list" id="messages-list"></div>
       </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+          const input = document.getElementById('notif_email_input');
+          const form = document.getElementById('notif-email-form');
+          const statusMsg = document.getElementById('notif-status-msg');
+
+          if (input && form) {
+            try {
+              const res = await fetch('api.php?action=get_notification_email');
+              const data = await res.json();
+              if (data && data.email) {
+                input.value = data.email;
+              }
+            } catch(e){}
+
+            form.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              try {
+                const res = await fetch('api.php?action=save_notification_email', {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({ email: input.value })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                  statusMsg.style.display = 'block';
+                  setTimeout(() => { statusMsg.style.display = 'none'; }, 3000);
+                }
+              } catch(e){ alert('Chyba při ukládání e-mailu'); }
+            });
+          }
+        });
+      </script>
     </section>
   </main>
 
