@@ -2527,6 +2527,43 @@ if ($editingSlug) {
           });
         }
 
+        // Real-Time Live Reordering of dynamic items in iframe DOM across sections
+        function liveUpdateDynamicItems() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+
+          // 1. Portfolio live update
+          liveUpdatePortfolio();
+
+          // 2. Generic reorder for other dynamic item containers
+          const sectionConfig = [
+            { containerId: 'uvp_cards_container', boxSel: '.uvp-item-box', iframeParentSel: '#uvp .uvp-grid, #uvp .cards-grid', iframeItemSel: '.uvp-card' },
+            { containerId: 'outcomes_container', boxSel: '.outcome-item-box', iframeParentSel: '#co-se-naucis .outcomes-grid', iframeItemSel: '.outcome-item' },
+            { containerId: 'timeline_container', boxSel: '.timeline-step-box', iframeParentSel: '#jak-to-probiha .timeline', iframeItemSel: '.timeline-step' },
+            { containerId: 'testimonials_container', boxSel: '.testimonial-item-box', iframeParentSel: '#reference .testimonials-grid', iframeItemSel: '.testimonial-card' },
+            { containerId: 'faq_container', boxSel: '.faq-item-box', iframeParentSel: '#faq .faq-list', iframeItemSel: 'details' }
+          ];
+
+          sectionConfig.forEach(cfg => {
+            const editorContainer = document.getElementById(cfg.containerId);
+            const iframeParent = doc.querySelector(cfg.iframeParentSel);
+            if (!editorContainer || !iframeParent) return;
+
+            const editorBoxes = editorContainer.querySelectorAll(cfg.boxSel);
+            const iframeItems = Array.from(iframeParent.querySelectorAll(cfg.iframeItemSel));
+
+            if (editorBoxes.length === 0 || iframeItems.length === 0) return;
+
+            // Re-append items in iframe in the exact order of editorBoxes
+            editorBoxes.forEach((box, idx) => {
+              if (iframeItems[idx]) {
+                iframeParent.appendChild(iframeItems[idx]);
+              }
+            });
+          });
+        }
+
         // Real-Time Live Typography Updates on iframe
         function liveUpdateTypography() {
           const iframe = document.getElementById('livePreviewFrame');
@@ -2738,6 +2775,7 @@ if ($editingSlug) {
           } else if (direction === 1 && box.nextElementSibling) {
             box.parentNode.insertBefore(box.nextElementSibling, box);
           }
+          liveUpdateDynamicItems();
         }
 
         function removeItem(btn, selector) {
@@ -2749,6 +2787,7 @@ if ($editingSlug) {
             return;
           }
           box.remove();
+          liveUpdateDynamicItems();
         }
 
         function makeItemBox(cssClass, headerText, innerHtml) {
