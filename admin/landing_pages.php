@@ -215,10 +215,10 @@ function renderLandingPageHtml($data) {
 
     $btnSizeKey = $design['btn_size'] ?? 'm';
     $btnSizeMap = [
-        's'  => ['pv' => '0.5rem',  'ph' => '1rem',    'fs' => '0.8rem',  'pv_m' => '0.38rem', 'ph_m' => '0.75rem', 'fs_m' => '0.74rem'],
-        'm'  => ['pv' => '0.75rem', 'ph' => '1.35rem', 'fs' => '0.88rem', 'pv_m' => '0.5rem',  'ph_m' => '1rem',    'fs_m' => '0.8rem'],
-        'l'  => ['pv' => '0.95rem', 'ph' => '1.75rem', 'fs' => '0.98rem', 'pv_m' => '0.65rem', 'ph_m' => '1.2rem',  'fs_m' => '0.86rem'],
-        'xl' => ['pv' => '1.2rem',  'ph' => '2.1rem',  'fs' => '1.08rem', 'pv_m' => '0.78rem', 'ph_m' => '1.4rem',  'fs_m' => '0.92rem']
+        's'  => ['pv' => '0.6rem',  'ph' => '1.2rem', 'fs' => '0.9rem',  'pv_m' => '0.45rem', 'ph_m' => '0.9rem',  'fs_m' => '0.8rem'],
+        'm'  => ['pv' => '0.9rem',  'ph' => '1.8rem', 'fs' => '1.05rem', 'pv_m' => '0.6rem',  'ph_m' => '1.2rem',  'fs_m' => '0.85rem'],
+        'l'  => ['pv' => '1.15rem', 'ph' => '2.4rem', 'fs' => '1.2rem',  'pv_m' => '0.75rem', 'ph_m' => '1.5rem',  'fs_m' => '0.92rem'],
+        'xl' => ['pv' => '1.4rem',  'ph' => '3.0rem', 'fs' => '1.35rem', 'pv_m' => '0.9rem',  'ph_m' => '1.8rem',  'fs_m' => '1.0rem']
     ];
     $bS = $btnSizeMap[$btnSizeKey] ?? $btnSizeMap['m'];
 
@@ -667,15 +667,15 @@ HTML;
     .eyebrow { text-transform: uppercase; font-size: var(--eyebrow-size); letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
     .hero h1 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.8rem; }
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
-    .hero-buttons-row { display: flex; gap: 0.8rem; flex-wrap: wrap; padding-top: 1.8rem; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--btn-pad-v) var(--btn-pad-h); font-size: var(--btn-font-size); border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 38px; cursor: pointer; border: none; text-align: center; }
+    .hero-buttons-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center; padding-top: 1.8rem; width: 100%; text-align: center; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--btn-pad-v) var(--btn-pad-h); font-size: var(--btn-font-size); border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 42px; cursor: pointer; border: none; text-align: center; }
     @media (max-width: 768px) {
       .btn { padding: var(--btn-pad-v-mob) var(--btn-pad-h-mob); font-size: var(--btn-font-size-mob); }
     }
     .btn-primary { background: var(--color-accent); color: #fff; }
     .btn-primary:hover { background: var(--btn-hover); }
     .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
-    .section-cta-wrap { text-align: center; margin-top: 2.2rem; padding-top: 0.5rem; }
+    .section-cta-wrap { display: flex; justify-content: center; align-items: center; text-align: center; margin-top: 2.5rem; padding-top: 0.5rem; width: 100%; }
     .hero-image img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
 
     .section-title { text-align: center; margin-bottom: 2.5rem; }
@@ -2178,10 +2178,10 @@ if ($editingSlug) {
         };
 
         const btnSizes = {
-          s:  { pv: '0.5rem',  ph: '1rem',    fs: '0.8rem',  pv_m: '0.38rem', ph_m: '0.75rem', fs_m: '0.74rem' },
-          m:  { pv: '0.75rem', ph: '1.35rem', fs: '0.88rem', pv_m: '0.5rem',  ph_m: '1rem',    fs_m: '0.8rem' },
-          l:  { pv: '0.95rem', ph: '1.75rem', fs: '0.98rem', pv_m: '0.65rem', ph_m: '1.2rem',  fs_m: '0.86rem' },
-          xl: { pv: '1.2rem',  ph: '2.1rem',  fs: '1.08rem', pv_m: '0.78rem', ph_m: '1.4rem',  fs_m: '0.92rem' }
+          s:  { pv: '0.6rem',  ph: '1.2rem', fs: '0.9rem',  pv_m: '0.45rem', ph_m: '0.9rem',  fs_m: '0.8rem' },
+          m:  { pv: '0.9rem',  ph: '1.8rem', fs: '1.05rem', pv_m: '0.6rem',  ph_m: '1.2rem',  fs_m: '0.85rem' },
+          l:  { pv: '1.15rem', ph: '2.4rem', fs: '1.2rem',  pv_m: '0.75rem', ph_m: '1.5rem',  fs_m: '0.92rem' },
+          xl: { pv: '1.4rem',  ph: '3.0rem', fs: '1.35rem', pv_m: '0.9rem',  ph_m: '1.8rem',  fs_m: '1.0rem' }
         };
 
         function selectTheme(key, el) {
