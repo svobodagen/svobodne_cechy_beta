@@ -25,11 +25,11 @@
       --font-heading: 'Cormorant Garamond', serif;
       --font-body: 'Inter', sans-serif;
 
-      /* User Configured Font Sizes */
-      --hero-h1-size: 2.8rem;
-      --section-h2-size: 2.2rem;
-      --card-h3-size: 1.35rem;
-      --body-text-size: 1rem;
+      /* Configured Fluid Typography Steps */
+      --hero-h1-clamp: clamp(2.0rem, 5vw, 3.4rem);
+      --section-h2-clamp: clamp(1.7rem, 4vw, 2.6rem);
+      --card-h3-clamp: clamp(1.25rem, 2.5vw, 1.5rem);
+      --body-text-size: 1.05rem;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -110,7 +110,7 @@
     }
     .hero h1 {
       font-family: var(--font-heading);
-      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      font-size: var(--hero-h1-clamp);
       color: var(--color-white);
       margin-bottom: 0.8rem;
     }
@@ -147,7 +147,7 @@
     .section-title { text-align: center; margin-bottom: 2.5rem; }
     .section-title h2 {
       font-family: var(--font-heading);
-      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-size: var(--section-h2-clamp);
       color: var(--color-white);
       margin-bottom: 0.5rem;
     }
@@ -164,13 +164,13 @@
       transition: border-color .3s;
     }
     .uvp-card:hover { border-color: var(--color-accent); }
-    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.5rem); color: var(--color-accent); margin-bottom: 0.4rem; }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: var(--card-h3-clamp); color: var(--color-accent); margin-bottom: 0.4rem; }
 
     /* Master Section */
     .master-section { padding: 5rem 0; background: rgba(0,0,0,0.3); border-y: 1px solid var(--color-glass-border); }
     .master-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 3.5rem; align-items: center; }
     .master-photo img { width: 100%; border-radius: 14px; border: 1px solid var(--color-accent); }
-    .master-info h3 { font-family: var(--font-heading); font-size: clamp(1.8rem, 4vw, 2.8rem); color: var(--color-white); margin-bottom: 0.5rem; }
+    .master-info h3 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.5rem; }
     .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; font-size: 0.9rem; }
     .quote-box {
       font-family: var(--font-heading);

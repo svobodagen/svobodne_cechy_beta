@@ -5,10 +5,10 @@
   "meta_desc": "Zajímá tě sklářské řemeslo? Poznej učednictví přímo v dílně Jiřího Pačinka v Kunraticích u Cvikova.",
   "section_order": ["hero", "uvp", "master", "outcomes", "timeline", "portfolio", "testimonials", "faq", "cta", "contact"],
   "typography": {
-    "hero_h1": "2.8rem",
-    "section_h2": "2.2rem",
-    "card_h3": "1.35rem",
-    "body_text": "1rem"
+    "hero_h1": "step-3",
+    "section_h2": "step-3",
+    "card_h3": "step-3",
+    "body_text": "step-3"
   },
   "hero": {
     "eyebrow": "UČEDNICTVÍ U MISTRA SKLÁŘE",

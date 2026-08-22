@@ -26,6 +26,66 @@ function fixAdminPreviewUrl($url) {
     return $url;
 }
 
+// Helper to convert typography steps (Stupeň 1 - Stupeň 6) to fluid CSS clamp values
+function getTypoCssValues($typo) {
+    $scales = [
+        'hero_h1' => [
+            'step-1' => 'clamp(1.5rem, 4vw, 2.2rem)',
+            'step-2' => 'clamp(1.75rem, 4.5vw, 2.8rem)',
+            'step-3' => 'clamp(2.0rem, 5vw, 3.4rem)',
+            'step-4' => 'clamp(2.25rem, 5.5vw, 4.0rem)',
+            'step-5' => 'clamp(2.5rem, 6vw, 4.6rem)',
+            'step-6' => 'clamp(2.8rem, 6.5vw, 5.2rem)',
+        ],
+        'section_h2' => [
+            'step-1' => 'clamp(1.3rem, 3vw, 1.8rem)',
+            'step-2' => 'clamp(1.5rem, 3.5vw, 2.2rem)',
+            'step-3' => 'clamp(1.7rem, 4vw, 2.6rem)',
+            'step-4' => 'clamp(1.9rem, 4.5vw, 3.0rem)',
+            'step-5' => 'clamp(2.1rem, 5vw, 3.4rem)',
+            'step-6' => 'clamp(2.4rem, 5.5vw, 3.8rem)',
+        ],
+        'card_h3' => [
+            'step-1' => 'clamp(1.05rem, 2vw, 1.2rem)',
+            'step-2' => 'clamp(1.15rem, 2.2vw, 1.35rem)',
+            'step-3' => 'clamp(1.25rem, 2.5vw, 1.5rem)',
+            'step-4' => 'clamp(1.35rem, 2.8vw, 1.7rem)',
+            'step-5' => 'clamp(1.5rem, 3vw, 1.9rem)',
+            'step-6' => 'clamp(1.65rem, 3.2vw, 2.1rem)',
+        ],
+        'body_text' => [
+            'step-1' => '0.95rem',
+            'step-2' => '1rem',
+            'step-3' => '1.05rem',
+            'step-4' => '1.15rem',
+            'step-5' => '1.25rem',
+            'step-6' => '1.35rem',
+        ]
+    ];
+
+    $h1_step = $typo['hero_h1'] ?? 'step-3';
+    $h2_step = $typo['section_h2'] ?? 'step-3';
+    $h3_step = $typo['card_h3'] ?? 'step-3';
+    $body_step = $typo['body_text'] ?? 'step-3';
+
+    // Map values with fallback for legacy data
+    $h1_val = $scales['hero_h1'][$h1_step] ?? $scales['hero_h1']['step-3'];
+    $h2_val = $scales['section_h2'][$h2_step] ?? $scales['section_h2']['step-3'];
+    $h3_val = $scales['card_h3'][$h3_step] ?? $scales['card_h3']['step-3'];
+    $body_val = $scales['body_text'][$body_step] ?? $scales['body_text']['step-3'];
+
+    return [
+        'h1' => $h1_val,
+        'h2' => $h2_val,
+        'h3' => $h3_val,
+        'body' => $body_val,
+        'h1_step' => $h1_step,
+        'h2_step' => $h2_step,
+        'h3_step' => $h3_step,
+        'body_step' => $body_step
+    ];
+}
+
 // AJAX Image Upload Handler
 if (isset($_GET['action']) && $_GET['action'] === 'upload') {
     header('Content-Type: application/json');
@@ -51,19 +111,19 @@ if (isset($_GET['action']) && $_GET['action'] === 'upload') {
     exit;
 }
 
-// Function to generate full HTML from section data array with dynamic section ordering and custom font typography
+// Function to generate full HTML from section data array with dynamic section ordering and step-based typography
 function renderLandingPageHtml($data) {
     $slug = htmlspecialchars($data['slug'] ?? 'master');
     $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
     $metaTitle = htmlspecialchars($data['meta_title'] ?? $masterName . ' – Svobodné Cechy');
     $metaDesc = htmlspecialchars($data['meta_desc'] ?? '');
     
-    // Custom typography font sizes from configuration
-    $typo = $data['typography'] ?? [];
-    $h1_size = htmlspecialchars($typo['hero_h1'] ?? '2.8rem');
-    $h2_size = htmlspecialchars($typo['section_h2'] ?? '2.2rem');
-    $h3_size = htmlspecialchars($typo['card_h3'] ?? '1.3rem');
-    $body_size = htmlspecialchars($typo['body_text'] ?? '1rem');
+    // Custom typography font sizes mapped from steps
+    $typoConf = getTypoCssValues($data['typography'] ?? []);
+    $h1_clamp = $typoConf['h1'];
+    $h2_clamp = $typoConf['h2'];
+    $h3_clamp = $typoConf['h3'];
+    $body_size = $typoConf['body'];
 
     // 1. Hero
     $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? '');
@@ -364,10 +424,10 @@ HTML;
       --font-heading: 'Cormorant Garamond', serif;
       --font-body: 'Inter', sans-serif;
 
-      /* User Configured Font Sizes */
-      --hero-h1-size: {$h1_size};
-      --section-h2-size: {$h2_size};
-      --card-h3-size: {$h3_size};
+      /* Configured Fluid Typography Steps */
+      --hero-h1-clamp: {$h1_clamp};
+      --section-h2-clamp: {$h2_clamp};
+      --card-h3-clamp: {$h3_clamp};
       --body-text-size: {$body_size};
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -398,7 +458,7 @@ HTML;
     .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 2.5rem; min-height: 60vh; }
     .hero-content { max-width: 580px; }
     .eyebrow { text-transform: uppercase; font-size: 0.78rem; letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
-    .hero h1 { font-family: var(--font-heading); font-size: clamp(1.6rem, 4.5vw, var(--hero-h1-size)); color: var(--color-white); margin-bottom: 0.8rem; }
+    .hero h1 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.8rem; }
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.4rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
@@ -409,19 +469,19 @@ HTML;
     .section-title { text-align: center; margin-bottom: 2.5rem; }
     .section-title h2 {
       font-family: var(--font-heading);
-      font-size: clamp(1.4rem, 3.5vw, var(--section-h2-size));
+      font-size: var(--section-h2-clamp);
       color: var(--color-white);
       margin-bottom: 0.5rem;
     }
-    .primary-cta-box h2 { font-family: var(--font-heading); font-size: clamp(1.4rem, 3.5vw, var(--section-h2-size)); color: var(--color-white); margin-bottom: 1rem; }
-    .contact-card h3 { font-family: var(--font-heading); font-size: clamp(1.2rem, 2.8vw, var(--section-h2-size)); color: var(--color-white); margin-bottom: 1rem; }
-    .master-info h3 { font-family: var(--font-heading); font-size: clamp(1.6rem, 4vw, var(--hero-h1-size)); color: var(--color-white); margin-bottom: 0.5rem; }
+    .primary-cta-box h2 { font-family: var(--font-heading); font-size: var(--section-h2-clamp); color: var(--color-white); margin-bottom: 1rem; }
+    .contact-card h3 { font-family: var(--font-heading); font-size: var(--section-h2-clamp); color: var(--color-white); margin-bottom: 1rem; }
+    .master-info h3 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.5rem; }
     .section-title p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 680px; margin: auto; }
 
     .uvp-section { padding: 3.5rem 0; }
     .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .uvp-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.5rem; }
-    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.5vw, var(--card-h3-size)); color: var(--color-accent); margin-bottom: 0.4rem; }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: var(--card-h3-clamp); color: var(--color-accent); margin-bottom: 0.4rem; }
 
     .master-section { padding: 3.5rem 0; background: rgba(0,0,0,0.3); }
     .master-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; align-items: center; }
@@ -432,7 +492,7 @@ HTML;
     .outcomes-section { padding: 3.5rem 0; }
     .outcomes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .outcome-item { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.25rem; }
-    .outcome-item h4, .step-content h4 { font-family: var(--font-heading); font-size: clamp(1.05rem, 2.2vw, var(--card-h3-size)); color: var(--color-white); margin-bottom: 0.3rem; }
+    .outcome-item h4, .step-content h4 { font-family: var(--font-heading); font-size: var(--card-h3-clamp); color: var(--color-white); margin-bottom: 0.3rem; }
 
     .timeline-section { padding: 3.5rem 0; background: rgba(0,0,0,0.2); }
     .timeline { display: flex; flex-direction: column; gap: 1rem; max-width: 850px; margin: auto; }
@@ -456,7 +516,7 @@ HTML;
     .faq-list { max-width: 800px; margin: auto; display: flex; flex-direction: column; gap: 0.7rem; }
     details { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 8px; padding: 0.9rem 1.1rem; }
     details[open] { border-color: var(--color-accent); background: rgba(232, 117, 22, 0.05); }
-    summary { font-family: var(--font-heading); font-size: clamp(1.05rem, 2.2vw, var(--card-h3-size)); font-weight: 600; color: var(--color-white); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; line-height: 1.15; }
+    summary { font-family: var(--font-heading); font-size: var(--card-h3-clamp); font-weight: 600; color: var(--color-white); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; line-height: 1.15; }
     summary::after { content: '+'; font-size: 1.3rem; color: var(--color-accent); margin-left: 0.5rem; }
     details[open] summary::after { content: '−'; }
 
@@ -532,7 +592,7 @@ if (isset($_POST['save_sections_form'])) {
         file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $generatedHtml = renderLandingPageHtml($formData);
         file_put_contents($htmlPath, $generatedHtml);
-        $message = "Všechny sekce, fotky, pořadí a nastavení fontů pro '{$slug}' byly úspěšně uloženy!";
+        $message = "Všechny sekce, fotky, pořadí a stupně fontů pro '{$slug}' byly úspěšně uloženy!";
     } else {
         $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
@@ -661,7 +721,7 @@ if ($editingSlug) {
     .device-btn { background: transparent; color: var(--text-muted); border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; transition: all .2s; }
     .device-btn.active { background: var(--accent); color: #fff; }
 
-    .preview-wrapper { width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1rem 0; border: 1px solid var(--border); }
+    .preview-wrapper { width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1rem 0; border: 1px solid var(--border); position: sticky; top: 1rem; }
     .preview-iframe { width: 100%; height: 780px; border: 1px solid var(--border); border-radius: 8px; background: #fff; transition: width 0.3s ease, border-radius 0.3s ease; }
     .preview-iframe.device-mobile { width: 375px; height: 750px; border: 8px solid #222; border-radius: 36px; box-shadow: 0 12px 30px rgba(0,0,0,0.8); }
     .preview-iframe.device-tablet { width: 430px; height: 750px; border: 8px solid #222; border-radius: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.8); }
@@ -674,7 +734,7 @@ if ($editingSlug) {
     </div>
 
     <h1>Vizuální Editor Landing Pages</h1>
-    <p class="subtitle">Upravuj obsah sekcí, nahrávej fotky, měň pořadí sekcí, nastavuj velikosti fontů i mobilní náhled!</p>
+    <p class="subtitle">Upravuj obsah sekcí, nahrávej fotky, měň pořadí sekcí, nastavuj stupně fontů s živým náhledem v reálném čase!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -694,7 +754,7 @@ if ($editingSlug) {
             <div>
               <div class="section-tab-nav">
                 <button type="button" class="tab-btn special-order active" onclick="showTab('tab-order')"><i class="bi bi-arrow-down-up"></i> ⚙️ POŘADÍ SEKCÍ</button>
-                <button type="button" class="tab-btn special-order" onclick="showTab('tab-typo')"><i class="bi bi-fonts"></i> 🎨 VELIKOSTI FONTŮ</button>
+                <button type="button" class="tab-btn special-order" onclick="showTab('tab-typo')"><i class="bi bi-type"></i> 🎨 STUPNĚ FONTŮ</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-hero')">1. HERO</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-uvp')">2. UVP</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-master')">3. MISTR</button>
@@ -710,36 +770,37 @@ if ($editingSlug) {
               <div id="tab-order" class="tab-content active">
                 <h3 style="color:#fff; margin-bottom:1rem;">⚙️ Měnění Pořadí Sekcí na Stránce</h3>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
-                  Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo.
+                  Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo. Změny okamžitě uvidíš v živém náhledu vpravo.
                 </p>
                 <div id="order_list_container"></div>
               </div>
 
-              <!-- TAB TYPOGRAPHY: FONT SIZE CONFIGURATION -->
+              <!-- TAB TYPOGRAPHY: STEP-BASED FONT SIZE CONFIGURATION -->
               <div id="tab-typo" class="tab-content">
-                <h3 style="color:#fff; margin-bottom:1rem;">🎨 Nastavení Velikostí Fontů (Typografie)</h3>
+                <h3 style="color:#fff; margin-bottom:0.5rem;">🎨 Nastavení Stupňů Velikostí Fontů</h3>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
-                  Vyber nebo zadej požadované velikosti fontů pro jednotlivé úrovně nadpisů a odstavců.
+                  Vyber stupeň velikosti fontu. Každý stupeň má přesně odladěný poměr pro <strong>Mobil i PC</strong>. Změna se okamžitě projevuje v živém náhledu!
                 </p>
 
                 <?php 
                 $typoData = $editingData['typography'] ?? []; 
-                $heroH1Val = $typoData['hero_h1'] ?? '2.8rem';
-                $secH2Val = $typoData['section_h2'] ?? '2.2rem';
-                $cardH3Val = $typoData['card_h3'] ?? '1.3rem';
-                $bodyVal = $typoData['body_text'] ?? '1rem';
+                $h1Step = $typoData['hero_h1'] ?? 'step-3';
+                $h2Step = $typoData['section_h2'] ?? 'step-3';
+                $h3Step = $typoData['card_h3'] ?? 'step-3';
+                $bodyStep = $typoData['body_text'] ?? 'step-3';
                 ?>
 
                 <div class="item-card">
                   <h4>🚀 Hlavní nadpis Hero (H1)</h4>
                   <div class="form-group">
-                    <label>Velikost pro Desktop (např. 2.4rem, 2.8rem, 3.2rem)</label>
-                    <select class="form-control" id="typo_hero_h1">
-                      <option value="2.2rem" <?= $heroH1Val === '2.2rem' ? 'selected' : '' ?>>Kompaktní (2.2rem ~ 35px)</option>
-                      <option value="2.5rem" <?= $heroH1Val === '2.5rem' ? 'selected' : '' ?>>Střední (2.5rem ~ 40px)</option>
-                      <option value="2.8rem" <?= $heroH1Val === '2.8rem' ? 'selected' : '' ?>>Doporučeno (2.8rem ~ 45px)</option>
-                      <option value="3.2rem" <?= $heroH1Val === '3.2rem' ? 'selected' : '' ?>>Výrazné (3.2rem ~ 51px)</option>
-                      <option value="3.6rem" <?= $heroH1Val === '3.6rem' ? 'selected' : '' ?>>Velké (3.6rem ~ 58px)</option>
+                    <label>Stupeň velikosti hlavní tituly (H1)</label>
+                    <select class="form-control typo-select" id="typo_hero_h1" onchange="liveUpdateTypography()">
+                      <option value="step-1" <?= $h1Step === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Kompaktní</option>
+                      <option value="step-2" <?= $h1Step === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní</option>
+                      <option value="step-3" <?= $h1Step === 'step-3' ? 'selected' : '' ?>>Stupeň 3 – Výrazný (Doporučeno)</option>
+                      <option value="step-4" <?= $h1Step === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Velký</option>
+                      <option value="step-5" <?= $h1Step === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Extra Velký</option>
+                      <option value="step-6" <?= $h1Step === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Gigantický</option>
                     </select>
                   </div>
                 </div>
@@ -747,12 +808,14 @@ if ($editingSlug) {
                 <div class="item-card">
                   <h4>📌 Nadpisy sekcí (H2)</h4>
                   <div class="form-group">
-                    <label>Velikost pro nadpisy UVP, Mistr, Postup, Galerie, FAQ, Kontakt (H2)</label>
-                    <select class="form-control" id="typo_section_h2">
-                      <option value="1.8rem" <?= $secH2Val === '1.8rem' ? 'selected' : '' ?>>Kompaktní (1.8rem ~ 29px)</option>
-                      <option value="2.0rem" <?= $secH2Val === '2.0rem' ? 'selected' : '' ?>>Střední (2.0rem ~ 32px)</option>
-                      <option value="2.2rem" <?= $secH2Val === '2.2rem' ? 'selected' : '' ?>>Doporučeno (2.2rem ~ 35px)</option>
-                      <option value="2.5rem" <?= $secH2Val === '2.5rem' ? 'selected' : '' ?>>Výrazné (2.5rem ~ 40px)</option>
+                    <label>Stupeň velikosti pro nadpisy sekcí (UVP, Mistr, Galerie...)</label>
+                    <select class="form-control typo-select" id="typo_section_h2" onchange="liveUpdateTypography()">
+                      <option value="step-1" <?= $h2Step === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Kompaktní</option>
+                      <option value="step-2" <?= $h2Step === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní</option>
+                      <option value="step-3" <?= $h2Step === 'step-3' ? 'selected' : '' ?>>Stupeň 3 – Výrazný (Doporučeno)</option>
+                      <option value="step-4" <?= $h2Step === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Velký</option>
+                      <option value="step-5" <?= $h2Step === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Extra Velký</option>
+                      <option value="step-6" <?= $h2Step === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Gigantický</option>
                     </select>
                   </div>
                 </div>
@@ -760,12 +823,14 @@ if ($editingSlug) {
                 <div class="item-card">
                   <h4>🎴 Nadpisy karet a dovedností (H3 & H4)</h4>
                   <div class="form-group">
-                    <label>Velikost pro nadpisy v kartách a seznamu (H3/H4)</label>
-                    <select class="form-control" id="typo_card_h3">
-                      <option value="1.1rem" <?= $cardH3Val === '1.1rem' ? 'selected' : '' ?>>Kompaktní (1.1rem ~ 18px)</option>
-                      <option value="1.25rem" <?= $cardH3Val === '1.25rem' ? 'selected' : '' ?>>Střední (1.25rem ~ 20px)</option>
-                      <option value="1.35rem" <?= $cardH3Val === '1.35rem' ? 'selected' : '' ?>>Doporučeno (1.35rem ~ 22px)</option>
-                      <option value="1.5rem" <?= $cardH3Val === '1.5rem' ? 'selected' : '' ?>>Výrazné (1.5rem ~ 24px)</option>
+                    <label>Stupeň velikosti pro podnadpisy v kartách a seznamu</label>
+                    <select class="form-control typo-select" id="typo_card_h3" onchange="liveUpdateTypography()">
+                      <option value="step-1" <?= $h3Step === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Kompaktní</option>
+                      <option value="step-2" <?= $h3Step === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní</option>
+                      <option value="step-3" <?= $h3Step === 'step-3' ? 'selected' : '' ?>>Stupeň 3 – Výrazný (Doporučeno)</option>
+                      <option value="step-4" <?= $h3Step === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Velký</option>
+                      <option value="step-5" <?= $h3Step === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Extra Velký</option>
+                      <option value="step-6" <?= $h3Step === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Gigantický</option>
                     </select>
                   </div>
                 </div>
@@ -773,12 +838,14 @@ if ($editingSlug) {
                 <div class="item-card">
                   <h4>📝 Běžný text a odstavce (Body text)</h4>
                   <div class="form-group">
-                    <label>Základní velikost textu (Odstavce, popisy)</label>
-                    <select class="form-control" id="typo_body_text">
-                      <option value="0.95rem" <?= $bodyVal === '0.95rem' ? 'selected' : '' ?>>Menší (0.95rem ~ 15px)</option>
-                      <option value="1rem" <?= $bodyVal === '1rem' ? 'selected' : '' ?>>Standardní (1rem ~ 16px)</option>
-                      <option value="1.05rem" <?= $bodyVal === '1.05rem' ? 'selected' : '' ?>>Větší čitelné (1.05rem ~ 17px)</option>
-                      <option value="1.1rem" <?= $bodyVal === '1.1rem' ? 'selected' : '' ?>>Prostorné (1.1rem ~ 18px)</option>
+                    <label>Stupeň základní velikosti textu (odstavce, popisy)</label>
+                    <select class="form-control typo-select" id="typo_body_text" onchange="liveUpdateTypography()">
+                      <option value="step-1" <?= $bodyStep === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Jemný text</option>
+                      <option value="step-2" <?= $bodyStep === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní text</option>
+                      <option value="step-3" <?= $bodyStep === 'step-3' ? 'selected' : '' ?>>Stupeň 3 – Čitelný (Doporučeno)</option>
+                      <option value="step-4" <?= $bodyStep === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Větší text</option>
+                      <option value="step-5" <?= $bodyStep === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Prostorný text</option>
+                      <option value="step-6" <?= $bodyStep === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Maxi text</option>
                     </select>
                   </div>
                 </div>
@@ -789,19 +856,19 @@ if ($editingSlug) {
                 <h3 style="color:#fff; margin-bottom:1rem;">🚀 Sekce 1: HERO (Úvodní obrazovka)</h3>
                 <div class="form-group">
                   <label>Eyebrow (malý text nad nadpisem)</label>
-                  <input type="text" class="form-control" id="h_eyebrow" value="<?= htmlspecialchars($editingData['hero']['eyebrow'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="h_eyebrow" value="<?= htmlspecialchars($editingData['hero']['eyebrow'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Hlavní Nadpis (H1)</label>
-                  <input type="text" class="form-control" id="h_h1" value="<?= htmlspecialchars($editingData['hero']['h1'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="h_h1" value="<?= htmlspecialchars($editingData['hero']['h1'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Podtitul (Dlouhý popis nabídky)</label>
-                  <textarea class="form-control" id="h_sub"><?= htmlspecialchars($editingData['hero']['subtitle'] ?? '') ?></textarea>
+                  <textarea class="form-control live-text" id="h_sub"><?= htmlspecialchars($editingData['hero']['subtitle'] ?? '') ?></textarea>
                 </div>
                 <div class="form-group">
                   <label>Text hlavního tlačítka (CTA)</label>
-                  <input type="text" class="form-control" id="h_btn1" value="<?= htmlspecialchars($editingData['hero']['btn_primary'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="h_btn1" value="<?= htmlspecialchars($editingData['hero']['btn_primary'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Fotka v huti (Hero Obrázek)</label>
@@ -821,19 +888,19 @@ if ($editingSlug) {
                 <h3 style="color:#fff; margin-bottom:1rem;">💎 Sekce 2: UVP (Proč toto učednictví)</h3>
                 <div class="form-group">
                   <label>Nadpis sekce UVP</label>
-                  <input type="text" class="form-control" id="uvp_title" value="<?= htmlspecialchars($editingData['uvp']['title'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="uvp_title" value="<?= htmlspecialchars($editingData['uvp']['title'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Podtitul sekce</label>
-                  <input type="text" class="form-control" id="uvp_sub" value="<?= htmlspecialchars($editingData['uvp']['subtitle'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="uvp_sub" value="<?= htmlspecialchars($editingData['uvp']['subtitle'] ?? '') ?>" />
                 </div>
                 <h4 style="color:#fff; margin:1rem 0 0.5rem;">Argumentační karty:</h4>
                 <div id="uvp_cards_container">
                   <?php foreach (($editingData['uvp']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card uvp-item-box">
                       <h4>Karta #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Titulek karty</label><input type="text" class="form-control uvp-item-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
-                      <div class="form-group"><label>Popis karty</label><textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
+                      <div class="form-group"><label>Titulek karty</label><input type="text" class="form-control uvp-item-title live-text" value="<?= htmlspecialchars($item['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis karty</label><textarea class="form-control uvp-item-desc live-text"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -844,19 +911,19 @@ if ($editingSlug) {
                 <h3 style="color:#fff; margin-bottom:1rem;">👑 Sekce 3: O mistrovi</h3>
                 <div class="form-group">
                   <label>Jméno mistra</label>
-                  <input type="text" class="form-control" id="m_name" value="<?= htmlspecialchars($editingData['master']['name'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="m_name" value="<?= htmlspecialchars($editingData['master']['name'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Titul mistra & Sklárna</label>
-                  <input type="text" class="form-control" id="m_title" value="<?= htmlspecialchars($editingData['master']['title'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="m_title" value="<?= htmlspecialchars($editingData['master']['title'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Příběh mistra (Popis)</label>
-                  <textarea class="form-control" id="m_bio"><?= htmlspecialchars($editingData['master']['bio'] ?? '') ?></textarea>
+                  <textarea class="form-control live-text" id="m_bio"><?= htmlspecialchars($editingData['master']['bio'] ?? '') ?></textarea>
                 </div>
                 <div class="form-group">
                   <label>Citát mistra</label>
-                  <textarea class="form-control" id="m_quote"><?= htmlspecialchars($editingData['master']['quote'] ?? '') ?></textarea>
+                  <textarea class="form-control live-text" id="m_quote"><?= htmlspecialchars($editingData['master']['quote'] ?? '') ?></textarea>
                 </div>
                 <div class="form-group">
                   <label>Fotka mistra</label>
@@ -876,15 +943,15 @@ if ($editingSlug) {
                 <h3 style="color:#fff; margin-bottom:1rem;">📚 Sekce 4: Co se učedník naučí</h3>
                 <div class="form-group">
                   <label>Nadpis sekce</label>
-                  <input type="text" class="form-control" id="o_title" value="<?= htmlspecialchars($editingData['outcomes']['title'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="o_title" value="<?= htmlspecialchars($editingData['outcomes']['title'] ?? '') ?>" />
                 </div>
                 <div id="outcomes_container">
                   <?php foreach (($editingData['outcomes']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card outcome-item-box">
                       <h4>Dovednost #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon" value="<?= htmlspecialchars($item['icon']) ?>" /></div>
-                      <div class="form-group"><label>Název dovednosti</label><input type="text" class="form-control outcome-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
-                      <div class="form-group"><label>Popis dovednosti</label><textarea class="form-control outcome-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
+                      <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon live-text" value="<?= htmlspecialchars($item['icon']) ?>" /></div>
+                      <div class="form-group"><label>Název dovednosti</label><input type="text" class="form-control outcome-title live-text" value="<?= htmlspecialchars($item['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis dovednosti</label><textarea class="form-control outcome-desc live-text"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -897,9 +964,9 @@ if ($editingSlug) {
                   <?php foreach (($editingData['timeline']['steps'] ?? []) as $idx => $step): ?>
                     <div class="item-card timeline-step-box">
                       <h4>Krok <?= htmlspecialchars($step['num']) ?></h4>
-                      <div class="form-group"><label>Číslo</label><input type="text" class="form-control step-num" value="<?= htmlspecialchars($step['num']) ?>" /></div>
-                      <div class="form-group"><label>Název kroku</label><input type="text" class="form-control step-title" value="<?= htmlspecialchars($step['title']) ?>" /></div>
-                      <div class="form-group"><label>Popis kroku</label><textarea class="form-control step-desc"><?= htmlspecialchars($step['desc']) ?></textarea></div>
+                      <div class="form-group"><label>Číslo</label><input type="text" class="form-control step-num live-text" value="<?= htmlspecialchars($step['num']) ?>" /></div>
+                      <div class="form-group"><label>Název kroku</label><input type="text" class="form-control step-title live-text" value="<?= htmlspecialchars($step['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis kroku</label><textarea class="form-control step-desc live-text"><?= htmlspecialchars($step['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -923,7 +990,7 @@ if ($editingSlug) {
                           </label>
                         </div>
                       </div>
-                      <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
+                      <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap live-text" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -936,9 +1003,9 @@ if ($editingSlug) {
                   <?php foreach (($editingData['testimonials']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card testimonial-item-box">
                       <h4>Reference #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Citace</label><textarea class="form-control ts-quote"><?= htmlspecialchars($item['quote']) ?></textarea></div>
-                      <div class="form-group"><label>Jméno</label><input type="text" class="form-control ts-name" value="<?= htmlspecialchars($item['name']) ?>" /></div>
-                      <div class="form-group"><label>Role / Vztah k dílně</label><input type="text" class="form-control ts-role" value="<?= htmlspecialchars($item['role']) ?>" /></div>
+                      <div class="form-group"><label>Citace</label><textarea class="form-control ts-quote live-text"><?= htmlspecialchars($item['quote']) ?></textarea></div>
+                      <div class="form-group"><label>Jméno</label><input type="text" class="form-control ts-name live-text" value="<?= htmlspecialchars($item['name']) ?>" /></div>
+                      <div class="form-group"><label>Role / Vztah k dílně</label><input type="text" class="form-control ts-role live-text" value="<?= htmlspecialchars($item['role']) ?>" /></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -951,8 +1018,8 @@ if ($editingSlug) {
                   <?php foreach (($editingData['faq']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card faq-item-box">
                       <h4>Otázka #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Otázka</label><input type="text" class="form-control faq-q" value="<?= htmlspecialchars($item['q']) ?>" /></div>
-                      <div class="form-group"><label>Odpověď</label><textarea class="form-control faq-a"><?= htmlspecialchars($item['a']) ?></textarea></div>
+                      <div class="form-group"><label>Otázka</label><input type="text" class="form-control faq-q live-text" value="<?= htmlspecialchars($item['q']) ?>" /></div>
+                      <div class="form-group"><label>Odpověď</label><textarea class="form-control faq-a live-text"><?= htmlspecialchars($item['a']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -963,15 +1030,15 @@ if ($editingSlug) {
                 <h3 style="color:#fff; margin-bottom:1rem;">📱 Sekce 9: Kontakt a WhatsApp</h3>
                 <div class="form-group">
                   <label>WhatsApp číslo (např. 420602763599 bez mezery)</label>
-                  <input type="text" class="form-control" id="c_wa_num" value="<?= htmlspecialchars($editingData['contact']['whatsapp_num'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="c_wa_num" value="<?= htmlspecialchars($editingData['contact']['whatsapp_num'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Předvyplněná zpráva pro zájemce na WhatsApp</label>
-                  <textarea class="form-control" id="c_wa_msg"><?= htmlspecialchars($editingData['contact']['whatsapp_msg'] ?? '') ?></textarea>
+                  <textarea class="form-control live-text" id="c_wa_msg"><?= htmlspecialchars($editingData['contact']['whatsapp_msg'] ?? '') ?></textarea>
                 </div>
                 <div class="form-group">
                   <label>Telefon pro rodiče</label>
-                  <input type="text" class="form-control" id="c_phone" value="<?= htmlspecialchars($editingData['contact']['phone_parent'] ?? '') ?>" />
+                  <input type="text" class="form-control live-text" id="c_phone" value="<?= htmlspecialchars($editingData['contact']['phone_parent'] ?? '') ?>" />
                 </div>
               </div>
 
@@ -1019,6 +1086,62 @@ if ($editingSlug) {
           'contact': '📱 KONTAKT A WHATSAPP'
         };
 
+        const typoScales = {
+          hero_h1: {
+            'step-1': 'clamp(1.5rem, 4vw, 2.2rem)',
+            'step-2': 'clamp(1.75rem, 4.5vw, 2.8rem)',
+            'step-3': 'clamp(2.0rem, 5vw, 3.4rem)',
+            'step-4': 'clamp(2.25rem, 5.5vw, 4.0rem)',
+            'step-5': 'clamp(2.5rem, 6vw, 4.6rem)',
+            'step-6': 'clamp(2.8rem, 6.5vw, 5.2rem)'
+          },
+          section_h2: {
+            'step-1': 'clamp(1.3rem, 3vw, 1.8rem)',
+            'step-2': 'clamp(1.5rem, 3.5vw, 2.2rem)',
+            'step-3': 'clamp(1.7rem, 4vw, 2.6rem)',
+            'step-4': 'clamp(1.9rem, 4.5vw, 3.0rem)',
+            'step-5': 'clamp(2.1rem, 5vw, 3.4rem)',
+            'step-6': 'clamp(2.4rem, 5.5vw, 3.8rem)'
+          },
+          card_h3: {
+            'step-1': 'clamp(1.05rem, 2vw, 1.2rem)',
+            'step-2': 'clamp(1.15rem, 2.2vw, 1.35rem)',
+            'step-3': 'clamp(1.25rem, 2.5vw, 1.5rem)',
+            'step-4': 'clamp(1.35rem, 2.8vw, 1.7rem)',
+            'step-5': 'clamp(1.5rem, 3vw, 1.9rem)',
+            'step-6': 'clamp(1.65rem, 3.2vw, 2.1rem)'
+          },
+          body_text: {
+            'step-1': '0.95rem',
+            'step-2': '1rem',
+            'step-3': '1.05rem',
+            'step-4': '1.15rem',
+            'step-5': '1.25rem',
+            'step-6': '1.35rem'
+          }
+        };
+
+        // Real-Time Live Typography Updates on iframe
+        function liveUpdateTypography() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
+          try {
+            const doc = iframe.contentDocument;
+            const root = doc.documentElement;
+            if (!root) return;
+
+            const h1Step = document.getElementById('typo_hero_h1').value;
+            const h2Step = document.getElementById('typo_section_h2').value;
+            const h3Step = document.getElementById('typo_card_h3').value;
+            const bodyStep = document.getElementById('typo_body_text').value;
+
+            root.style.setProperty('--hero-h1-clamp', typoScales.hero_h1[h1Step] || typoScales.hero_h1['step-3']);
+            root.style.setProperty('--section-h2-clamp', typoScales.section_h2[h2Step] || typoScales.section_h2['step-3']);
+            root.style.setProperty('--card-h3-clamp', typoScales.card_h3[h3Step] || typoScales.card_h3['step-3']);
+            root.style.setProperty('--body-text-size', typoScales.body_text[bodyStep] || typoScales.body_text['step-3']);
+          } catch(e) { console.log('Live update error:', e); }
+        }
+
         function setPreviewDevice(device) {
           const frame = document.getElementById('livePreviewFrame');
           document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('active'));
@@ -1033,11 +1156,15 @@ if ($editingSlug) {
             frame.className = 'preview-iframe';
             document.getElementById('btn_desktop').classList.add('active');
           }
+          setTimeout(liveUpdateTypography, 100);
         }
 
         function refreshPreview() {
           const iframe = document.getElementById('livePreviewFrame');
-          if (iframe) { iframe.src = iframe.src; }
+          if (iframe) { 
+            iframe.src = iframe.src; 
+            iframe.onload = liveUpdateTypography;
+          }
         }
 
         function renderOrderList() {
@@ -1074,6 +1201,10 @@ if ($editingSlug) {
 
         document.addEventListener('DOMContentLoaded', () => {
           renderOrderList();
+          const iframe = document.getElementById('livePreviewFrame');
+          if (iframe) {
+            iframe.onload = liveUpdateTypography;
+          }
         });
 
         function showTab(tabId) {
@@ -1100,7 +1231,6 @@ if ($editingSlug) {
                 document.getElementById(previewImgId).src = data.admin_preview_url || data.url;
               }
               refreshPreview();
-              alert('Fotka byla úspěšně nahrána!');
             } else {
               alert('Chyba při nahrávání: ' + (data.message || 'Neznámá chyba'));
             }
