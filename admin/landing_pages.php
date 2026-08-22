@@ -1079,12 +1079,17 @@ HTML;
 
 $message = "";
 $messageType = "success";
+$savedActiveTab = "tab-order";
 
 // Handle Saving Visual Form Data
 if (isset($_POST['save_sections_form'])) {
     $slug = basename($_POST['edit_slug']);
     $jsonPath = $dir . "/" . $slug . ".json";
     $htmlPath = $dir . "/" . $slug . ".html";
+
+    if (!empty($_POST['active_tab'])) {
+        $savedActiveTab = basename($_POST['active_tab']);
+    }
 
     $formData = json_decode($_POST['sections_json_data'], true);
     if (is_array($formData)) {
@@ -1279,6 +1284,7 @@ if ($editingSlug) {
         <form method="post" action="landing_pages.php?edit=<?= urlencode($editingSlug) ?>" id="visualEditorForm">
           <input type="hidden" name="edit_slug" value="<?= htmlspecialchars($editingSlug) ?>" />
           <input type="hidden" name="sections_json_data" id="sections_json_data" />
+          <input type="hidden" name="active_tab" id="active_tab" value="<?= htmlspecialchars($savedActiveTab) ?>" />
 
           <div class="editor-layout">
             <!-- LEFT: SECTION TABS & FORM FIELDS -->
@@ -2727,6 +2733,14 @@ if ($editingSlug) {
 
         document.addEventListener('DOMContentLoaded', () => {
           renderOrderList();
+
+          // Restore saved active tab after save or page reload
+          const savedActiveTab = document.getElementById('active_tab')?.value || 'tab-order';
+          const activeTabBtn = document.querySelector(`.tab-btn[onclick*="${savedActiveTab}"]`);
+          if (savedActiveTab && document.getElementById(savedActiveTab)) {
+            showTab(savedActiveTab, activeTabBtn);
+          }
+
           const iframe = document.getElementById('livePreviewFrame');
           if (iframe) {
             iframe.onload = () => {
@@ -2735,6 +2749,16 @@ if ($editingSlug) {
               liveReorderSectionsInIframe();
               liveUpdateSecCtaVisibility();
               liveUpdateSecCtaTexts();
+
+              // Scroll iframe preview to current active tab section once iframe content is fully loaded
+              const currentTabId = document.getElementById('active_tab')?.value || 'tab-order';
+              const sectionSelector = tabToSectionMap[currentTabId];
+              if (sectionSelector && iframe.contentDocument) {
+                const el = iframe.contentDocument.querySelector(sectionSelector);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }
             };
           }
 
@@ -2749,11 +2773,47 @@ if ($editingSlug) {
           });
         });
 
-        function showTab(tabId) {
+        // Map: editor tab ID -> iframe section element selector
+        const tabToSectionMap = {
+          'tab-hero': '.hero-wrapper',
+          'tab-uvp': '#uvp',
+          'tab-master': '#mistr',
+          'tab-outcomes': '#co-se-naucis',
+          'tab-timeline': '#jak-to-probiha',
+          'tab-portfolio': '#realizace',
+          'tab-testimonials': '#reference',
+          'tab-faq': '#faq',
+          'tab-cta': '.primary-cta-box',
+          'tab-contact': '#kontakt'
+        };
+
+        function showTab(tabId, scrollBtn) {
           document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
           document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
           document.getElementById(tabId).classList.add('active');
-          event.target.classList.add('active');
+          // Mark the correct button active
+          if (scrollBtn) {
+            scrollBtn.classList.add('active');
+          } else if (event && event.target) {
+            event.target.classList.add('active');
+          }
+          // Save active tab
+          const hiddenTab = document.getElementById('active_tab');
+          if (hiddenTab) hiddenTab.value = tabId;
+
+          // Scroll iframe preview to the corresponding section
+          const sectionSelector = tabToSectionMap[tabId];
+          if (sectionSelector) {
+            try {
+              const iframe = document.getElementById('livePreviewFrame');
+              if (iframe && iframe.contentDocument) {
+                const el = iframe.contentDocument.querySelector(sectionSelector);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }
+            } catch(e) { /* cross-origin safety */ }
+          }
         }
 
         function uploadImage(fileInput, targetInputId, previewImgId) {
