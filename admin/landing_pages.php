@@ -126,8 +126,8 @@ function renderLandingPageHtml($data) {
     $body_size = $typoConf['body'];
 
     // 1. Hero
-    $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? '');
-    $h_h1 = htmlspecialchars($data['hero']['h1'] ?? '');
+    $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? 'UČEDNICTVÍ U MISTRA SKLÁŘE');
+    $h_h1 = htmlspecialchars($data['hero']['h1'] ?? 'NAUČ SE ŘEMESLO PŘÍMO OD MISTRA');
     $h_sub = htmlspecialchars($data['hero']['subtitle'] ?? '');
     $h_btn1 = htmlspecialchars($data['hero']['btn_primary'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
     $h_btn2 = htmlspecialchars($data['hero']['btn_secondary'] ?? 'PODÍVAT SE, JAK SE PRACUJE SE SKLEM');
@@ -149,8 +149,8 @@ function renderLandingPageHtml($data) {
 HTML;
 
     // 2. UVP
-    $uvp_eyebrow = htmlspecialchars($data['uvp']['eyebrow'] ?? '');
-    $uvp_title = htmlspecialchars($data['uvp']['title'] ?? '');
+    $uvp_eyebrow = htmlspecialchars($data['uvp']['eyebrow'] ?? 'Proč toto učednictví?');
+    $uvp_title = htmlspecialchars($data['uvp']['title'] ?? 'SKUTEČNÉ ŘEMESLO. SKUTEČNÝ MISTR. SKUTEČNÁ PRÁCE.');
     $uvp_sub = htmlspecialchars($data['uvp']['subtitle'] ?? '');
     $uvp_cards_html = "";
     foreach (($data['uvp']['items'] ?? []) as $item) {
@@ -171,12 +171,12 @@ HTML;
 HTML;
 
     // 3. Master
-    $m_eyebrow = htmlspecialchars($data['master']['eyebrow'] ?? '');
-    $m_name = htmlspecialchars($data['master']['name'] ?? '');
-    $m_title = htmlspecialchars($data['master']['title'] ?? '');
+    $m_eyebrow = htmlspecialchars($data['master']['eyebrow'] ?? 'KDO TĚ BUDE UČIT');
+    $m_name = htmlspecialchars($data['master']['name'] ?? 'JIŘÍ PAČINEK');
+    $m_title = htmlspecialchars($data['master']['title'] ?? 'MISTR SKLÁŘ & ZAKLADATEL SKLÁRNY PAČINEK GLASS');
     $m_bio = htmlspecialchars($data['master']['bio'] ?? '');
     $m_quote = htmlspecialchars($data['master']['quote'] ?? '');
-    $m_bio2 = htmlspecialchars($data['master']['bio2'] ?? '');
+    $m_bio2 = htmlspecialchars($data['master']['bio2'] ?? 'V dílně sází na poctivý přístup a předávání sklářského umění další generaci.');
     $m_img = htmlspecialchars(fixImgUrl($data['master']['image'] ?? ''));
 
     $masterSection = <<<HTML
@@ -196,9 +196,9 @@ HTML;
 HTML;
 
     // 4. Outcomes
-    $o_eyebrow = htmlspecialchars($data['outcomes']['eyebrow'] ?? '');
-    $o_title = htmlspecialchars($data['outcomes']['title'] ?? '');
-    $o_sub = htmlspecialchars($data['outcomes']['subtitle'] ?? '');
+    $o_eyebrow = htmlspecialchars($data['outcomes']['eyebrow'] ?? 'Praktické dovednosti');
+    $o_title = htmlspecialchars($data['outcomes']['title'] ?? 'CO SE UČEDNÍK SKUTEČNĚ NAUČÍ');
+    $o_sub = htmlspecialchars($data['outcomes']['subtitle'] ?? 'Konkrétní znalosti a návyky, které si z dílny odneseš do života.');
     $outcomes_html = "";
     foreach (($data['outcomes']['items'] ?? []) as $item) {
         $icon = htmlspecialchars($item['icon'] ?? '🔥');
@@ -219,10 +219,10 @@ HTML;
 HTML;
 
     // 5. Timeline
-    $t_eyebrow = htmlspecialchars($data['timeline']['eyebrow'] ?? '');
-    $t_title = htmlspecialchars($data['timeline']['title'] ?? '');
-    $t_sub = htmlspecialchars($data['timeline']['subtitle'] ?? '');
-    $t_disc = htmlspecialchars($data['timeline']['disclaimer'] ?? '');
+    $t_eyebrow = htmlspecialchars($data['timeline']['eyebrow'] ?? 'Postup krok za krokem');
+    $t_title = htmlspecialchars($data['timeline']['title'] ?? 'JAK PROBÍHÁ CESTA K UČEDNICTVÍ');
+    $t_sub = htmlspecialchars($data['timeline']['subtitle'] ?? 'Pět jasných kroků od prvního projevení zájmu až po začátek práce v dílně.');
+    $t_disc = htmlspecialchars($data['timeline']['disclaimer'] ?? '💡 Základní cesta vypadá takto. Konkrétní průběh se přizpůsobuje zájemci.');
     $timeline_html = "";
     foreach (($data['timeline']['steps'] ?? []) as $step) {
         $num = htmlspecialchars($step['num'] ?? '01');
@@ -246,9 +246,9 @@ HTML;
 HTML;
 
     // 6. Portfolio
-    $p_eyebrow = htmlspecialchars($data['portfolio']['eyebrow'] ?? '');
-    $p_title = htmlspecialchars($data['portfolio']['title'] ?? '');
-    $p_sub = htmlspecialchars($data['portfolio']['subtitle'] ?? '');
+    $p_eyebrow = htmlspecialchars($data['portfolio']['eyebrow'] ?? 'Ukázka z prostředí');
+    $p_title = htmlspecialchars($data['portfolio']['title'] ?? 'CO VZNIKÁ V DÍLNĚ');
+    $p_sub = htmlspecialchars($data['portfolio']['subtitle'] ?? 'Nahlédni do živého procesu sklářského umění.');
     $portfolio_html = "";
     foreach (($data['portfolio']['items'] ?? []) as $item) {
         $pimg = htmlspecialchars(fixImgUrl($item['image'] ?? ''));
@@ -268,9 +268,9 @@ HTML;
 HTML;
 
     // 7. Testimonials
-    $ts_eyebrow = htmlspecialchars($data['testimonials']['eyebrow'] ?? '');
-    $ts_title = htmlspecialchars($data['testimonials']['title'] ?? '');
-    $ts_sub = htmlspecialchars($data['testimonials']['subtitle'] ?? '');
+    $ts_eyebrow = htmlspecialchars($data['testimonials']['eyebrow'] ?? 'Zkušenosti a reference');
+    $ts_title = htmlspecialchars($data['testimonials']['title'] ?? 'CO ŘÍKAJÍ LIDÉ, KTEŘÍ U TOHO BYLI');
+    $ts_sub = htmlspecialchars($data['testimonials']['subtitle'] ?? 'Reálné pohledy zástupců a rodin.');
     $testimonials_html = "";
     foreach (($data['testimonials']['items'] ?? []) as $item) {
         $quote = htmlspecialchars($item['quote'] ?? '');
@@ -293,9 +293,9 @@ HTML;
 HTML;
 
     // 8. FAQ
-    $f_eyebrow = htmlspecialchars($data['faq']['eyebrow'] ?? '');
-    $f_title = htmlspecialchars($data['faq']['title'] ?? '');
-    $f_sub = htmlspecialchars($data['faq']['subtitle'] ?? '');
+    $f_eyebrow = htmlspecialchars($data['faq']['eyebrow'] ?? 'Odpovědi na dotazy');
+    $f_title = htmlspecialchars($data['faq']['title'] ?? 'ČASTÉ OTÁZKY');
+    $f_sub = htmlspecialchars($data['faq']['subtitle'] ?? 'Vše, co tě může zajímat před prvním kontaktem.');
     $faq_html = "";
     foreach (($data['faq']['items'] ?? []) as $item) {
         $q = htmlspecialchars($item['q'] ?? '');
@@ -315,8 +315,8 @@ HTML;
 HTML;
 
     // 9. Primary CTA Box
-    $cta_title = htmlspecialchars($data['cta']['title'] ?? '');
-    $cta_text = htmlspecialchars($data['cta']['text'] ?? '');
+    $cta_title = htmlspecialchars($data['cta']['title'] ?? 'ZAJÍMÁ TĚ, JESTLI JE TO PRO TEBE?');
+    $cta_text = htmlspecialchars($data['cta']['text'] ?? 'Nemusíš se hned k ničemu zavazovat. První krok je jednoduchý nezávazný rozhovor.');
     $cta_btn = htmlspecialchars($data['cta']['btn'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ');
 
     $ctaSection = <<<HTML
@@ -330,9 +330,9 @@ HTML;
 HTML;
 
     // 10. Contact
-    $c_eyebrow = htmlspecialchars($data['contact']['eyebrow'] ?? '');
-    $c_title = htmlspecialchars($data['contact']['title'] ?? '');
-    $c_sub = htmlspecialchars($data['contact']['subtitle'] ?? '');
+    $c_eyebrow = htmlspecialchars($data['contact']['eyebrow'] ?? 'První krok');
+    $c_title = htmlspecialchars($data['contact']['title'] ?? 'NAVÁŽEME KONTAKT');
+    $c_sub = htmlspecialchars($data['contact']['subtitle'] ?? 'Zvol si způsob, který je pro tě nejsnadnější.');
     $wa_num = htmlspecialchars($data['contact']['whatsapp_num'] ?? '420602763599');
     $wa_msg = urlencode($data['contact']['whatsapp_msg'] ?? 'Dobrý den, mám zájem o učednictví.');
     $ig_link = htmlspecialchars($data['contact']['instagram_link'] ?? 'https://instagram.com');
@@ -679,6 +679,23 @@ if ($editingSlug) {
     td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
     .badge-file { font-family: monospace; background: rgba(255,255,255,0.08); padding: 0.3rem 0.6rem; border-radius: 4px; color: #fff; }
 
+    /* Typo Badges on form labels */
+    .badge-typo {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge-typo.h1 { background: rgba(232, 117, 22, 0.25); color: #e87516; border: 1px solid #e87516; }
+    .badge-typo.h2 { background: rgba(59, 130, 246, 0.25); color: #60a5fa; border: 1px solid #3b82f6; }
+    .badge-typo.h3 { background: rgba(168, 85, 247, 0.25); color: #c084fc; border: 1px solid #a855f7; }
+    .badge-typo.body { background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-typo.eyebrow { background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
+
     /* Actions */
     .btn-action { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: all .2s; }
     .btn-edit { background: #3b82f6; color: #fff; }
@@ -702,7 +719,7 @@ if ($editingSlug) {
     .tab-content.active { display: block; }
 
     .form-group { margin-bottom: 1.2rem; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.3rem; }
+    .form-group label { display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem; font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 0.3rem; }
     .form-control { width: 100%; padding: 0.75rem 1rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
     textarea.form-control { min-height: 80px; resize: vertical; }
 
@@ -734,7 +751,7 @@ if ($editingSlug) {
     </div>
 
     <h1>Vizuální Editor Landing Pages</h1>
-    <p class="subtitle">Upravuj obsah sekcí, nahrávej fotky, měň pořadí sekcí, nastavuj stupně fontů s živým náhledem v reálném čase!</p>
+    <p class="subtitle">Upravuj VŠECHNY texty, nahrávej fotky, měň pořadí sekcí v živém náhledu i nastavení stupňů fontů!</p>
 
     <?php if ($message): ?>
       <div class="msg <?= $messageType ?>">✓ <?= htmlspecialchars($message) ?></div>
@@ -763,14 +780,15 @@ if ($editingSlug) {
                 <button type="button" class="tab-btn" onclick="showTab('tab-portfolio')">6. GALERIE FOTEK</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-testimonials')">7. REFERENCE</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-faq')">8. FAQ</button>
-                <button type="button" class="tab-btn" onclick="showTab('tab-contact')">9. KONTAKT</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-cta')">9. CTA BOX</button>
+                <button type="button" class="tab-btn" onclick="showTab('tab-contact')">10. KONTAKT</button>
               </div>
 
               <!-- TAB ORDER: SECTIONS REORDERING -->
               <div id="tab-order" class="tab-content active">
                 <h3 style="color:#fff; margin-bottom:1rem;">⚙️ Měnění Pořadí Sekcí na Stránce</h3>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
-                  Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo. Změny okamžitě uvidíš v živém náhledu vpravo.
+                  Kliknutím na tlačítka <strong>Nahoru ⬆️</strong> nebo <strong>Dolů ⬇️</strong> posuneš sekci na požadované místo. Změny se <strong>ihned projevují v živém náhledu vpravo</strong>.
                 </p>
                 <div id="order_list_container"></div>
               </div>
@@ -791,9 +809,9 @@ if ($editingSlug) {
                 ?>
 
                 <div class="item-card">
-                  <h4>🚀 Hlavní nadpis Hero (H1)</h4>
+                  <h4>🚀 Hlavní nadpis Hero (H1) <span class="badge-typo h1">🚀 Hero H1</span></h4>
                   <div class="form-group">
-                    <label>Stupeň velikosti hlavní tituly (H1)</label>
+                    <label>Stupeň velikosti hlavní tituly (H1) a jména mistra</label>
                     <select class="form-control typo-select" id="typo_hero_h1" onchange="liveUpdateTypography()">
                       <option value="step-1" <?= $h1Step === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Kompaktní</option>
                       <option value="step-2" <?= $h1Step === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní</option>
@@ -806,9 +824,9 @@ if ($editingSlug) {
                 </div>
 
                 <div class="item-card">
-                  <h4>📌 Nadpisy sekcí (H2)</h4>
+                  <h4>📌 Nadpisy sekcí (H2) <span class="badge-typo h2">📌 Nadpis H2</span></h4>
                   <div class="form-group">
-                    <label>Stupeň velikosti pro nadpisy sekcí (UVP, Mistr, Galerie...)</label>
+                    <label>Stupeň velikosti pro hlavních nadpisů sekcí (UVP, Galerie, CTA...)</label>
                     <select class="form-control typo-select" id="typo_section_h2" onchange="liveUpdateTypography()">
                       <option value="step-1" <?= $h2Step === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Kompaktní</option>
                       <option value="step-2" <?= $h2Step === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní</option>
@@ -821,9 +839,9 @@ if ($editingSlug) {
                 </div>
 
                 <div class="item-card">
-                  <h4>🎴 Nadpisy karet a dovedností (H3 & H4)</h4>
+                  <h4>🎴 Nadpisy karet a dovedností (H3 & H4) <span class="badge-typo h3">🎴 Karta H3/H4</span></h4>
                   <div class="form-group">
-                    <label>Stupeň velikosti pro podnadpisy v kartách a seznamu</label>
+                    <label>Stupeň velikosti pro podnadpisy v kartách, dovednostech a FAQ</label>
                     <select class="form-control typo-select" id="typo_card_h3" onchange="liveUpdateTypography()">
                       <option value="step-1" <?= $h3Step === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Kompaktní</option>
                       <option value="step-2" <?= $h3Step === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní</option>
@@ -836,9 +854,9 @@ if ($editingSlug) {
                 </div>
 
                 <div class="item-card">
-                  <h4>📝 Běžný text a odstavce (Body text)</h4>
+                  <h4>📝 Běžný text a odstavce (Body text) <span class="badge-typo body">📝 Běžný text</span></h4>
                   <div class="form-group">
-                    <label>Stupeň základní velikosti textu (odstavce, popisy)</label>
+                    <label>Stupeň základní velikosti textu (odstavce, popisy, citace)</label>
                     <select class="form-control typo-select" id="typo_body_text" onchange="liveUpdateTypography()">
                       <option value="step-1" <?= $bodyStep === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Jemný text</option>
                       <option value="step-2" <?= $bodyStep === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Standardní text</option>
@@ -855,20 +873,24 @@ if ($editingSlug) {
               <div id="tab-hero" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">🚀 Sekce 1: HERO (Úvodní obrazovka)</h3>
                 <div class="form-group">
-                  <label>Eyebrow (malý text nad nadpisem)</label>
-                  <input type="text" class="form-control live-text" id="h_eyebrow" value="<?= htmlspecialchars($editingData['hero']['eyebrow'] ?? '') ?>" />
+                  <label>Eyebrow (malý text nad nadpisem) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="h_eyebrow" value="<?= htmlspecialchars($editingData['hero']['eyebrow'] ?? 'UČEDNICTVÍ U MISTRA SKLÁŘE') ?>" />
                 </div>
                 <div class="form-group">
-                  <label>Hlavní Nadpis (H1)</label>
-                  <input type="text" class="form-control live-text" id="h_h1" value="<?= htmlspecialchars($editingData['hero']['h1'] ?? '') ?>" />
+                  <label>Hlavní Nadpis (H1) <span class="badge-typo h1">🚀 Hero H1</span></label>
+                  <input type="text" class="form-control" id="h_h1" value="<?= htmlspecialchars($editingData['hero']['h1'] ?? 'NAUČ SE ŘEMESLO PŘÍMO OD MISTRA') ?>" />
                 </div>
                 <div class="form-group">
-                  <label>Podtitul (Dlouhý popis nabídky)</label>
-                  <textarea class="form-control live-text" id="h_sub"><?= htmlspecialchars($editingData['hero']['subtitle'] ?? '') ?></textarea>
+                  <label>Podtitul (Dlouhý popis nabídky) <span class="badge-typo body">📝 Běžný text</span></label>
+                  <textarea class="form-control" id="h_sub"><?= htmlspecialchars($editingData['hero']['subtitle'] ?? '') ?></textarea>
                 </div>
                 <div class="form-group">
-                  <label>Text hlavního tlačítka (CTA)</label>
-                  <input type="text" class="form-control live-text" id="h_btn1" value="<?= htmlspecialchars($editingData['hero']['btn_primary'] ?? '') ?>" />
+                  <label>Text hlavního tlačítka (CTA) <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="h_btn1" value="<?= htmlspecialchars($editingData['hero']['btn_primary'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Text druhého tlačítka <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="h_btn2" value="<?= htmlspecialchars($editingData['hero']['btn_secondary'] ?? 'PODÍVAT SE, JAK SE PRACUJE SE SKLEM') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Fotka v huti (Hero Obrázek)</label>
@@ -887,20 +909,24 @@ if ($editingSlug) {
               <div id="tab-uvp" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">💎 Sekce 2: UVP (Proč toto učednictví)</h3>
                 <div class="form-group">
-                  <label>Nadpis sekce UVP</label>
-                  <input type="text" class="form-control live-text" id="uvp_title" value="<?= htmlspecialchars($editingData['uvp']['title'] ?? '') ?>" />
+                  <label>Eyebrow (malý text nad nadpisem) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="uvp_eyebrow" value="<?= htmlspecialchars($editingData['uvp']['eyebrow'] ?? 'Proč toto učednictví?') ?>" />
                 </div>
                 <div class="form-group">
-                  <label>Podtitul sekce</label>
-                  <input type="text" class="form-control live-text" id="uvp_sub" value="<?= htmlspecialchars($editingData['uvp']['subtitle'] ?? '') ?>" />
+                  <label>Nadpis sekce UVP <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="uvp_title" value="<?= htmlspecialchars($editingData['uvp']['title'] ?? 'SKUTEČNÉ ŘEMESLO. SKUTEČNÝ MISTR. SKUTEČNÁ PRÁCE.') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="uvp_sub" value="<?= htmlspecialchars($editingData['uvp']['subtitle'] ?? '') ?>" />
                 </div>
                 <h4 style="color:#fff; margin:1rem 0 0.5rem;">Argumentační karty:</h4>
                 <div id="uvp_cards_container">
                   <?php foreach (($editingData['uvp']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card uvp-item-box">
                       <h4>Karta #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Titulek karty</label><input type="text" class="form-control uvp-item-title live-text" value="<?= htmlspecialchars($item['title']) ?>" /></div>
-                      <div class="form-group"><label>Popis karty</label><textarea class="form-control uvp-item-desc live-text"><?= htmlspecialchars($item['desc']) ?></textarea></div>
+                      <div class="form-group"><label>Titulek karty <span class="badge-typo h3">🎴 Karta H3</span></label><input type="text" class="form-control uvp-item-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis karty <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -910,20 +936,28 @@ if ($editingSlug) {
               <div id="tab-master" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">👑 Sekce 3: O mistrovi</h3>
                 <div class="form-group">
-                  <label>Jméno mistra</label>
-                  <input type="text" class="form-control live-text" id="m_name" value="<?= htmlspecialchars($editingData['master']['name'] ?? '') ?>" />
+                  <label>Eyebrow (malý text nad jménem) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="m_eyebrow" value="<?= htmlspecialchars($editingData['master']['eyebrow'] ?? 'KDO TĚ BUDE UČIT') ?>" />
                 </div>
                 <div class="form-group">
-                  <label>Titul mistra & Sklárna</label>
-                  <input type="text" class="form-control live-text" id="m_title" value="<?= htmlspecialchars($editingData['master']['title'] ?? '') ?>" />
+                  <label>Jméno mistra <span class="badge-typo h1">🚀 Velký nadpis H1</span></label>
+                  <input type="text" class="form-control" id="m_name" value="<?= htmlspecialchars($editingData['master']['name'] ?? 'JIŘÍ PAČINEK') ?>" />
                 </div>
                 <div class="form-group">
-                  <label>Příběh mistra (Popis)</label>
-                  <textarea class="form-control live-text" id="m_bio"><?= htmlspecialchars($editingData['master']['bio'] ?? '') ?></textarea>
+                  <label>Titul mistra & Sklárna <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="m_title" value="<?= htmlspecialchars($editingData['master']['title'] ?? 'MISTR SKLÁŘ & ZAKLADATEL SKLÁRNY PAČINEK GLASS') ?>" />
                 </div>
                 <div class="form-group">
-                  <label>Citát mistra</label>
-                  <textarea class="form-control live-text" id="m_quote"><?= htmlspecialchars($editingData['master']['quote'] ?? '') ?></textarea>
+                  <label>Příběh mistra (Popis 1. část) <span class="badge-typo body">📝 Běžný text</span></label>
+                  <textarea class="form-control" id="m_bio"><?= htmlspecialchars($editingData['master']['bio'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Citát mistra <span class="badge-typo h2">📌 Citát / H2</span></label>
+                  <textarea class="form-control" id="m_quote"><?= htmlspecialchars($editingData['master']['quote'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Příběh mistra (Popis 2. část) <span class="badge-typo body">📝 Běžný text</span></label>
+                  <textarea class="form-control" id="m_bio2"><?= htmlspecialchars($editingData['master']['bio2'] ?? 'V dílně sází na poctivý přístup a předávání sklářského umění další generaci.') ?></textarea>
                 </div>
                 <div class="form-group">
                   <label>Fotka mistra</label>
@@ -942,16 +976,24 @@ if ($editingSlug) {
               <div id="tab-outcomes" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">📚 Sekce 4: Co se učedník naučí</h3>
                 <div class="form-group">
-                  <label>Nadpis sekce</label>
-                  <input type="text" class="form-control live-text" id="o_title" value="<?= htmlspecialchars($editingData['outcomes']['title'] ?? '') ?>" />
+                  <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="o_eyebrow" value="<?= htmlspecialchars($editingData['outcomes']['eyebrow'] ?? 'Praktické dovednosti') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Nadpis sekce <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="o_title" value="<?= htmlspecialchars($editingData['outcomes']['title'] ?? 'CO SE UČEDNÍK SKUTEČNĚ NAUČÍ') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="o_sub" value="<?= htmlspecialchars($editingData['outcomes']['subtitle'] ?? 'Konkrétní znalosti a návyky, které si z dílny odneseš do života.') ?>" />
                 </div>
                 <div id="outcomes_container">
                   <?php foreach (($editingData['outcomes']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card outcome-item-box">
                       <h4>Dovednost #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon live-text" value="<?= htmlspecialchars($item['icon']) ?>" /></div>
-                      <div class="form-group"><label>Název dovednosti</label><input type="text" class="form-control outcome-title live-text" value="<?= htmlspecialchars($item['title']) ?>" /></div>
-                      <div class="form-group"><label>Popis dovednosti</label><textarea class="form-control outcome-desc live-text"><?= htmlspecialchars($item['desc']) ?></textarea></div>
+                      <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon" value="<?= htmlspecialchars($item['icon']) ?>" /></div>
+                      <div class="form-group"><label>Název dovednosti <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control outcome-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis dovednosti <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control outcome-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -960,21 +1002,49 @@ if ($editingSlug) {
               <!-- TAB 5: POSTUP -->
               <div id="tab-timeline" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">🗺️ Sekce 5: Jak probíhá cesta k učednictví</h3>
+                <div class="form-group">
+                  <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="t_eyebrow" value="<?= htmlspecialchars($editingData['timeline']['eyebrow'] ?? 'Postup krok za krokem') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Nadpis sekce <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="t_title" value="<?= htmlspecialchars($editingData['timeline']['title'] ?? 'JAK PROBÍHÁ CESTA K UČEDNICTVÍ') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="t_sub" value="<?= htmlspecialchars($editingData['timeline']['subtitle'] ?? 'Pět jasných kroků od prvního projevení zájmu až po začátek práce v dílně.') ?>" />
+                </div>
                 <div id="timeline_container">
                   <?php foreach (($editingData['timeline']['steps'] ?? []) as $idx => $step): ?>
                     <div class="item-card timeline-step-box">
                       <h4>Krok <?= htmlspecialchars($step['num']) ?></h4>
-                      <div class="form-group"><label>Číslo</label><input type="text" class="form-control step-num live-text" value="<?= htmlspecialchars($step['num']) ?>" /></div>
-                      <div class="form-group"><label>Název kroku</label><input type="text" class="form-control step-title live-text" value="<?= htmlspecialchars($step['title']) ?>" /></div>
-                      <div class="form-group"><label>Popis kroku</label><textarea class="form-control step-desc live-text"><?= htmlspecialchars($step['desc']) ?></textarea></div>
+                      <div class="form-group"><label>Číslo kroku</label><input type="text" class="form-control step-num" value="<?= htmlspecialchars($step['num']) ?>" /></div>
+                      <div class="form-group"><label>Název kroku <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control step-title" value="<?= htmlspecialchars($step['title']) ?>" /></div>
+                      <div class="form-group"><label>Popis kroku <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control step-desc"><?= htmlspecialchars($step['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
+                </div>
+                <div class="form-group" style="margin-top:1rem;">
+                  <label>Poznámka pod postupem (Disclaimer) <span class="badge-typo body">📝 Běžný text</span></label>
+                  <textarea class="form-control" id="t_disc"><?= htmlspecialchars($editingData['timeline']['disclaimer'] ?? '💡 Základní cesta vypadá takto. Konkrétní průběh se přizpůsobuje zájemci.') ?></textarea>
                 </div>
               </div>
 
               <!-- TAB 6: GALERIE -->
               <div id="tab-portfolio" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">🖼️ Sekce 6: Galerie a Fotky z huti</h3>
+                <div class="form-group">
+                  <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="p_eyebrow" value="<?= htmlspecialchars($editingData['portfolio']['eyebrow'] ?? 'Ukázka z prostředí') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Nadpis sekce <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="p_title" value="<?= htmlspecialchars($editingData['portfolio']['title'] ?? 'CO VZNIKÁ V DÍLNĚ') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="p_sub" value="<?= htmlspecialchars($editingData['portfolio']['subtitle'] ?? 'Nahlédni do živého procesu sklářského umění.') ?>" />
+                </div>
                 <div id="portfolio_container">
                   <?php foreach (($editingData['portfolio']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card portfolio-item-box">
@@ -990,7 +1060,7 @@ if ($editingSlug) {
                           </label>
                         </div>
                       </div>
-                      <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap live-text" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
+                      <div class="form-group"><label>Popisek pod fotkou <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -999,13 +1069,25 @@ if ($editingSlug) {
               <!-- TAB 7: REFERENCE -->
               <div id="tab-testimonials" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">💬 Sekce 7: Reference</h3>
+                <div class="form-group">
+                  <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="ts_eyebrow" value="<?= htmlspecialchars($editingData['testimonials']['eyebrow'] ?? 'Zkušenosti a reference') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Nadpis sekce <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="ts_title" value="<?= htmlspecialchars($editingData['testimonials']['title'] ?? 'CO ŘÍKAJÍ LIDÉ, KTEŘÍ U TOHO BYLI') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="ts_sub" value="<?= htmlspecialchars($editingData['testimonials']['subtitle'] ?? 'Reálné pohledy zástupců a rodin.') ?>" />
+                </div>
                 <div id="testimonials_container">
                   <?php foreach (($editingData['testimonials']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card testimonial-item-box">
                       <h4>Reference #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Citace</label><textarea class="form-control ts-quote live-text"><?= htmlspecialchars($item['quote']) ?></textarea></div>
-                      <div class="form-group"><label>Jméno</label><input type="text" class="form-control ts-name live-text" value="<?= htmlspecialchars($item['name']) ?>" /></div>
-                      <div class="form-group"><label>Role / Vztah k dílně</label><input type="text" class="form-control ts-role live-text" value="<?= htmlspecialchars($item['role']) ?>" /></div>
+                      <div class="form-group"><label>Citace <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control ts-quote"><?= htmlspecialchars($item['quote']) ?></textarea></div>
+                      <div class="form-group"><label>Jméno autora <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control ts-name" value="<?= htmlspecialchars($item['name']) ?>" /></div>
+                      <div class="form-group"><label>Role / Vztah k dílně <span class="badge-typo eyebrow">🏷️ Štítek</span></label><input type="text" class="form-control ts-role" value="<?= htmlspecialchars($item['role']) ?>" /></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -1014,31 +1096,76 @@ if ($editingSlug) {
               <!-- TAB 8: FAQ -->
               <div id="tab-faq" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">❓ Sekce 8: Časté otázky</h3>
+                <div class="form-group">
+                  <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="f_eyebrow" value="<?= htmlspecialchars($editingData['faq']['eyebrow'] ?? 'Odpovědi na dotazy') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Nadpis sekce <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="f_title" value="<?= htmlspecialchars($editingData['faq']['title'] ?? 'ČASTÉ OTÁZKY') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="f_sub" value="<?= htmlspecialchars($editingData['faq']['subtitle'] ?? 'Vše, co tě může zajímat před prvním kontaktem.') ?>" />
+                </div>
                 <div id="faq_container">
                   <?php foreach (($editingData['faq']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card faq-item-box">
                       <h4>Otázka #<?= $idx+1 ?></h4>
-                      <div class="form-group"><label>Otázka</label><input type="text" class="form-control faq-q live-text" value="<?= htmlspecialchars($item['q']) ?>" /></div>
-                      <div class="form-group"><label>Odpověď</label><textarea class="form-control faq-a live-text"><?= htmlspecialchars($item['a']) ?></textarea></div>
+                      <div class="form-group"><label>Otázka <span class="badge-typo h3">🎴 Otázka H4</span></label><input type="text" class="form-control faq-q" value="<?= htmlspecialchars($item['q']) ?>" /></div>
+                      <div class="form-group"><label>Odpověď <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control faq-a"><?= htmlspecialchars($item['a']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
                 </div>
               </div>
 
-              <!-- TAB 9: KONTAKT -->
+              <!-- TAB 9: CTA BOX -->
+              <div id="tab-cta" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:1rem;">🎯 Sekce 9: Výrazný CTA Box</h3>
+                <div class="form-group">
+                  <label>Nadpis v CTA boxu <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="cta_title" value="<?= htmlspecialchars($editingData['cta']['title'] ?? 'ZAJÍMÁ TĚ, JESTLI JE TO PRO TEBE?') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Text v CTA boxu <span class="badge-typo body">📝 Běžný text</span></label>
+                  <textarea class="form-control" id="cta_text"><?= htmlspecialchars($editingData['cta']['text'] ?? 'Nemusíš se hned k ničemu zavazovat. První krok je jednoduchý nezávazný rozhovor.') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Text tlačítka v CTA boxu <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="cta_btn" value="<?= htmlspecialchars($editingData['cta']['btn'] ?? 'ZJISTIT, JESTLI JE TO PRO MĚ') ?>" />
+                </div>
+              </div>
+
+              <!-- TAB 10: KONTAKT -->
               <div id="tab-contact" class="tab-content">
-                <h3 style="color:#fff; margin-bottom:1rem;">📱 Sekce 9: Kontakt a WhatsApp</h3>
+                <h3 style="color:#fff; margin-bottom:1rem;">📱 Sekce 10: Kontakt a WhatsApp</h3>
+                <div class="form-group">
+                  <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
+                  <input type="text" class="form-control" id="c_eyebrow" value="<?= htmlspecialchars($editingData['contact']['eyebrow'] ?? 'První krok') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Nadpis sekce <span class="badge-typo h2">📌 Nadpis H2</span></label>
+                  <input type="text" class="form-control" id="c_title" value="<?= htmlspecialchars($editingData['contact']['title'] ?? 'NAVÁŽEME KONTAKT') ?>" />
+                </div>
+                <div class="form-group">
+                  <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
+                  <input type="text" class="form-control" id="c_sub" value="<?= htmlspecialchars($editingData['contact']['subtitle'] ?? 'Zvol si způsob, který je pro tě nejsnadnější.') ?>" />
+                </div>
                 <div class="form-group">
                   <label>WhatsApp číslo (např. 420602763599 bez mezery)</label>
-                  <input type="text" class="form-control live-text" id="c_wa_num" value="<?= htmlspecialchars($editingData['contact']['whatsapp_num'] ?? '') ?>" />
+                  <input type="text" class="form-control" id="c_wa_num" value="<?= htmlspecialchars($editingData['contact']['whatsapp_num'] ?? '') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Předvyplněná zpráva pro zájemce na WhatsApp</label>
-                  <textarea class="form-control live-text" id="c_wa_msg"><?= htmlspecialchars($editingData['contact']['whatsapp_msg'] ?? '') ?></textarea>
+                  <textarea class="form-control" id="c_wa_msg"><?= htmlspecialchars($editingData['contact']['whatsapp_msg'] ?? '') ?></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Instagram odkaz</label>
+                  <input type="text" class="form-control" id="c_ig_link" value="<?= htmlspecialchars($editingData['contact']['instagram_link'] ?? 'https://instagram.com') ?>" />
                 </div>
                 <div class="form-group">
                   <label>Telefon pro rodiče</label>
-                  <input type="text" class="form-control live-text" id="c_phone" value="<?= htmlspecialchars($editingData['contact']['phone_parent'] ?? '') ?>" />
+                  <input type="text" class="form-control" id="c_phone" value="<?= htmlspecialchars($editingData['contact']['phone_parent'] ?? '') ?>" />
                 </div>
               </div>
 
@@ -1063,7 +1190,7 @@ if ($editingSlug) {
               </div>
 
               <div class="preview-wrapper">
-                <iframe id="livePreviewFrame" class="preview-iframe" src="landing_pages/<?= htmlspecialchars($editingSlug) ?>.html"></iframe>
+                <iframe id="livePreviewFrame" class="preview-iframe" src="landing_pages/<?= htmlspecialchars($editingSlug) ?>.html?v=<?= time() ?>"></iframe>
               </div>
             </div>
           </div>
@@ -1142,6 +1269,37 @@ if ($editingSlug) {
           } catch(e) { console.log('Live update error:', e); }
         }
 
+        // Real-Time Section Reordering in livePreviewFrame iframe DOM
+        function liveReorderSectionsInIframe() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
+          try {
+            const doc = iframe.contentDocument;
+            const main = doc.querySelector('main');
+            if (!main) return;
+
+            const sectionElements = {
+              'hero': doc.querySelector('.hero'),
+              'uvp': doc.querySelector('#uvp'),
+              'master': doc.querySelector('#mistr'),
+              'outcomes': doc.querySelector('#co-se-naucis'),
+              'timeline': doc.querySelector('#jak-to-probiha'),
+              'portfolio': doc.querySelector('#realizace'),
+              'testimonials': doc.querySelector('#reference'),
+              'faq': doc.querySelector('#faq'),
+              'cta': doc.querySelector('.primary-cta-box')?.parentElement || doc.querySelector('.primary-cta-box'),
+              'contact': doc.querySelector('#kontakt')
+            };
+
+            currentSectionOrder.forEach(key => {
+              const el = sectionElements[key];
+              if (el) {
+                main.appendChild(el);
+              }
+            });
+          } catch(e) { console.log('Reorder iframe error:', e); }
+        }
+
         function setPreviewDevice(device) {
           const frame = document.getElementById('livePreviewFrame');
           document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('active'));
@@ -1162,8 +1320,11 @@ if ($editingSlug) {
         function refreshPreview() {
           const iframe = document.getElementById('livePreviewFrame');
           if (iframe) { 
-            iframe.src = iframe.src; 
-            iframe.onload = liveUpdateTypography;
+            iframe.src = iframe.src.split('?')[0] + '?v=' + Date.now(); 
+            iframe.onload = () => {
+              liveUpdateTypography();
+              liveReorderSectionsInIframe();
+            };
           }
         }
 
@@ -1197,13 +1358,17 @@ if ($editingSlug) {
           currentSectionOrder[index] = currentSectionOrder[targetIndex];
           currentSectionOrder[targetIndex] = temp;
           renderOrderList();
+          liveReorderSectionsInIframe();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
           renderOrderList();
           const iframe = document.getElementById('livePreviewFrame');
           if (iframe) {
-            iframe.onload = liveUpdateTypography;
+            iframe.onload = () => {
+              liveUpdateTypography();
+              liveReorderSectionsInIframe();
+            };
           }
         });
 
@@ -1258,11 +1423,11 @@ if ($editingSlug) {
               h1: document.getElementById('h_h1').value,
               subtitle: document.getElementById('h_sub').value,
               btn_primary: document.getElementById('h_btn1').value,
-              btn_secondary: "PODÍVAT SE, JAK SE PRACUJE SE SKLEM",
+              btn_secondary: document.getElementById('h_btn2').value,
               image: document.getElementById('h_img').value
             },
             uvp: {
-              eyebrow: "Proč toto učednictví?",
+              eyebrow: document.getElementById('uvp_eyebrow').value,
               title: document.getElementById('uvp_title').value,
               subtitle: document.getElementById('uvp_sub').value,
               items: Array.from(document.querySelectorAll('.uvp-item-box')).map(box => ({
@@ -1271,18 +1436,18 @@ if ($editingSlug) {
               }))
             },
             master: {
-              eyebrow: "KDO TĚ BUDE UČIT",
+              eyebrow: document.getElementById('m_eyebrow').value,
               name: document.getElementById('m_name').value,
               title: document.getElementById('m_title').value,
               bio: document.getElementById('m_bio').value,
               quote: document.getElementById('m_quote').value,
-              bio2: "V dílně sází na poctivý přístup a předávání sklářského umění další generaci.",
+              bio2: document.getElementById('m_bio2').value,
               image: document.getElementById('m_img').value
             },
             outcomes: {
-              eyebrow: "Praktické dovednosti",
+              eyebrow: document.getElementById('o_eyebrow').value,
               title: document.getElementById('o_title').value,
-              subtitle: "Konkrétní znalosti a návyky, které si z dílny odneseš do života.",
+              subtitle: document.getElementById('o_sub').value,
               items: Array.from(document.querySelectorAll('.outcome-item-box')).map(box => ({
                 icon: box.querySelector('.outcome-icon').value,
                 title: box.querySelector('.outcome-title').value,
@@ -1290,29 +1455,29 @@ if ($editingSlug) {
               }))
             },
             timeline: {
-              eyebrow: "Postup krok za krokem",
-              title: "JAK PROBÍHÁ CESTA K UČEDNICTVÍ",
-              subtitle: "Pět jasných kroků od prvního projevení zájmu až po začátek práce v dílně.",
+              eyebrow: document.getElementById('t_eyebrow').value,
+              title: document.getElementById('t_title').value,
+              subtitle: document.getElementById('t_sub').value,
               steps: Array.from(document.querySelectorAll('.timeline-step-box')).map(box => ({
                 num: box.querySelector('.step-num').value,
                 title: box.querySelector('.step-title').value,
                 desc: box.querySelector('.step-desc').value
               })),
-              disclaimer: "💡 Základní cesta vypadá takto. Konkrétní průběh se přizpůsobuje zájemci."
+              disclaimer: document.getElementById('t_disc').value
             },
             portfolio: {
-              eyebrow: "Ukázka z prostředí",
-              title: "CO VZNIKÁ V DÍLNĚ",
-              subtitle: "Nahlédni do živého procesu sklářského umění.",
+              eyebrow: document.getElementById('p_eyebrow').value,
+              title: document.getElementById('p_title').value,
+              subtitle: document.getElementById('p_sub').value,
               items: Array.from(document.querySelectorAll('.portfolio-item-box')).map(box => ({
                 image: box.querySelector('.p-img').value,
                 caption: box.querySelector('.p-cap').value
               }))
             },
             testimonials: {
-              eyebrow: "Zkušenosti a reference",
-              title: "CO ŘÍKAJÍ LIDÉ, KTEŘÍ U TOHO BYLI",
-              subtitle: "Reálné pohledy zástupců a rodin.",
+              eyebrow: document.getElementById('ts_eyebrow').value,
+              title: document.getElementById('ts_title').value,
+              subtitle: document.getElementById('ts_sub').value,
               items: Array.from(document.querySelectorAll('.testimonial-item-box')).map(box => ({
                 quote: box.querySelector('.ts-quote').value,
                 name: box.querySelector('.ts-name').value,
@@ -1320,26 +1485,26 @@ if ($editingSlug) {
               }))
             },
             faq: {
-              eyebrow: "Odpovědi na dotazy",
-              title: "ČASTÉ OTÁZKY",
-              subtitle: "Vše, co tě může zajímat před prvním kontaktem.",
+              eyebrow: document.getElementById('f_eyebrow').value,
+              title: document.getElementById('f_title').value,
+              subtitle: document.getElementById('f_sub').value,
               items: Array.from(document.querySelectorAll('.faq-item-box')).map(box => ({
                 q: box.querySelector('.faq-q').value,
                 a: box.querySelector('.faq-a').value
               }))
             },
             cta: {
-              title: "ZAJÍMÁ TĚ, JESTLI JE TO PRO TEBE?",
-              text: "Nemusíš se hned k ničemu zavazovat. První krok je jednoduchý nezávazný rozhovor.",
-              btn: document.getElementById('h_btn1').value
+              title: document.getElementById('cta_title').value,
+              text: document.getElementById('cta_text').value,
+              btn: document.getElementById('cta_btn').value
             },
             contact: {
-              eyebrow: "První krok",
-              title: "NAVÁŽEME KONTAKT",
-              subtitle: "Zvol si způsob, který je pro tě nejsnadnější.",
+              eyebrow: document.getElementById('c_eyebrow').value,
+              title: document.getElementById('c_title').value,
+              subtitle: document.getElementById('c_sub').value,
               whatsapp_num: document.getElementById('c_wa_num').value,
               whatsapp_msg: document.getElementById('c_wa_msg').value,
-              instagram_link: "https://instagram.com",
+              instagram_link: document.getElementById('c_ig_link').value,
               phone_parent: document.getElementById('c_phone').value
             }
           };
