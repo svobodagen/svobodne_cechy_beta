@@ -215,10 +215,10 @@ function renderLandingPageHtml($data) {
 
     $btnSizeKey = $design['btn_size'] ?? 'm';
     $btnSizeMap = [
-        's'  => ['pv' => '0.5rem',  'ph' => '1rem',   'fs' => '0.8rem',  'pv_m' => '0.45rem', 'ph_m' => '0.85rem', 'fs_m' => '0.78rem'],
-        'm'  => ['pv' => '0.8rem',  'ph' => '1.4rem', 'fs' => '0.9rem',  'pv_m' => '0.7rem',  'ph_m' => '1.2rem',  'fs_m' => '0.85rem'],
-        'l'  => ['pv' => '1rem',    'ph' => '1.8rem', 'fs' => '1rem',    'pv_m' => '0.85rem', 'ph_m' => '1.4rem',  'fs_m' => '0.92rem'],
-        'xl' => ['pv' => '1.25rem', 'ph' => '2.2rem', 'fs' => '1.1rem',  'pv_m' => '1rem',    'ph_m' => '1.7rem',  'fs_m' => '1rem']
+        's'  => ['pv' => '0.5rem',  'ph' => '1rem',    'fs' => '0.8rem',  'pv_m' => '0.38rem', 'ph_m' => '0.75rem', 'fs_m' => '0.74rem'],
+        'm'  => ['pv' => '0.75rem', 'ph' => '1.35rem', 'fs' => '0.88rem', 'pv_m' => '0.5rem',  'ph_m' => '1rem',    'fs_m' => '0.8rem'],
+        'l'  => ['pv' => '0.95rem', 'ph' => '1.75rem', 'fs' => '0.98rem', 'pv_m' => '0.65rem', 'ph_m' => '1.2rem',  'fs_m' => '0.86rem'],
+        'xl' => ['pv' => '1.2rem',  'ph' => '2.1rem',  'fs' => '1.08rem', 'pv_m' => '0.78rem', 'ph_m' => '1.4rem',  'fs_m' => '0.92rem']
     ];
     $bS = $btnSizeMap[$btnSizeKey] ?? $btnSizeMap['m'];
 
@@ -613,17 +613,13 @@ HTML;
       --even-side-padding: {$evenSidePad};
       --even-vert-padding: {$evenVertPad};
 
-      /* Configured Button Size */
+      /* Configured Button Size (Desktop & Mobile) */
       --btn-pad-v: {$bS['pv']};
       --btn-pad-h: {$bS['ph']};
       --btn-font-size: {$bS['fs']};
-    }
-    @media (max-width: 768px) {
-      :root {
-        --btn-pad-v: {$bS['pv_m']};
-        --btn-pad-h: {$bS['ph_m']};
-        --btn-font-size: {$bS['fs_m']};
-      }
+      --btn-pad-v-mob: {$bS['pv_m']};
+      --btn-pad-h-mob: {$bS['ph_m']};
+      --btn-font-size-mob: {$bS['fs_m']};
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -672,8 +668,10 @@ HTML;
     .hero h1 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.8rem; }
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
     .hero-buttons-row { display: flex; gap: 0.8rem; flex-wrap: wrap; padding-top: 1.8rem; }
-    .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--btn-pad-v) var(--btn-pad-h); font-size: var(--btn-font-size); border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--btn-pad-v) var(--btn-pad-h); font-size: var(--btn-font-size); border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 38px; cursor: pointer; border: none; text-align: center; }
+    @media (max-width: 768px) {
+      .btn { padding: var(--btn-pad-v-mob) var(--btn-pad-h-mob); font-size: var(--btn-font-size-mob); }
+    }
     .btn-primary { background: var(--color-accent); color: #fff; }
     .btn-primary:hover { background: var(--btn-hover); }
     .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
@@ -2180,10 +2178,10 @@ if ($editingSlug) {
         };
 
         const btnSizes = {
-          s:  { pv: '0.5rem',  ph: '1rem',   fs: '0.8rem' },
-          m:  { pv: '0.8rem',  ph: '1.4rem', fs: '0.9rem' },
-          l:  { pv: '1rem',    ph: '1.8rem', fs: '1rem' },
-          xl: { pv: '1.25rem', ph: '2.2rem', fs: '1.1rem' }
+          s:  { pv: '0.5rem',  ph: '1rem',    fs: '0.8rem',  pv_m: '0.38rem', ph_m: '0.75rem', fs_m: '0.74rem' },
+          m:  { pv: '0.75rem', ph: '1.35rem', fs: '0.88rem', pv_m: '0.5rem',  ph_m: '1rem',    fs_m: '0.8rem' },
+          l:  { pv: '0.95rem', ph: '1.75rem', fs: '0.98rem', pv_m: '0.65rem', ph_m: '1.2rem',  fs_m: '0.86rem' },
+          xl: { pv: '1.2rem',  ph: '2.1rem',  fs: '1.08rem', pv_m: '0.78rem', ph_m: '1.4rem',  fs_m: '0.92rem' }
         };
 
         function selectTheme(key, el) {
@@ -2240,12 +2238,9 @@ if ($editingSlug) {
             root.style.setProperty('--btn-pad-v', bSize.pv);
             root.style.setProperty('--btn-pad-h', bSize.ph);
             root.style.setProperty('--btn-font-size', bSize.fs);
-
-            // Apply directly to all iframe buttons for instant live preview response
-            doc.querySelectorAll('.btn').forEach(btn => {
-              btn.style.padding = bSize.pv + ' ' + bSize.ph;
-              btn.style.fontSize = bSize.fs;
-            });
+            root.style.setProperty('--btn-pad-v-mob', bSize.pv_m);
+            root.style.setProperty('--btn-pad-h-mob', bSize.ph_m);
+            root.style.setProperty('--btn-font-size-mob', bSize.fs_m);
 
             const oddSide = document.getElementById('design_odd_side_padding').value;
             const oddVert = document.getElementById('design_odd_vert_padding').value;

@@ -33,16 +33,12 @@
       --eyebrow-size: 0.85rem;
 
       /* Button size configuration */
-      --btn-pad-v: 0.8rem;
-      --btn-pad-h: 1.4rem;
-      --btn-font-size: 0.9rem;
-    }
-    @media (max-width: 768px) {
-      :root {
-        --btn-pad-v: 0.7rem;
-        --btn-pad-h: 1.2rem;
-        --btn-font-size: 0.85rem;
-      }
+      --btn-pad-v: 0.75rem;
+      --btn-pad-h: 1.35rem;
+      --btn-font-size: 0.88rem;
+      --btn-pad-v-mob: 0.5rem;
+      --btn-pad-h-mob: 1rem;
+      --btn-font-size-mob: 0.8rem;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -134,9 +130,16 @@
       font-weight: 700;
       text-decoration: none;
       transition: all .2s;
-      min-height: 44px;
+      min-height: 38px;
       cursor: pointer;
       border: none;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      .btn {
+        padding: var(--btn-pad-v-mob) var(--btn-pad-h-mob);
+        font-size: var(--btn-font-size-mob);
+      }
     }
     .btn-primary { background: var(--color-accent); color: #fff; }
     .btn-primary:hover { background: #d0640d; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232, 117, 22, 0.3); }
