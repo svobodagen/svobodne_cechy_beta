@@ -60,6 +60,14 @@ function getTypoCssValues($typo) {
             'step-4' => '1.15rem',
             'step-5' => '1.25rem',
             'step-6' => '1.35rem',
+        ],
+        'eyebrow' => [
+            'step-1' => '0.7rem',
+            'step-2' => '0.78rem',
+            'step-3' => '0.85rem',
+            'step-4' => '0.95rem',
+            'step-5' => '1.05rem',
+            'step-6' => '1.15rem',
         ]
     ];
 
@@ -67,22 +75,26 @@ function getTypoCssValues($typo) {
     $h2_step = $typo['section_h2'] ?? 'step-3';
     $h3_step = $typo['card_h3'] ?? 'step-3';
     $body_step = $typo['body_text'] ?? 'step-3';
+    $eyebrow_step = $typo['eyebrow'] ?? 'step-3';
 
     // Map values with fallback for legacy data
     $h1_val = $scales['hero_h1'][$h1_step] ?? $scales['hero_h1']['step-3'];
     $h2_val = $scales['section_h2'][$h2_step] ?? $scales['section_h2']['step-3'];
     $h3_val = $scales['card_h3'][$h3_step] ?? $scales['card_h3']['step-3'];
     $body_val = $scales['body_text'][$body_step] ?? $scales['body_text']['step-3'];
+    $eyebrow_val = $scales['eyebrow'][$eyebrow_step] ?? $scales['eyebrow']['step-3'];
 
     return [
         'h1' => $h1_val,
         'h2' => $h2_val,
         'h3' => $h3_val,
         'body' => $body_val,
+        'eyebrow' => $eyebrow_val,
         'h1_step' => $h1_step,
         'h2_step' => $h2_step,
         'h3_step' => $h3_step,
-        'body_step' => $body_step
+        'body_step' => $body_step,
+        'eyebrow_step' => $eyebrow_step
     ];
 }
 
@@ -124,6 +136,7 @@ function renderLandingPageHtml($data) {
     $h2_clamp = $typoConf['h2'];
     $h3_clamp = $typoConf['h3'];
     $body_size = $typoConf['body'];
+    $eyebrow_size = $typoConf['eyebrow'];
 
     // 1. Hero
     $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? 'UČEDNICTVÍ U MISTRA SKLÁŘE');
@@ -429,6 +442,7 @@ HTML;
       --section-h2-clamp: {$h2_clamp};
       --card-h3-clamp: {$h3_clamp};
       --body-text-size: {$body_size};
+      --eyebrow-size: {$eyebrow_size};
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -457,7 +471,7 @@ HTML;
 
     .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 2.5rem; min-height: 60vh; }
     .hero-content { max-width: 580px; }
-    .eyebrow { text-transform: uppercase; font-size: 0.78rem; letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
+    .eyebrow { text-transform: uppercase; font-size: var(--eyebrow-size); letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
     .hero h1 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.8rem; }
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
@@ -486,7 +500,7 @@ HTML;
     .master-section { padding: 3.5rem 0; background: rgba(0,0,0,0.3); }
     .master-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; align-items: center; }
     .master-photo img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 14px; border: 1px solid var(--color-accent); }
-    .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; font-size: 0.8rem; }
+    .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; font-size: var(--eyebrow-size); }
     .quote-box { font-family: var(--font-heading); font-style: italic; font-size: clamp(1.05rem, 2.5vw, 1.25rem); color: var(--color-cream); border-left: 3px solid var(--color-accent); padding-left: 0.9rem; margin: 1rem 0; line-height: 1.3; }
 
     .outcomes-section { padding: 3.5rem 0; }
@@ -806,6 +820,7 @@ if ($editingSlug) {
                 $h2Step = $typoData['section_h2'] ?? 'step-3';
                 $h3Step = $typoData['card_h3'] ?? 'step-3';
                 $bodyStep = $typoData['body_text'] ?? 'step-3';
+                $eyebrowStep = $typoData['eyebrow'] ?? 'step-3';
                 ?>
 
                 <div class="item-card">
@@ -864,6 +879,21 @@ if ($editingSlug) {
                       <option value="step-4" <?= $bodyStep === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Větší text</option>
                       <option value="step-5" <?= $bodyStep === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Prostorný text</option>
                       <option value="step-6" <?= $bodyStep === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Maxi text</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="item-card">
+                  <h4>🏷️ Malé štítky a tituly (Eyebrows) <span class="badge-typo eyebrow">🏷️ Štítek</span></h4>
+                  <div class="form-group">
+                    <label>Stupeň velikosti pro horní malé štítky (Eyebrow text) a podtituly mistra</label>
+                    <select class="form-control typo-select" id="typo_eyebrow" onchange="liveUpdateTypography()">
+                      <option value="step-1" <?= $eyebrowStep === 'step-1' ? 'selected' : '' ?>>Stupeň 1 – Mikro (0.7rem ~ 11px)</option>
+                      <option value="step-2" <?= $eyebrowStep === 'step-2' ? 'selected' : '' ?>>Stupeň 2 – Kompaktní (0.78rem ~ 12.5px)</option>
+                      <option value="step-3" <?= $eyebrowStep === 'step-3' ? 'selected' : '' ?>>Stupeň 3 – Standardní (0.85rem ~ 13.5px - Doporučeno)</option>
+                      <option value="step-4" <?= $eyebrowStep === 'step-4' ? 'selected' : '' ?>>Stupeň 4 – Výrazný (0.95rem ~ 15px)</option>
+                      <option value="step-5" <?= $eyebrowStep === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Velký (1.05rem ~ 17px)</option>
+                      <option value="step-6" <?= $eyebrowStep === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Extra Velký (1.15rem ~ 18.5px)</option>
                     </select>
                   </div>
                 </div>
@@ -1245,6 +1275,14 @@ if ($editingSlug) {
             'step-4': '1.15rem',
             'step-5': '1.25rem',
             'step-6': '1.35rem'
+          },
+          eyebrow: {
+            'step-1': '0.7rem',
+            'step-2': '0.78rem',
+            'step-3': '0.85rem',
+            'step-4': '0.95rem',
+            'step-5': '1.05rem',
+            'step-6': '1.15rem'
           }
         };
 
@@ -1261,11 +1299,13 @@ if ($editingSlug) {
             const h2Step = document.getElementById('typo_section_h2').value;
             const h3Step = document.getElementById('typo_card_h3').value;
             const bodyStep = document.getElementById('typo_body_text').value;
+            const eyebrowStep = document.getElementById('typo_eyebrow').value;
 
             root.style.setProperty('--hero-h1-clamp', typoScales.hero_h1[h1Step] || typoScales.hero_h1['step-3']);
             root.style.setProperty('--section-h2-clamp', typoScales.section_h2[h2Step] || typoScales.section_h2['step-3']);
             root.style.setProperty('--card-h3-clamp', typoScales.card_h3[h3Step] || typoScales.card_h3['step-3']);
             root.style.setProperty('--body-text-size', typoScales.body_text[bodyStep] || typoScales.body_text['step-3']);
+            root.style.setProperty('--eyebrow-size', typoScales.eyebrow[eyebrowStep] || typoScales.eyebrow['step-3']);
           } catch(e) { console.log('Live update error:', e); }
         }
 
@@ -1416,7 +1456,8 @@ if ($editingSlug) {
               hero_h1: document.getElementById('typo_hero_h1').value,
               section_h2: document.getElementById('typo_section_h2').value,
               card_h3: document.getElementById('typo_card_h3').value,
-              body_text: document.getElementById('typo_body_text').value
+              body_text: document.getElementById('typo_body_text').value,
+              eyebrow: document.getElementById('typo_eyebrow').value
             },
             hero: {
               eyebrow: document.getElementById('h_eyebrow').value,
