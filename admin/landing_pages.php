@@ -208,10 +208,19 @@ function renderLandingPageHtml($data) {
     $body_size = $typoConf['body'];
     $eyebrow_size = $typoConf['eyebrow'];
 
-    // Design Configuration (Themes, Odd/Even Margins, Sticky CTA)
+    // Design Configuration (Themes, Odd/Even Margins, Sticky CTA, Button Sizes)
     $design = $data['design'] ?? [];
     $themeKey = $design['color_theme'] ?? 'amber';
     $tvars = getThemeCssVariables($themeKey);
+
+    $btnSizeKey = $design['btn_size'] ?? 'm';
+    $btnSizeMap = [
+        's'  => ['pv' => '0.5rem',  'ph' => '1rem',   'fs' => '0.8rem',  'pv_m' => '0.45rem', 'ph_m' => '0.85rem', 'fs_m' => '0.78rem'],
+        'm'  => ['pv' => '0.8rem',  'ph' => '1.4rem', 'fs' => '0.9rem',  'pv_m' => '0.7rem',  'ph_m' => '1.2rem',  'fs_m' => '0.85rem'],
+        'l'  => ['pv' => '1rem',    'ph' => '1.8rem', 'fs' => '1rem',    'pv_m' => '0.85rem', 'ph_m' => '1.4rem',  'fs_m' => '0.92rem'],
+        'xl' => ['pv' => '1.25rem', 'ph' => '2.2rem', 'fs' => '1.1rem',  'pv_m' => '1rem',    'ph_m' => '1.7rem',  'fs_m' => '1rem']
+    ];
+    $bS = $btnSizeMap[$btnSizeKey] ?? $btnSizeMap['m'];
 
     $oddSidePad = htmlspecialchars($design['odd_side_padding'] ?? '1.2rem');
     $oddVertPad = htmlspecialchars($design['odd_vert_padding'] ?? '2.8rem');
@@ -221,6 +230,12 @@ function renderLandingPageHtml($data) {
     $stickyCtaEnabled = !isset($design['sticky_cta_enabled']) || $design['sticky_cta_enabled'] == true;
     $hideInHero = isset($design['sticky_cta_hide_in_hero']) && $design['sticky_cta_hide_in_hero'] == true;
     $hideInContact = isset($design['sticky_cta_hide_in_contact']) && $design['sticky_cta_hide_in_contact'] == true;
+
+    // Section CTA configuration & Same text setting
+    $secCtaData = $data['section_cta'] ?? [];
+    $secCtaSameText = !isset($secCtaData['same_text']) || $secCtaData['same_text'] == true;
+    $secCtaVisibility = $secCtaData['visibility'] ?? [];
+    $secCtaTexts = $secCtaData['texts'] ?? [];
 
     // 3-Phase Modal Contact Texts
     $mc = $data['modal_contact'] ?? [];
@@ -264,6 +279,20 @@ function renderLandingPageHtml($data) {
     </section>
 HTML;
 
+    // Helper closure to build section CTA button HTML
+    $getSecCtaHtml = function($secKey) use ($h_btn1, $secCtaSameText, $secCtaVisibility, $secCtaTexts) {
+        $show = $secCtaVisibility[$secKey] ?? true;
+        $dispStyle = $show ? '' : ' style="display:none;"';
+        $txt = $secCtaSameText ? $h_btn1 : ($secCtaTexts[$secKey] ?? $h_btn1);
+        if (trim((string)$txt) === '') $txt = $h_btn1;
+        $txtHtml = htmlspecialchars($txt);
+        return <<<HTML
+      <div class="section-cta-wrap"{$dispStyle}>
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">{$txtHtml}</a>
+      </div>
+HTML;
+    };
+
     // 2. UVP
     $uvp_eyebrow = htmlspecialchars($data['uvp']['eyebrow'] ?? 'Proč toto učednictví?');
     $uvp_title = htmlspecialchars($data['uvp']['title'] ?? 'SKUTEČNÉ ŘEMESLO. SKUTEČNÝ MISTR. SKUTEČNÁ PRÁCE.');
@@ -274,6 +303,7 @@ HTML;
         $d = htmlspecialchars($item['desc'] ?? '');
         $uvp_cards_html .= "<div class='uvp-card'><h3>{$t}</h3><p>{$d}</p></div>";
     }
+    $uvpCtaHtml = $getSecCtaHtml('uvp');
 
     $uvpSection = <<<HTML
     <section id="uvp" class="uvp-section container">
@@ -283,6 +313,7 @@ HTML;
         <p>{$uvp_sub}</p>
       </div>
       <div class="uvp-grid">{$uvp_cards_html}</div>
+      {$uvpCtaHtml}
     </section>
 HTML;
 
@@ -294,6 +325,7 @@ HTML;
     $m_quote = htmlspecialchars($data['master']['quote'] ?? '');
     $m_bio2 = htmlspecialchars($data['master']['bio2'] ?? 'V dílně sází na poctivý přístup a předávání sklářského umění další generaci.');
     $m_img = htmlspecialchars(fixImgUrl($data['master']['image'] ?? ''));
+    $masterCtaHtml = $getSecCtaHtml('master');
 
     $masterSection = <<<HTML
     <section id="mistr" class="master-section">
@@ -307,6 +339,9 @@ HTML;
           <div class="quote-box">{$m_quote}</div>
           <p>{$m_bio2}</p>
         </div>
+      </div>
+      <div class="container">
+        {$masterCtaHtml}
       </div>
     </section>
 HTML;
@@ -322,6 +357,7 @@ HTML;
         $d = htmlspecialchars($item['desc'] ?? '');
         $outcomes_html .= "<div class='outcome-item'><h4>{$icon} {$t}</h4><p>{$d}</p></div>";
     }
+    $outcomesCtaHtml = $getSecCtaHtml('outcomes');
 
     $outcomesSection = <<<HTML
     <section id="co-se-naucis" class="outcomes-section container">
@@ -331,6 +367,7 @@ HTML;
         <p>{$o_sub}</p>
       </div>
       <div class="outcomes-grid">{$outcomes_html}</div>
+      {$outcomesCtaHtml}
     </section>
 HTML;
 
@@ -346,6 +383,7 @@ HTML;
         $sd = htmlspecialchars($step['desc'] ?? '');
         $timeline_html .= "<div class='timeline-step'><div class='step-number'>{$num}</div><div class='step-content'><h4>{$st}</h4><p>{$sd}</p></div></div>";
     }
+    $timelineCtaHtml = $getSecCtaHtml('timeline');
 
     $timelineSection = <<<HTML
     <section id="jak-to-probiha" class="timeline-section">
@@ -357,6 +395,7 @@ HTML;
         </div>
         <div class="timeline">{$timeline_html}</div>
         <p class="disclaimer-box">{$t_disc}</p>
+        {$timelineCtaHtml}
       </div>
     </section>
 HTML;
@@ -371,6 +410,7 @@ HTML;
         $pcap = htmlspecialchars($item['caption'] ?? '');
         $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' /><div class='portfolio-caption'>{$pcap}</div></div>";
     }
+    $portfolioCtaHtml = $getSecCtaHtml('portfolio');
 
     $portfolioSection = <<<HTML
     <section id="realizace" class="portfolio-section container">
@@ -380,6 +420,7 @@ HTML;
         <p>{$p_sub}</p>
       </div>
       <div class="portfolio-grid">{$portfolio_html}</div>
+      {$portfolioCtaHtml}
     </section>
 HTML;
 
@@ -394,6 +435,7 @@ HTML;
         $role = htmlspecialchars($item['role'] ?? '');
         $testimonials_html .= "<div class='testimonial-card'><p class='quote-text'>{$quote}</p><div class='author-info'><div><strong>{$name}</strong><span>{$role}</span></div></div></div>";
     }
+    $testimonialsCtaHtml = $getSecCtaHtml('testimonials');
 
     $testimonialsSection = <<<HTML
     <section id="reference" class="testimonials-section">
@@ -404,6 +446,7 @@ HTML;
           <p>{$ts_sub}</p>
         </div>
         <div class="testimonials-grid">{$testimonials_html}</div>
+        {$testimonialsCtaHtml}
       </div>
     </section>
 HTML;
@@ -418,6 +461,7 @@ HTML;
         $a = htmlspecialchars($item['a'] ?? '');
         $faq_html .= "<details><summary>{$q}</summary><p>{$a}</p></details>";
     }
+    $faqCtaHtml = $getSecCtaHtml('faq');
 
     $faqSection = <<<HTML
     <section id="faq" class="faq-section container">
@@ -427,6 +471,7 @@ HTML;
         <p>{$f_sub}</p>
       </div>
       <div class="faq-list">{$faq_html}</div>
+      {$faqCtaHtml}
     </section>
 HTML;
 
@@ -567,6 +612,18 @@ HTML;
       --odd-vert-padding: {$oddVertPad};
       --even-side-padding: {$evenSidePad};
       --even-vert-padding: {$evenVertPad};
+
+      /* Configured Button Size */
+      --btn-pad-v: {$bS['pv']};
+      --btn-pad-h: {$bS['ph']};
+      --btn-font-size: {$bS['fs']};
+    }
+    @media (max-width: 768px) {
+      :root {
+        --btn-pad-v: {$bS['pv_m']};
+        --btn-pad-h: {$bS['ph_m']};
+        --btn-font-size: {$bS['fs_m']};
+      }
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -616,10 +673,11 @@ HTML;
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
     .hero-buttons-row { display: flex; gap: 0.8rem; flex-wrap: wrap; padding-top: 1.8rem; }
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.4rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--btn-pad-v) var(--btn-pad-h); font-size: var(--btn-font-size); border-radius: 6px; font-weight: 700; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
     .btn-primary { background: var(--color-accent); color: #fff; }
     .btn-primary:hover { background: var(--btn-hover); }
     .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
+    .section-cta-wrap { text-align: center; margin-top: 2.2rem; padding-top: 0.5rem; }
     .hero-image img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
 
     .section-title { text-align: center; margin-bottom: 2.5rem; }
@@ -1138,6 +1196,11 @@ if ($editingSlug) {
     .theme-swatches { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
     .swatch { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
 
+    /* Button Size Cards */
+    .btn-size-option { border: 2px solid var(--border); border-radius: 8px; padding: 0.8rem; text-align: center; cursor: pointer; background: rgba(0,0,0,0.3); transition: all .2s; }
+    .btn-size-option:hover { border-color: var(--accent); }
+    .btn-size-option.selected { border-color: var(--accent); background: rgba(232,117,22,0.15); }
+
     /* Upload Box UI */
     .upload-row { display: flex; gap: 0.8rem; align-items: center; margin-top: 0.4rem; }
     .upload-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px dashed var(--accent); padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
@@ -1220,6 +1283,7 @@ if ($editingSlug) {
                 <?php 
                 $designData = $editingData['design'] ?? []; 
                 $currentTheme = $designData['color_theme'] ?? 'amber';
+                $btnSizeVal = $designData['btn_size'] ?? 'm';
                 $oddSidePadVal = $designData['odd_side_padding'] ?? '1.2rem';
                 $oddVertPadVal = $designData['odd_vert_padding'] ?? '2.8rem';
                 $evenSidePadVal = $designData['even_side_padding'] ?? '0.6rem';
@@ -1279,6 +1343,33 @@ if ($editingSlug) {
                     </div>
                   </div>
                   <input type="hidden" id="design_color_theme" value="<?= htmlspecialchars($currentTheme) ?>" />
+                </div>
+
+                <!-- 2. BUTTON SIZES -->
+                <div class="item-card">
+                  <h4>🔘 Velikost Tlačítek (4 Velikosti pro PC i Mobil)</h4>
+                  <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+                    Vyber si velikost tlačítka. Velikosti jsou responzivně vyladěné pro desktop i mobil.
+                  </p>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.8rem;">
+                    <div class="btn-size-option <?= $btnSizeVal === 's' ? 'selected' : '' ?>" onclick="selectBtnSize('s')">
+                      <strong>Malé (S)</strong>
+                      <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.4rem 0.8rem; font-size:0.75rem; min-height:auto;">Tlačítko S</span></div>
+                    </div>
+                    <div class="btn-size-option <?= $btnSizeVal === 'm' ? 'selected' : '' ?>" onclick="selectBtnSize('m')">
+                      <strong>Střední (M)</strong>
+                      <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.6rem 1.1rem; font-size:0.85rem; min-height:auto;">Střední M</span></div>
+                    </div>
+                    <div class="btn-size-option <?= $btnSizeVal === 'l' ? 'selected' : '' ?>" onclick="selectBtnSize('l')">
+                      <strong>Velké (L)</strong>
+                      <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.75rem 1.3rem; font-size:0.95rem; min-height:auto;">Velké L</span></div>
+                    </div>
+                    <div class="btn-size-option <?= $btnSizeVal === 'xl' ? 'selected' : '' ?>" onclick="selectBtnSize('xl')">
+                      <strong>Extra (XL)</strong>
+                      <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.9rem 1.6rem; font-size:1.05rem; min-height:auto;">Extra XL</span></div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="design_btn_size" value="<?= htmlspecialchars($btnSizeVal) ?>" />
                 </div>
 
                 <!-- 2. ALTERNATING ODD & EVEN SECTION MARGINS & PADDING -->
@@ -1559,7 +1650,22 @@ if ($editingSlug) {
                   <input type="checkbox" id="h_btn2_show" style="width:20px; height:20px; accent-color:var(--accent); cursor:pointer;" <?= ($editingData['hero']['btn_secondary_show'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
                   <label for="h_btn2_show" style="margin:0; cursor:pointer; font-weight:600;">Zobrazit druhé tlačítko v HERO sekci</label>
                 </div>
-                <div class="form-group">
+                
+                <div style="margin-top:1.5rem; background:rgba(232,117,22,0.08); padding:1rem; border-radius:8px; border:1px solid var(--accent);">
+                  <h4 style="color:var(--accent); margin-bottom:0.6rem;">📢 Tlačítka s výzvou na konci sekcí (Section CTA)</h4>
+                  <div class="form-group" style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
+                    <input type="checkbox" id="sec_cta_same_text" style="width:20px; height:20px; accent-color:var(--accent); cursor:pointer;"
+                      <?= $secCtaSameText ? 'checked' : '' ?> onchange="onSecCtaSameTextChange()" />
+                    <label for="sec_cta_same_text" style="margin:0; cursor:pointer; font-weight:700; color:#fff;">
+                      Text tlačítka stejný ve všech sekcích (přebírat z Primárního tlačítka HERO)
+                    </label>
+                  </div>
+                  <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
+                    Pokud je zaškrtnuto, všechna tlačítka na konci jednotlivých sekcí automaticky použijí text primárního tlačítka z HERO. Pokud zrušíte zaškrtnutí, můžete u každé sekce nastavit vlastní text.
+                  </p>
+                </div>
+
+                <div class="form-group" style="margin-top:1.2rem;">
                   <label>Fotka v huti (Hero Obrázek)</label>
                   <div class="upload-row">
                     <img src="<?= htmlspecialchars(fixAdminPreviewUrl($editingData['hero']['image'] ?? '')) ?>" id="prev_h_img" class="thumb-preview" />
@@ -1596,6 +1702,23 @@ if ($editingSlug) {
                       <div class="form-group"><label>Popis karty <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
+                </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
+                      <input type="checkbox" class="sec-cta-show-checkbox" id="sec_cta_show_uvp" style="width:18px; height:18px; accent-color:var(--accent);"
+                        <?= ($secCtaVisibility['uvp'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateSecCtaVisibility()" />
+                      <strong style="color:#fff;">Zobrazit CTA tlačítko na konci sekce UVP</strong>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top:0.8rem; margin-bottom:0;">
+                    <label>Text tlačítka pro tuto sekci</label>
+                    <input type="text" class="form-control sec-cta-text-input" id="sec_cta_text_uvp"
+                      value="<?= htmlspecialchars($secCtaTexts['uvp'] ?? '') ?>" <?= $secCtaSameText ? 'disabled' : '' ?> oninput="liveUpdateSecCtaTexts()" />
+                    <small class="sec-cta-text-note" style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">
+                      <?= $secCtaSameText ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.' ?>
+                    </small>
+                  </div>
                 </div>
               </div>
 
@@ -1637,6 +1760,23 @@ if ($editingSlug) {
                     </label>
                   </div>
                 </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
+                      <input type="checkbox" class="sec-cta-show-checkbox" id="sec_cta_show_master" style="width:18px; height:18px; accent-color:var(--accent);"
+                        <?= ($secCtaVisibility['master'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateSecCtaVisibility()" />
+                      <strong style="color:#fff;">Zobrazit CTA tlačítko na konci sekce MISTR</strong>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top:0.8rem; margin-bottom:0;">
+                    <label>Text tlačítka pro tuto sekci</label>
+                    <input type="text" class="form-control sec-cta-text-input" id="sec_cta_text_master"
+                      value="<?= htmlspecialchars($secCtaTexts['master'] ?? '') ?>" <?= $secCtaSameText ? 'disabled' : '' ?> oninput="liveUpdateSecCtaTexts()" />
+                    <small class="sec-cta-text-note" style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">
+                      <?= $secCtaSameText ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.' ?>
+                    </small>
+                  </div>
+                </div>
               </div>
 
               <!-- TAB 4: CO SE NAUČÍŠ -->
@@ -1663,6 +1803,23 @@ if ($editingSlug) {
                       <div class="form-group"><label>Popis dovednosti <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control outcome-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
+                </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
+                      <input type="checkbox" class="sec-cta-show-checkbox" id="sec_cta_show_outcomes" style="width:18px; height:18px; accent-color:var(--accent);"
+                        <?= ($secCtaVisibility['outcomes'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateSecCtaVisibility()" />
+                      <strong style="color:#fff;">Zobrazit CTA tlačítko na konci sekce CO SE NAUČÍŠ</strong>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top:0.8rem; margin-bottom:0;">
+                    <label>Text tlačítka pro tuto sekci</label>
+                    <input type="text" class="form-control sec-cta-text-input" id="sec_cta_text_outcomes"
+                      value="<?= htmlspecialchars($secCtaTexts['outcomes'] ?? '') ?>" <?= $secCtaSameText ? 'disabled' : '' ?> oninput="liveUpdateSecCtaTexts()" />
+                    <small class="sec-cta-text-note" style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">
+                      <?= $secCtaSameText ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.' ?>
+                    </small>
+                  </div>
                 </div>
               </div>
 
@@ -1694,6 +1851,23 @@ if ($editingSlug) {
                 <div class="form-group" style="margin-top:1rem;">
                   <label>Poznámka pod postupem (Disclaimer) <span class="badge-typo body">📝 Běžný text</span></label>
                   <textarea class="form-control" id="t_disc"><?= htmlspecialchars($editingData['timeline']['disclaimer'] ?? '💡 Základní cesta vypadá takto. Konkrétní průběh se přizpůsobuje zájemci.') ?></textarea>
+                </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
+                      <input type="checkbox" class="sec-cta-show-checkbox" id="sec_cta_show_timeline" style="width:18px; height:18px; accent-color:var(--accent);"
+                        <?= ($secCtaVisibility['timeline'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateSecCtaVisibility()" />
+                      <strong style="color:#fff;">Zobrazit CTA tlačítko na konci sekce POSTUP</strong>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top:0.8rem; margin-bottom:0;">
+                    <label>Text tlačítka pro tuto sekci</label>
+                    <input type="text" class="form-control sec-cta-text-input" id="sec_cta_text_timeline"
+                      value="<?= htmlspecialchars($secCtaTexts['timeline'] ?? '') ?>" <?= $secCtaSameText ? 'disabled' : '' ?> oninput="liveUpdateSecCtaTexts()" />
+                    <small class="sec-cta-text-note" style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">
+                      <?= $secCtaSameText ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.' ?>
+                    </small>
+                  </div>
                 </div>
               </div>
 
@@ -1731,6 +1905,23 @@ if ($editingSlug) {
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
+                      <input type="checkbox" class="sec-cta-show-checkbox" id="sec_cta_show_portfolio" style="width:18px; height:18px; accent-color:var(--accent);"
+                        <?= ($secCtaVisibility['portfolio'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateSecCtaVisibility()" />
+                      <strong style="color:#fff;">Zobrazit CTA tlačítko na konci sekce GALERIE</strong>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top:0.8rem; margin-bottom:0;">
+                    <label>Text tlačítka pro tuto sekci</label>
+                    <input type="text" class="form-control sec-cta-text-input" id="sec_cta_text_portfolio"
+                      value="<?= htmlspecialchars($secCtaTexts['portfolio'] ?? '') ?>" <?= $secCtaSameText ? 'disabled' : '' ?> oninput="liveUpdateSecCtaTexts()" />
+                    <small class="sec-cta-text-note" style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">
+                      <?= $secCtaSameText ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.' ?>
+                    </small>
+                  </div>
+                </div>
               </div>
 
               <!-- TAB 7: REFERENCE -->
@@ -1758,6 +1949,23 @@ if ($editingSlug) {
                     </div>
                   <?php endforeach; ?>
                 </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
+                      <input type="checkbox" class="sec-cta-show-checkbox" id="sec_cta_show_testimonials" style="width:18px; height:18px; accent-color:var(--accent);"
+                        <?= ($secCtaVisibility['testimonials'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateSecCtaVisibility()" />
+                      <strong style="color:#fff;">Zobrazit CTA tlačítko na konci sekce REFERENCE</strong>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top:0.8rem; margin-bottom:0;">
+                    <label>Text tlačítka pro tuto sekci</label>
+                    <input type="text" class="form-control sec-cta-text-input" id="sec_cta_text_testimonials"
+                      value="<?= htmlspecialchars($secCtaTexts['testimonials'] ?? '') ?>" <?= $secCtaSameText ? 'disabled' : '' ?> oninput="liveUpdateSecCtaTexts()" />
+                    <small class="sec-cta-text-note" style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">
+                      <?= $secCtaSameText ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.' ?>
+                    </small>
+                  </div>
+                </div>
               </div>
 
               <!-- TAB 8: FAQ -->
@@ -1783,6 +1991,23 @@ if ($editingSlug) {
                       <div class="form-group"><label>Odpověď <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control faq-a"><?= htmlspecialchars($item['a']) ?></textarea></div>
                     </div>
                   <?php endforeach; ?>
+                </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-top: 1.5rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer;">
+                      <input type="checkbox" class="sec-cta-show-checkbox" id="sec_cta_show_faq" style="width:18px; height:18px; accent-color:var(--accent);"
+                        <?= ($secCtaVisibility['faq'] ?? true) ? 'checked' : '' ?> onchange="liveUpdateSecCtaVisibility()" />
+                      <strong style="color:#fff;">Zobrazit CTA tlačítko na konci sekce ČASTÉ OTÁZKY</strong>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top:0.8rem; margin-bottom:0;">
+                    <label>Text tlačítka pro tuto sekci</label>
+                    <input type="text" class="form-control sec-cta-text-input" id="sec_cta_text_faq"
+                      value="<?= htmlspecialchars($secCtaTexts['faq'] ?? '') ?>" <?= $secCtaSameText ? 'disabled' : '' ?> oninput="liveUpdateSecCtaTexts()" />
+                    <small class="sec-cta-text-note" style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">
+                      <?= $secCtaSameText ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.' ?>
+                    </small>
+                  </div>
                 </div>
               </div>
 
@@ -1932,14 +2157,28 @@ if ($editingSlug) {
           light: { primary: '#F8F6F0', dark: '#EEEBE1', cream: '#211E1B', white: '#12100E', accent: '#B85D0D', glass: 'rgba(0, 0, 0, 0.04)', glass_border: 'rgba(0, 0, 0, 0.12)', text: '#211E1B', text_muted: '#665F57', btn_hover: '#9c4c07', body_bg: 'linear-gradient(135deg, #F8F6F0, #EEEBE1)' }
         };
 
+        const btnSizes = {
+          s:  { pv: '0.5rem',  ph: '1rem',   fs: '0.8rem' },
+          m:  { pv: '0.8rem',  ph: '1.4rem', fs: '0.9rem' },
+          l:  { pv: '1rem',    ph: '1.8rem', fs: '1rem' },
+          xl: { pv: '1.25rem', ph: '2.2rem', fs: '1.1rem' }
+        };
+
         function selectTheme(key) {
           document.querySelectorAll('.theme-card-option').forEach(el => el.classList.remove('selected'));
-          event.currentTarget.classList.add('selected');
+          if (event && event.currentTarget) event.currentTarget.classList.add('selected');
           document.getElementById('design_color_theme').value = key;
           liveUpdateDesign();
         }
 
-        // Real-Time Live Design Updates (Themes, Odd/Even Margins, Sticky CTA)
+        function selectBtnSize(key) {
+          document.querySelectorAll('.btn-size-option').forEach(el => el.classList.remove('selected'));
+          if (event && event.currentTarget) event.currentTarget.classList.add('selected');
+          document.getElementById('design_btn_size').value = key;
+          liveUpdateDesign();
+        }
+
+        // Real-Time Live Design Updates (Themes, Odd/Even Margins, Sticky CTA, Button Sizes)
         function liveUpdateDesign() {
           const iframe = document.getElementById('livePreviewFrame');
           if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
@@ -1965,6 +2204,12 @@ if ($editingSlug) {
             body.style.background = tvars.body_bg;
             body.style.color = tvars.text;
 
+            const bSizeKey = document.getElementById('design_btn_size')?.value || 'm';
+            const bSize = btnSizes[bSizeKey] || btnSizes.m;
+            root.style.setProperty('--btn-pad-v', bSize.pv);
+            root.style.setProperty('--btn-pad-h', bSize.ph);
+            root.style.setProperty('--btn-font-size', bSize.fs);
+
             const oddSide = document.getElementById('design_odd_side_padding').value;
             const oddVert = document.getElementById('design_odd_vert_padding').value;
             const evenSide = document.getElementById('design_even_side_padding').value;
@@ -1987,6 +2232,73 @@ if ($editingSlug) {
               heroBtn2.style.display = heroBtn2Show ? 'inline-flex' : 'none';
             }
           } catch(e) { console.log('Design live update error:', e); }
+        }
+
+        // Section CTA Text & Visibility live update handlers
+        function onSecCtaSameTextChange() {
+          const same = document.getElementById('sec_cta_same_text')?.checked;
+          const heroBtn1Val = document.getElementById('h_btn1')?.value || '';
+          
+          document.querySelectorAll('.sec-cta-text-input').forEach(input => {
+            input.disabled = same;
+            if (same) {
+              input.value = heroBtn1Val;
+            }
+          });
+          document.querySelectorAll('.sec-cta-text-note').forEach(note => {
+            note.textContent = same ? '🔒 (Přebírá se z HERO tlačítka)' : 'Můžete zadat vlastní text nebo nechat prázdné pro výchozí.';
+          });
+          liveUpdateSecCtaTexts();
+        }
+
+        function liveUpdateSecCtaVisibility() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+          const sections = ['uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq'];
+          const secSelectors = {
+            'uvp': '#uvp', 'master': '#mistr', 'outcomes': '#co-se-naucis',
+            'timeline': '#jak-to-probiha', 'portfolio': '#realizace',
+            'testimonials': '#reference', 'faq': '#faq'
+          };
+          sections.forEach(key => {
+            const chk = document.getElementById('sec_cta_show_' + key);
+            const secEl = doc.querySelector(secSelectors[key]);
+            if (secEl) {
+              const wrap = secEl.querySelector('.section-cta-wrap');
+              if (wrap) {
+                wrap.style.display = (chk && chk.checked) ? 'block' : 'none';
+              }
+            }
+          });
+        }
+
+        function liveUpdateSecCtaTexts() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+          const same = document.getElementById('sec_cta_same_text')?.checked;
+          const heroBtn1Val = document.getElementById('h_btn1')?.value || '';
+          const sections = ['uvp', 'master', 'outcomes', 'timeline', 'portfolio', 'testimonials', 'faq'];
+          const secSelectors = {
+            'uvp': '#uvp', 'master': '#mistr', 'outcomes': '#co-se-naucis',
+            'timeline': '#jak-to-probiha', 'portfolio': '#realizace',
+            'testimonials': '#reference', 'faq': '#faq'
+          };
+          sections.forEach(key => {
+            const secEl = doc.querySelector(secSelectors[key]);
+            if (secEl) {
+              const btn = secEl.querySelector('.section-cta-wrap .btn');
+              if (btn) {
+                let txt = heroBtn1Val;
+                if (!same) {
+                  const customTxt = document.getElementById('sec_cta_text_' + key)?.value;
+                  if (customTxt && customTxt.trim() !== '') txt = customTxt;
+                }
+                btn.textContent = txt;
+              }
+            }
+          });
         }
 
         // Real-Time Live Typography Updates on iframe
@@ -2022,7 +2334,7 @@ if ($editingSlug) {
             if (!main) return;
 
             const sectionElements = {
-              'hero': doc.querySelector('.hero'),
+              'hero': doc.querySelector('.hero-wrapper') || doc.querySelector('.hero'),
               'uvp': doc.querySelector('#uvp'),
               'master': doc.querySelector('#mistr'),
               'outcomes': doc.querySelector('#co-se-naucis'),
@@ -2078,6 +2390,8 @@ if ($editingSlug) {
               liveUpdateTypography();
               liveUpdateDesign();
               liveReorderSectionsInIframe();
+              liveUpdateSecCtaVisibility();
+              liveUpdateSecCtaTexts();
             };
           }
         }
@@ -2164,8 +2478,20 @@ if ($editingSlug) {
               liveUpdateTypography();
               liveUpdateDesign();
               liveReorderSectionsInIframe();
+              liveUpdateSecCtaVisibility();
+              liveUpdateSecCtaTexts();
             };
           }
+
+          document.getElementById('h_btn1')?.addEventListener('input', () => {
+            if (document.getElementById('sec_cta_same_text')?.checked) {
+              const heroBtn1Val = document.getElementById('h_btn1').value;
+              document.querySelectorAll('.sec-cta-text-input').forEach(input => {
+                input.value = heroBtn1Val;
+              });
+              liveUpdateSecCtaTexts();
+            }
+          });
         });
 
         function showTab(tabId) {
@@ -2209,8 +2535,30 @@ if ($editingSlug) {
             meta_desc: document.getElementById('h_sub').value,
             section_order: currentSectionOrder,
             section_visibility: currentSectionVisibility,
+            section_cta: {
+              same_text: document.getElementById('sec_cta_same_text')?.checked ?? true,
+              visibility: {
+                uvp: document.getElementById('sec_cta_show_uvp')?.checked ?? true,
+                master: document.getElementById('sec_cta_show_master')?.checked ?? true,
+                outcomes: document.getElementById('sec_cta_show_outcomes')?.checked ?? true,
+                timeline: document.getElementById('sec_cta_show_timeline')?.checked ?? true,
+                portfolio: document.getElementById('sec_cta_show_portfolio')?.checked ?? true,
+                testimonials: document.getElementById('sec_cta_show_testimonials')?.checked ?? true,
+                faq: document.getElementById('sec_cta_show_faq')?.checked ?? true
+              },
+              texts: {
+                uvp: document.getElementById('sec_cta_text_uvp')?.value ?? '',
+                master: document.getElementById('sec_cta_text_master')?.value ?? '',
+                outcomes: document.getElementById('sec_cta_text_outcomes')?.value ?? '',
+                timeline: document.getElementById('sec_cta_text_timeline')?.value ?? '',
+                portfolio: document.getElementById('sec_cta_text_portfolio')?.value ?? '',
+                testimonials: document.getElementById('sec_cta_text_testimonials')?.value ?? '',
+                faq: document.getElementById('sec_cta_text_faq')?.value ?? ''
+              }
+            },
             design: {
               color_theme: document.getElementById('design_color_theme').value,
+              btn_size: document.getElementById('design_btn_size').value,
               odd_side_padding: document.getElementById('design_odd_side_padding').value,
               odd_vert_padding: document.getElementById('design_odd_vert_padding').value,
               even_side_padding: document.getElementById('design_even_side_padding').value,

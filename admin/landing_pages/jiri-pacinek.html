@@ -31,6 +31,18 @@
       --card-h3-clamp: clamp(1.25rem, 2.5vw, 1.5rem);
       --body-text-size: 1.05rem;
       --eyebrow-size: 0.85rem;
+
+      /* Button size configuration */
+      --btn-pad-v: 0.8rem;
+      --btn-pad-h: 1.4rem;
+      --btn-font-size: 0.9rem;
+    }
+    @media (max-width: 768px) {
+      :root {
+        --btn-pad-v: 0.7rem;
+        --btn-pad-h: 1.2rem;
+        --btn-font-size: 0.85rem;
+      }
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -116,10 +128,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0.8rem 1.4rem;
+      padding: var(--btn-pad-v) var(--btn-pad-h);
+      font-size: var(--btn-font-size);
       border-radius: 6px;
       font-weight: 700;
-      font-size: 0.9rem;
       text-decoration: none;
       transition: all .2s;
       min-height: 44px;
@@ -130,6 +142,7 @@
     .btn-primary:hover { background: #d0640d; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232, 117, 22, 0.3); }
     .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
     .btn-secondary:hover { background: rgba(232, 117, 22, 0.15); transform: translateY(-2px); }
+    .section-cta-wrap { text-align: center; margin-top: 2.2rem; padding-top: 0.5rem; }
     .hero-image img {
       width: 100%;
       max-height: 400px;
@@ -387,15 +400,13 @@
         <div class="uvp-card">
           <h3>Kontakt s reálnou výrobou</h3>
           <p>Vidíš, jak vzniká profesionální zakázková tvorba pro klienty a sběratele z celého světa.</p>
-        </div>
-        <div class="uvp-card">
-          <h3>Individuální přístup</h3>
-          <p>Tempo výuky se přizpůsobuje tvým schopnostem, zájmu a fyzickým možnostem.</p>
-        </div>
-        <div class="uvp-card">
+                <div class="uvp-card">
           <h3>Možnost profesní cesty</h3>
           <p>Cílem není si sklo jen zkusit, ale zjistit, zda se z ručního řemesla může stát tvoje budoucnost.</p>
         </div>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
       </div>
     </section>
 
@@ -414,6 +425,11 @@
             „Řemeslo není jen práce s materiálem. Je to pokora, soustředění a schopnost vtisknout žhavé hmotě tvar i myšlenku.“
           </div>
           <p>V dílně sází na poctivý přístup, týmovou spolupráci u pece a předávání sklářského umění další generaci.</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="section-cta-wrap">
+          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
         </div>
       </div>
     </section>
@@ -451,6 +467,9 @@
           <h4>💪 Samostatnost & Trpělivost</h4>
           <p>Rozvineš soustředění, vytrvalost a schopnost učit se z vlastních chyb.</p>
         </div>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
       </div>
     </section>
 
@@ -502,6 +521,9 @@
         </div>
 
         <p class="disclaimer-box">💡 Základní cesta vypadá takto. Konkrétní průběh se vždy přizpůsobuje člověku, jeho časovým možnostem a zkušenostem.</p>
+        <div class="section-cta-wrap">
+          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        </div>
       </div>
     </section>
 
@@ -530,6 +552,9 @@
           <img src="../../images/sample_master.png" alt="Křišťálová zahrada" />
           <div class="portfolio-caption">Křišťálová zahrada v Kunraticích</div>
         </div>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
       </div>
     </section>
 
@@ -571,6 +596,9 @@
             </div>
           </div>
         </div>
+        <div class="section-cta-wrap">
+          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        </div>
       </div>
     </section>
 
@@ -607,6 +635,9 @@
           <summary>Musím se hned k nečemu zavázat?</summary>
           <p>Vůbec ne. Prvním krokem je zcela nezávazný rozhovor, kde si vyjasníme dotazy a představíme možnosti.</p>
         </details>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
       </div>
     </section>
 
