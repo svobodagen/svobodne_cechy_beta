@@ -418,11 +418,15 @@ HTML;
     $p_eyebrow = htmlspecialchars($data['portfolio']['eyebrow'] ?? 'Ukázka z prostředí');
     $p_title = htmlspecialchars($data['portfolio']['title'] ?? 'CO VZNIKÁ V DÍLNĚ');
     $p_sub = htmlspecialchars($data['portfolio']['subtitle'] ?? 'Nahlédni do živého procesu sklářského umění.');
+    $p_ratio = htmlspecialchars($data['portfolio']['aspect_ratio'] ?? '4/3');
+    $p_fit = htmlspecialchars($data['portfolio']['object_fit'] ?? 'cover');
     $portfolio_html = "";
     foreach (($data['portfolio']['items'] ?? []) as $item) {
         $pimg = htmlspecialchars(fixImgUrl($item['image'] ?? ''));
         $pcap = htmlspecialchars($item['caption'] ?? '');
-        $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' /><div class='portfolio-caption'>{$pcap}</div></div>";
+        $pitem_pos = htmlspecialchars($item['object_position'] ?? ($data['portfolio']['object_position'] ?? 'center'));
+        $img_style = "width:100%; aspect-ratio:{$p_ratio}; object-fit:{$p_fit}; object-position:{$pitem_pos}; display:block;";
+        $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' style='{$img_style}' /><div class='portfolio-caption'>{$pcap}</div></div>";
     }
     $portfolioCtaHtml = $getSecCtaHtml('portfolio');
 
@@ -1963,6 +1967,34 @@ if ($editingSlug) {
                   <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
                   <input type="text" class="form-control" id="p_sub" value="<?= htmlspecialchars($editingData['portfolio']['subtitle'] ?? 'Nahlédni do živého procesu sklářského umění.') ?>" />
                 </div>
+                
+                <!-- GALERIE LAYOUT & CROP CONTROLS -->
+                <div class="item-card" style="border-left: 3px solid #3b82f6; margin-bottom: 1.5rem; background: rgba(59, 130, 246, 0.05);">
+                  <h4 style="margin:0 0 0.8rem 0; color:#fff;">📐 Globální vzhled a poměr stran fotek</h4>
+                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Poměr stran fotek (Aspect Ratio)</label>
+                      <?php $currRatio = $editingData['portfolio']['aspect_ratio'] ?? '4/3'; ?>
+                      <select class="form-control" id="p_aspect_ratio">
+                        <option value="4/3" <?= $currRatio === '4/3' ? 'selected' : '' ?>>🖼️ 4:3 (Standardní fotka)</option>
+                        <option value="16/9" <?= $currRatio === '16/9' ? 'selected' : '' ?>>📺 16:9 (Širokoúhlá)</option>
+                        <option value="1/1" <?= $currRatio === '1/1' ? 'selected' : '' ?>>🔲 1:1 (Čtverec)</option>
+                        <option value="3/2" <?= $currRatio === '3/2' ? 'selected' : '' ?>>📷 3:2 (Klasický fotoaparát)</option>
+                        <option value="3/4" <?= $currRatio === '3/4' ? 'selected' : '' ?>>📱 3:4 (Portrét / Na výšku)</option>
+                        <option value="auto" <?= $currRatio === 'auto' ? 'selected' : '' ?>>↔️ Původní poměr fotky (Auto)</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Způsob ořezu / přizpůsobení</label>
+                      <?php $currFit = $editingData['portfolio']['object_fit'] ?? 'cover'; ?>
+                      <select class="form-control" id="p_object_fit">
+                        <option value="cover" <?= $currFit === 'cover' ? 'selected' : '' ?>>✂️ Oříznout a vyplnit (Cover - bez mezer)</option>
+                        <option value="contain" <?= $currFit === 'contain' ? 'selected' : '' ?>>🔍 Zobrazit celou fotku (Contain - bez ořezu)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 <div id="portfolio_container">
                   <?php foreach (($editingData['portfolio']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card portfolio-item-box">
@@ -1982,6 +2014,17 @@ if ($editingSlug) {
                         </div>
                       </div>
                       <div class="form-group"><label>Popisek pod fotkou <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
+                      <div class="form-group" style="margin-bottom:0;">
+                        <label>Pozice výřezu (Crop Alignment)</label>
+                        <?php $itemPos = $item['object_position'] ?? 'center'; ?>
+                        <select class="form-control p-pos">
+                          <option value="center" <?= $itemPos === 'center' ? 'selected' : '' ?>>🎯 Střed (Center)</option>
+                          <option value="top" <?= $itemPos === 'top' ? 'selected' : '' ?>>⬆️ Horní část (Top)</option>
+                          <option value="bottom" <?= $itemPos === 'bottom' ? 'selected' : '' ?>>⬇️ Spodní část (Bottom)</option>
+                          <option value="left" <?= $itemPos === 'left' ? 'selected' : '' ?>>⬅️ Levá část (Left)</option>
+                          <option value="right" <?= $itemPos === 'right' ? 'selected' : '' ?>>➡️ Pravá část (Right)</option>
+                        </select>
+                      </div>
                     </div>
                   <?php endforeach; ?>
                 </div>
@@ -2698,6 +2741,16 @@ if ($editingSlug) {
               </div>
             </div>
             <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap" value="" /></div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Pozice výřezu (Crop Alignment)</label>
+              <select class="form-control p-pos">
+                <option value="center" selected>🎯 Střed (Center)</option>
+                <option value="top">⬆️ Horní část (Top)</option>
+                <option value="bottom">⬇️ Spodní část (Bottom)</option>
+                <option value="left">⬅️ Levá část (Left)</option>
+                <option value="right">➡️ Pravá část (Right)</option>
+              </select>
+            </div>
           `));
         }
 
@@ -2954,9 +3007,12 @@ if ($editingSlug) {
               eyebrow: document.getElementById('p_eyebrow').value,
               title: document.getElementById('p_title').value,
               subtitle: document.getElementById('p_sub').value,
+              aspect_ratio: document.getElementById('p_aspect_ratio').value,
+              object_fit: document.getElementById('p_object_fit').value,
               items: Array.from(document.querySelectorAll('.portfolio-item-box')).map(box => ({
                 image: box.querySelector('.p-img').value,
-                caption: box.querySelector('.p-cap').value
+                caption: box.querySelector('.p-cap').value,
+                object_position: box.querySelector('.p-pos') ? box.querySelector('.p-pos').value : 'center'
               }))
             },
             testimonials: {
