@@ -49,11 +49,11 @@ function get_smtp_settings() {
     global $pdo;
     $defaults = [
         'enabled' => '0',
-        'host' => 'email.active24.com',
-        'port' => '587',
+        'host' => 'smtp.seznam.cz',
+        'port' => '465',
         'user' => '',
         'pass' => '',
-        'secure' => 'tls',
+        'secure' => 'ssl',
         'from' => 'info@svobodnecechy.cz',
         'from_name' => 'Svobodné Cechy'
     ];

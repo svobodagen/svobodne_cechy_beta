@@ -215,11 +215,25 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
     <!-- SMTP SERVER CONFIGURATION CARD -->
     <div class="card">
       <h3 style="color:var(--accent); margin-bottom:0.5rem; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;">
-        <i class="bi bi-gear-wide-connected"></i> Nastavení SMTP Serveru (Garantované doručení)
+        <i class="bi bi-gear-wide-connected"></i> Nastavení SMTP Serveru (Seznam.cz / Active24 / Gmail)
       </h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1.5rem;">
-        Při vypnutém SMTP se e-maily posílají přes PHP <code>mail()</code>. Zapnutím SMTP se e-maily odesílají přímo přes váš e-mailový server (Active24 SMTP, Seznam, Gmail, SendGrid...), což garantuje 100% doručení bez zahazování serverem.
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1.2rem;">
+        Posílání přes přímý SMTP server garantuje 100% doručení bez zahazování e-mailů. Pro Seznam.cz stačí zadat vaše přihlašovací jméno (celý e-mail) a heslo ke schránce.
       </p>
+
+      <!-- Quick Preset Buttons -->
+      <div style="margin-bottom:1.5rem; background:rgba(255,255,255,0.03); padding:0.8rem 1rem; border-radius:8px; border:1px solid var(--border); display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+        <span style="font-weight:600; font-size:0.85rem; color:var(--text-muted); margin-right:0.4rem;">Rychlé přednastavení:</span>
+        <button type="button" class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem; background:rgba(239, 68, 68, 0.15); border-color:#ef4444; color:#f87171;" onclick="applySmtpPreset('seznam')">
+          🟡 Seznam.cz (smtp.seznam.cz:465 SSL)
+        </button>
+        <button type="button" class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="applySmtpPreset('active24')">
+          🔵 Active24 (email.active24.com:587 TLS)
+        </button>
+        <button type="button" class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="applySmtpPreset('gmail')">
+          🔴 Gmail (smtp.gmail.com:587 TLS)
+        </button>
+      </div>
 
       <form method="post">
         <input type="hidden" name="action" value="save_smtp" />
@@ -234,35 +248,35 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.2rem;">
           <div class="form-group">
             <label>SMTP Host (Server)</label>
-            <input type="text" name="smtp_host" value="<?= htmlspecialchars($smtp['host']) ?>" class="form-control" placeholder="např. email.active24.com nebo smtp.seznam.cz" />
+            <input type="text" name="smtp_host" value="<?= htmlspecialchars($smtp['host'] ?: 'smtp.seznam.cz') ?>" class="form-control" placeholder="smtp.seznam.cz" />
           </div>
           <div class="form-group">
             <label>SMTP Port</label>
             <select name="smtp_port" class="form-control">
-              <option value="587" <?= $smtp['port'] === '587' ? 'selected' : '' ?>>587 (Standardní TLS)</option>
-              <option value="465" <?= $smtp['port'] === '465' ? 'selected' : '' ?>>465 (SSL)</option>
-              <option value="25" <?= $smtp['port'] === '25' ? 'selected' : '' ?>>25 (Nešifrované / Localhost)</option>
+              <option value="465" <?= $smtp['port'] === '465' ? 'selected' : '' ?>>465 (SSL - Doporučeno pro Seznam.cz)</option>
+              <option value="587" <?= $smtp['port'] === '587' ? 'selected' : '' ?>>587 (TLS / STARTTLS)</option>
+              <option value="25" <?= $smtp['port'] === '25' ? 'selected' : '' ?>>25 (Nešifrované)</option>
             </select>
           </div>
           <div class="form-group">
             <label>Šifrování (Encryption)</label>
             <select name="smtp_secure" class="form-control">
-              <option value="tls" <?= $smtp['secure'] === 'tls' ? 'selected' : '' ?>>TLS (STARTTLS - doporučeno)</option>
-              <option value="ssl" <?= $smtp['secure'] === 'ssl' ? 'selected' : '' ?>>SSL</option>
+              <option value="ssl" <?= $smtp['secure'] === 'ssl' ? 'selected' : '' ?>>SSL (Doporučeno pro Seznam port 465)</option>
+              <option value="tls" <?= $smtp['secure'] === 'tls' ? 'selected' : '' ?>>TLS (STARTTLS)</option>
               <option value="none" <?= $smtp['secure'] === 'none' ? 'selected' : '' ?>>Žádné</option>
             </select>
           </div>
           <div class="form-group">
-            <label>SMTP Uživatelské jméno (E-mail)</label>
-            <input type="text" name="smtp_user" value="<?= htmlspecialchars($smtp['user']) ?>" class="form-control" placeholder="např. notifikace@svobodnecechy.cz" />
+            <label>SMTP Uživatelské jméno (Váš Seznam e-mail)</label>
+            <input type="text" name="smtp_user" value="<?= htmlspecialchars($smtp['user']) ?>" class="form-control" placeholder="např. vas-email@seznam.cz" />
           </div>
           <div class="form-group">
             <label>SMTP Heslo</label>
-            <input type="password" name="smtp_pass" value="<?= htmlspecialchars($smtp['pass']) ?>" class="form-control" placeholder="Heslo k e-mailové schránce" />
+            <input type="password" name="smtp_pass" value="<?= htmlspecialchars($smtp['pass']) ?>" class="form-control" placeholder="Heslo ke schránce Seznam" />
           </div>
           <div class="form-group">
             <label>Adresa odesílatele (From Email)</label>
-            <input type="email" name="smtp_from" value="<?= htmlspecialchars($smtp['from']) ?>" class="form-control" placeholder="info@svobodnecechy.cz" />
+            <input type="email" name="smtp_from" value="<?= htmlspecialchars($smtp['from'] ?: 'info@svobodnecechy.cz') ?>" class="form-control" placeholder="vas-email@seznam.cz" />
           </div>
         </div>
 
@@ -271,6 +285,31 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
         </div>
       </form>
     </div>
+
+    <script>
+      function applySmtpPreset(type) {
+        const host = document.querySelector('input[name="smtp_host"]');
+        const port = document.querySelector('select[name="smtp_port"]');
+        const secure = document.querySelector('select[name="smtp_secure"]');
+        const enabled = document.getElementById('smtp_enabled');
+
+        if (enabled) enabled.checked = true;
+
+        if (type === 'seznam') {
+          if (host) host.value = 'smtp.seznam.cz';
+          if (port) port.value = '465';
+          if (secure) secure.value = 'ssl';
+        } else if (type === 'active24') {
+          if (host) host.value = 'email.active24.com';
+          if (port) port.value = '587';
+          if (secure) secure.value = 'tls';
+        } else if (type === 'gmail') {
+          if (host) host.value = 'smtp.gmail.com';
+          if (port) port.value = '587';
+          if (secure) secure.value = 'tls';
+        }
+      }
+    </script>
 
     <!-- SERVER DIAGNOSTICS CARD -->
     <div class="card">
