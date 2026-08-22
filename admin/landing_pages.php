@@ -414,18 +414,21 @@ HTML;
     </section>
 HTML;
 
+    foreach (($data['testimonials']['items'] ?? []) as $item) {
+    }
     // 6. Portfolio
     $p_eyebrow = htmlspecialchars($data['portfolio']['eyebrow'] ?? 'Ukázka z prostředí');
     $p_title = htmlspecialchars($data['portfolio']['title'] ?? 'CO VZNIKÁ V DÍLNĚ');
     $p_sub = htmlspecialchars($data['portfolio']['subtitle'] ?? 'Nahlédni do živého procesu sklářského umění.');
-    $p_ratio = htmlspecialchars($data['portfolio']['aspect_ratio'] ?? '4/3');
+    $p_global_ratio = htmlspecialchars($data['portfolio']['aspect_ratio'] ?? '4/3');
     $p_fit = htmlspecialchars($data['portfolio']['object_fit'] ?? 'cover');
     $portfolio_html = "";
     foreach (($data['portfolio']['items'] ?? []) as $item) {
         $pimg = htmlspecialchars(fixImgUrl($item['image'] ?? ''));
         $pcap = htmlspecialchars($item['caption'] ?? '');
+        $pitem_ratio = htmlspecialchars($item['aspect_ratio'] ?? $p_global_ratio);
         $pitem_pos = htmlspecialchars($item['object_position'] ?? ($data['portfolio']['object_position'] ?? 'center'));
-        $img_style = "width:100%; aspect-ratio:{$p_ratio}; object-fit:{$p_fit}; object-position:{$pitem_pos}; display:block;";
+        $img_style = "width:100%; aspect-ratio:{$pitem_ratio}; object-fit:{$p_fit}; object-position:{$pitem_pos}; display:block;";
         $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' style='{$img_style}' /><div class='portfolio-caption'>{$pcap}</div></div>";
     }
     $portfolioCtaHtml = $getSecCtaHtml('portfolio');
@@ -2032,16 +2035,30 @@ if ($editingSlug) {
                         </div>
                       </div>
                       <div class="form-group"><label>Popisek pod fotkou <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control p-cap" value="<?= htmlspecialchars($item['caption']) ?>" /></div>
-                      <div class="form-group" style="margin-bottom:0;">
-                        <label>Pozice výřezu (Crop Alignment)</label>
-                        <?php $itemPos = $item['object_position'] ?? 'center'; ?>
-                        <select class="form-control p-pos">
-                          <option value="center" <?= $itemPos === 'center' ? 'selected' : '' ?>>🎯 Střed (Center)</option>
-                          <option value="top" <?= $itemPos === 'top' ? 'selected' : '' ?>>⬆️ Horní část (Top)</option>
-                          <option value="bottom" <?= $itemPos === 'bottom' ? 'selected' : '' ?>>⬇️ Spodní část (Bottom)</option>
-                          <option value="left" <?= $itemPos === 'left' ? 'selected' : '' ?>>⬅️ Levá část (Left)</option>
-                          <option value="right" <?= $itemPos === 'right' ? 'selected' : '' ?>>➡️ Pravá část (Right)</option>
-                        </select>
+                      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom:0;">
+                        <div class="form-group" style="margin-bottom:0;">
+                          <label>Poměr stran této fotky</label>
+                          <?php $itemRatio = $item['aspect_ratio'] ?? ($editingData['portfolio']['aspect_ratio'] ?? '4/3'); ?>
+                          <select class="form-control p-ratio">
+                            <option value="4/3" <?= $itemRatio === '4/3' ? 'selected' : '' ?>>🖼️ 4:3</option>
+                            <option value="16/9" <?= $itemRatio === '16/9' ? 'selected' : '' ?>>📺 16:9</option>
+                            <option value="1/1" <?= $itemRatio === '1/1' ? 'selected' : '' ?>>🔲 1:1</option>
+                            <option value="3/2" <?= $itemRatio === '3/2' ? 'selected' : '' ?>>📷 3:2</option>
+                            <option value="3/4" <?= $itemRatio === '3/4' ? 'selected' : '' ?>>📱 3:4</option>
+                            <option value="auto" <?= $itemRatio === 'auto' ? 'selected' : '' ?>>↔️ Auto (Původní)</option>
+                          </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                          <label>Pozice výřezu (Crop Alignment)</label>
+                          <?php $itemPos = $item['object_position'] ?? 'center'; ?>
+                          <select class="form-control p-pos">
+                            <option value="center" <?= $itemPos === 'center' ? 'selected' : '' ?>>🎯 Střed</option>
+                            <option value="top" <?= $itemPos === 'top' ? 'selected' : '' ?>>⬆️ Horní část</option>
+                            <option value="bottom" <?= $itemPos === 'bottom' ? 'selected' : '' ?>>⬇️ Spodní část</option>
+                            <option value="left" <?= $itemPos === 'left' ? 'selected' : '' ?>>⬅️ Levá část</option>
+                            <option value="right" <?= $itemPos === 'right' ? 'selected' : '' ?>>➡️ Pravá část</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
                   <?php endforeach; ?>
@@ -2782,15 +2799,28 @@ if ($editingSlug) {
               </div>
             </div>
             <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap" value="" /></div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Pozice výřezu (Crop Alignment)</label>
-              <select class="form-control p-pos">
-                <option value="center" selected>🎯 Střed (Center)</option>
-                <option value="top">⬆️ Horní část (Top)</option>
-                <option value="bottom">⬇️ Spodní část (Bottom)</option>
-                <option value="left">⬅️ Levá část (Left)</option>
-                <option value="right">➡️ Pravá část (Right)</option>
-              </select>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom:0;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Poměr stran této fotky</label>
+                <select class="form-control p-ratio">
+                  <option value="4/3" selected>🖼️ 4:3</option>
+                  <option value="16/9">📺 16:9</option>
+                  <option value="1/1">🔲 1:1</option>
+                  <option value="3/2">📷 3:2</option>
+                  <option value="3/4">📱 3:4</option>
+                  <option value="auto">↔️ Auto (Původní)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Pozice výřezu (Crop Alignment)</label>
+                <select class="form-control p-pos">
+                  <option value="center" selected>🎯 Střed</option>
+                  <option value="top">⬆️ Horní část</option>
+                  <option value="bottom">⬇️ Spodní část</option>
+                  <option value="left">⬅️ Levá část</option>
+                  <option value="right">➡️ Pravá část</option>
+                </select>
+              </div>
             </div>
           `));
         }
@@ -3054,6 +3084,7 @@ if ($editingSlug) {
               items: Array.from(document.querySelectorAll('.portfolio-item-box')).map(box => ({
                 image: box.querySelector('.p-img').value,
                 caption: box.querySelector('.p-cap').value,
+                aspect_ratio: box.querySelector('.p-ratio') ? box.querySelector('.p-ratio').value : '4/3',
                 object_position: box.querySelector('.p-pos') ? box.querySelector('.p-pos').value : 'center'
               }))
             },
