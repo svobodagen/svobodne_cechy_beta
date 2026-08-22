@@ -45,6 +45,43 @@ function set_notification_email($email) {
     }
 }
 
+function get_smtp_settings() {
+    global $pdo;
+    $defaults = [
+        'enabled' => '0',
+        'host' => 'email.active24.com',
+        'port' => '587',
+        'user' => '',
+        'pass' => '',
+        'secure' => 'tls',
+        'from' => 'info@svobodnecechy.cz',
+        'from_name' => 'Svobodné Cechy'
+    ];
+    try {
+        $stmt = $pdo->query("SELECT key_name, content_value FROM site_content WHERE key_name LIKE 'smtp_%'");
+        $rows = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        foreach ($defaults as $k => $v) {
+            if (isset($rows['smtp_' . $k])) {
+                $defaults[$k] = $rows['smtp_' . $k];
+            }
+        }
+    } catch (\Exception $e) {}
+    return $defaults;
+}
+
+function save_smtp_settings($settings) {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("INSERT INTO site_content (key_name, content_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE content_value = VALUES(content_value)");
+        foreach ($settings as $k => $v) {
+            $stmt->execute(['smtp_' . $k, trim($v)]);
+        }
+        return true;
+    } catch (\Exception $e) {
+        return false;
+    }
+}
+
 function get_base_url() {
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || ($_SERVER['SERVER_PORT'] ?? 0) == 443) ? "https://" : "http://";
     $host = $_SERVER['HTTP_HOST'] ?? 'beta.svobodnecechy.cz';
@@ -68,6 +105,145 @@ function log_notification($recipient, $subject, $bodySnippet, $status, $errorInf
     }
 }
 
+/**
+ * Lightweight Pure PHP SMTP Socket Mailer Class
+ * Zero dependencies, direct socket connection with real SMTP error codes.
+ */
+class SimpleSmtpMailer {
+    private $host;
+    private $port;
+    private $username;
+    private $password;
+    private $encryption;
+    private $timeout = 12;
+
+    public function __construct($host, $port = 587, $username = '', $password = '', $encryption = 'tls') {
+        $this->host = $host;
+        $this->port = (int)$port;
+        $this->username = $username;
+        $this->password = $password;
+        $this->encryption = strtolower($encryption);
+    }
+
+    public function send($fromEmail, $fromName, $toEmail, $subject, $bodyHtml) {
+        $socketHost = $this->host;
+        if ($this->encryption === 'ssl') {
+            $socketHost = 'ssl://' . $this->host;
+        }
+
+        $socket = @fsockopen($socketHost, $this->port, $errno, $errstr, $this->timeout);
+        if (!$socket) {
+            return ['success' => false, 'error' => "Nelze se připojit k SMTP serveru {$this->host}:{$this->port} ($errstr)"];
+        }
+
+        stream_set_timeout($socket, $this->timeout);
+        $res = $this->readResponse($socket);
+
+        // EHLO
+        $this->cmd($socket, "EHLO " . gethostname());
+
+        // STARTTLS
+        if ($this->encryption === 'tls') {
+            $res = $this->cmd($socket, "STARTTLS");
+            if (strpos($res, '220') !== 0) {
+                fclose($socket);
+                return ['success' => false, 'error' => "SMTP STARTTLS selhalo: " . $res];
+            }
+            $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+            if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+                $cryptoMethod |= STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+            }
+            $crypto = @stream_socket_enable_crypto($socket, true, $cryptoMethod);
+            if (!$crypto) {
+                fclose($socket);
+                return ['success' => false, 'error' => "Šifrování TLS selhalo při vyjednávání spojení se serverem {$this->host}."];
+            }
+            $this->cmd($socket, "EHLO " . gethostname());
+        }
+
+        // AUTH LOGIN
+        if (!empty($this->username)) {
+            $res = $this->cmd($socket, "AUTH LOGIN");
+            if (strpos($res, '334') !== 0) {
+                fclose($socket);
+                return ['success' => false, 'error' => "SMTP AUTH LOGIN odmítnuto: " . $res];
+            }
+            $res = $this->cmd($socket, base64_encode($this->username));
+            if (strpos($res, '334') !== 0) {
+                fclose($socket);
+                return ['success' => false, 'error' => "SMTP Uživatelské jméno odmítnuto: " . $res];
+            }
+            $res = $this->cmd($socket, base64_encode($this->password));
+            if (strpos($res, '235') !== 0) {
+                fclose($socket);
+                return ['success' => false, 'error' => "SMTP Autentizace selhala (špatné heslo nebo jméno): " . $res];
+            }
+        }
+
+        // MAIL FROM
+        $res = $this->cmd($socket, "MAIL FROM:<{$fromEmail}>");
+        if (strpos($res, '250') !== 0) {
+            fclose($socket);
+            return ['success' => false, 'error' => "SMTP MAIL FROM odmítnut serverem: " . $res];
+        }
+
+        // RCPT TO
+        $res = $this->cmd($socket, "RCPT TO:<{$toEmail}>");
+        if (strpos($res, '250') !== 0 && strpos($res, '251') !== 0) {
+            fclose($socket);
+            return ['success' => false, 'error' => "SMTP RCPT TO odmítnut pro příjemce {$toEmail}: " . $res];
+        }
+
+        // DATA
+        $res = $this->cmd($socket, "DATA");
+        if (strpos($res, '354') !== 0) {
+            fclose($socket);
+            return ['success' => false, 'error' => "SMTP DATA příkaz odmítnut: " . $res];
+        }
+
+        // Prepare MIME headers & message body
+        $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+        $encodedFromName = '=?UTF-8?B?' . base64_encode($fromName) . '?=';
+
+        $mime = "MIME-Version: 1.0\r\n";
+        $mime .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $mime .= "From: {$encodedFromName} <{$fromEmail}>\r\n";
+        $mime .= "Reply-To: <{$fromEmail}>\r\n";
+        $mime .= "To: <{$toEmail}>\r\n";
+        $mime .= "Subject: {$encodedSubject}\r\n";
+        $mime .= "Date: " . date('r') . "\r\n";
+        $mime .= "X-Mailer: Svobodne Cechy Direct SMTP Mailer\r\n\r\n";
+        $mime .= $bodyHtml . "\r\n.";
+
+        $res = $this->cmd($socket, $mime);
+        if (strpos($res, '250') !== 0) {
+            fclose($socket);
+            return ['success' => false, 'error' => "SMTP Odeslání zprávy selhalo: " . $res];
+        }
+
+        $this->cmd($socket, "QUIT");
+        fclose($socket);
+
+        return ['success' => true, 'info' => "Zpráva doručena na SMTP server ({$res})"];
+    }
+
+    private function cmd($socket, $command) {
+        fwrite($socket, $command . "\r\n");
+        return $this->readResponse($socket);
+    }
+
+    private function readResponse($socket) {
+        $response = '';
+        while ($line = fgets($socket, 512)) {
+            $response .= $line;
+            if (isset($line[3]) && $line[3] === ' ') {
+                break;
+            }
+        }
+        return trim($response);
+    }
+}
+
 function send_admin_notification($subject, $bodyHtml, $overrideRecipient = null) {
     $to = $overrideRecipient !== null ? trim($overrideRecipient) : get_notification_email();
 
@@ -80,15 +256,6 @@ function send_admin_notification($subject, $bodyHtml, $overrideRecipient = null)
         log_notification($to, $subject, $bodyHtml, 'failed', "Neplatný formát e-mailové adresy: '{$to}'");
         return false;
     }
-
-    $senderEmail = "info@svobodnecechy.cz";
-    
-    // Headers setup with standard \n for maximum mail() compatibility on Linux/Active24
-    $headers  = "MIME-Version: 1.0\n";
-    $headers .= "Content-Type: text/html; charset=UTF-8\n";
-    $headers .= "From: Svobodné Cechy <{$senderEmail}>\n";
-    $headers .= "Reply-To: {$to}\n";
-    $headers .= "X-Mailer: PHP/" . phpversion() . "\n";
 
     $fullHtml = '
     <!DOCTYPE html>
@@ -113,6 +280,36 @@ function send_admin_notification($subject, $bodyHtml, $overrideRecipient = null)
     </html>
     ';
 
+    // 1. Try Direct SMTP if enabled
+    $smtp = get_smtp_settings();
+    if ($smtp['enabled'] === '1' && !empty($smtp['host'])) {
+        $mailer = new SimpleSmtpMailer(
+            $smtp['host'],
+            $smtp['port'],
+            $smtp['user'],
+            $smtp['pass'],
+            $smtp['secure']
+        );
+        $res = $mailer->send($smtp['from'], $smtp['from_name'], $to, $subject, $fullHtml);
+        if ($res['success']) {
+            log_notification($to, $subject, $bodyHtml, 'success', '[SMTP OK] ' . $res['info']);
+            return true;
+        } else {
+            log_notification($to, $subject, $bodyHtml, 'failed', '[SMTP CHYBA] ' . $res['error']);
+            return false;
+        }
+    }
+
+    // 2. Fallback to PHP mail()
+    $senderEmail = !empty($smtp['from']) ? $smtp['from'] : "info@svobodnecechy.cz";
+    $senderName = !empty($smtp['from_name']) ? $smtp['from_name'] : "Svobodné Cechy";
+
+    $headers  = "MIME-Version: 1.0\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\n";
+    $headers .= "From: =?UTF-8?B?" . base64_encode($senderName) . "?= <{$senderEmail}>\n";
+    $headers .= "Reply-To: {$to}\n";
+    $headers .= "X-Mailer: PHP/" . phpversion() . "\n";
+
     $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 
     if (function_exists('error_clear_last')) {
@@ -136,11 +333,11 @@ function send_admin_notification($subject, $bodyHtml, $overrideRecipient = null)
 
     $lastErr = error_get_last();
     if (!$sent) {
-        $errMessage = $lastErr ? $lastErr['message'] : 'Funkce mail() vrátila false. Poskytovatel hostingu (Active24) buď vyžaduje specifickou From adresu, nebo selhala lokální poštovní fronta.';
-        log_notification($to, $subject, $bodyHtml, 'failed', $errMessage);
+        $errMessage = $lastErr ? $lastErr['message'] : 'Funkce mail() vrátila false. Poštovní server lokálně odmítl odeslat e-mail. Doporučujeme v administraci zapnout SMTP server (Active24 SMTP, Seznam, Gmail apod.).';
+        log_notification($to, $subject, $bodyHtml, 'failed', '[PHP mail() CHYBA] ' . $errMessage);
         return false;
     } else {
-        log_notification($to, $subject, $bodyHtml, 'success', 'E-mail byl úspěšně předán poštovnímu serveru (mail() vráti true).');
+        log_notification($to, $subject, $bodyHtml, 'success', '[PHP mail() OK] E-mail byl předán lokální poštovní frontě.');
         return true;
     }
 }

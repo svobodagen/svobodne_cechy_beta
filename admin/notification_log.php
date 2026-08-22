@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../notification_helper.php';
 
-// Handle Action: Save Email
+// Handle Actions
 $msg = '';
 $msgType = 'info';
 
@@ -14,6 +14,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['notification_email'] ?? '');
         set_notification_email($email);
         $msg = "Notifikační e-mail byl uložen.";
+        $msgType = "success";
+    }
+
+    if ($action === 'save_smtp') {
+        $smtpData = [
+            'enabled' => isset($_POST['smtp_enabled']) ? '1' : '0',
+            'host' => trim($_POST['smtp_host'] ?? 'email.active24.com'),
+            'port' => trim($_POST['smtp_port'] ?? '587'),
+            'user' => trim($_POST['smtp_user'] ?? ''),
+            'pass' => trim($_POST['smtp_pass'] ?? ''),
+            'secure' => trim($_POST['smtp_secure'] ?? 'tls'),
+            'from' => trim($_POST['smtp_from'] ?? 'info@svobodnecechy.cz'),
+            'from_name' => trim($_POST['smtp_from_name'] ?? 'Svobodné Cechy')
+        ];
+        save_smtp_settings($smtpData);
+        $msg = "Nastavení SMTP serveru bylo uloženo.";
         $msgType = "success";
     }
 
@@ -33,13 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <tr><td style='padding:6px 0; color:#94a3b8;'><strong>Cílový e-mail:</strong></td><td style='padding:6px 0;'>" . htmlspecialchars($testRecipient) . "</td></tr>
               </table>
               <div style='background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-family:monospace; font-size:12px; color:#a7f3d0;'>
-                ✓ Pokud jste obdrželi tento e-mail, systém notifikací funguje správně!
+                ✓ Pokud jste obdrželi tento e-mail, systém notifikací funguje 100% správně!
               </div>
             ";
 
             $res = send_admin_notification($subject, $body, $testRecipient);
             if ($res) {
-                $msg = "Testovací e-mail byl odeslán! Zkontrolujte schránku {$testRecipient} (i složku SPAM).";
+                $msg = "Testovací e-mail byl úspěšně odeslán! Zkontrolujte schránku {$testRecipient} (i složku SPAM).";
                 $msgType = "success";
             } else {
                 $msg = "Odeslání testovacího e-mailu selhalo. Podrobnosti naleznete v tabulce logů níže.";
@@ -60,8 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch current notification email
+// Fetch Settings
 $currentEmail = get_notification_email();
+$smtp = get_smtp_settings();
 
 // Filter logs
 $statusFilter = $_GET['status'] ?? '';
@@ -151,7 +168,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
     </div>
 
     <h1>📧 Správa Notifikací a Diagnostika E-mailů</h1>
-    <p class="subtitle">Evidence odeslaných e-mailových notifikací, kontrola doručení a testovací rozhraní.</p>
+    <p class="subtitle">Evidence odeslaných e-mailových notifikací, kontrola doručení, nastavení SMTP a testování.</p>
 
     <?php if ($msg): ?>
       <div class="alert alert-<?= $msgType ?>">
@@ -182,7 +199,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
       <!-- CARD 2: Testovací Odeslání -->
       <div class="card" style="margin-bottom:0;">
         <h3 style="color:var(--accent); margin-bottom:1rem; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
-          <i class="bi bi-send-check"></i> Odeslat Testovací E-mail
+          <i class="bi bi-send-check"></i> Odeslat Testovací E-mail Hned
         </h3>
         <form method="post">
           <input type="hidden" name="action" value="send_test" />
@@ -195,12 +212,80 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
       </div>
     </div>
 
+    <!-- SMTP SERVER CONFIGURATION CARD -->
+    <div class="card">
+      <h3 style="color:var(--accent); margin-bottom:0.5rem; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;">
+        <i class="bi bi-gear-wide-connected"></i> Nastavení SMTP Serveru (Garantované doručení)
+      </h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1.5rem;">
+        Při vypnutém SMTP se e-maily posílají přes PHP <code>mail()</code>. Zapnutím SMTP se e-maily odesílají přímo přes váš e-mailový server (Active24 SMTP, Seznam, Gmail, SendGrid...), což garantuje 100% doručení bez zahazování serverem.
+      </p>
+
+      <form method="post">
+        <input type="hidden" name="action" value="save_smtp" />
+        
+        <div style="margin-bottom:1.5rem; background:rgba(232,117,22,0.1); padding:1rem; border-radius:8px; border:1px solid rgba(232,117,22,0.3); display:flex; align-items:center; gap:0.8rem;">
+          <input type="checkbox" id="smtp_enabled" name="smtp_enabled" value="1" <?= $smtp['enabled'] === '1' ? 'checked' : '' ?> style="width:20px; height:20px; accent-color:var(--accent); cursor:pointer;" />
+          <label for="smtp_enabled" style="cursor:pointer; font-weight:700; color:#fff; margin:0;">
+            Aktivovat přímé odesílání přes SMTP server
+          </label>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.2rem;">
+          <div class="form-group">
+            <label>SMTP Host (Server)</label>
+            <input type="text" name="smtp_host" value="<?= htmlspecialchars($smtp['host']) ?>" class="form-control" placeholder="např. email.active24.com nebo smtp.seznam.cz" />
+          </div>
+          <div class="form-group">
+            <label>SMTP Port</label>
+            <select name="smtp_port" class="form-control">
+              <option value="587" <?= $smtp['port'] === '587' ? 'selected' : '' ?>>587 (Standardní TLS)</option>
+              <option value="465" <?= $smtp['port'] === '465' ? 'selected' : '' ?>>465 (SSL)</option>
+              <option value="25" <?= $smtp['port'] === '25' ? 'selected' : '' ?>>25 (Nešifrované / Localhost)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Šifrování (Encryption)</label>
+            <select name="smtp_secure" class="form-control">
+              <option value="tls" <?= $smtp['secure'] === 'tls' ? 'selected' : '' ?>>TLS (STARTTLS - doporučeno)</option>
+              <option value="ssl" <?= $smtp['secure'] === 'ssl' ? 'selected' : '' ?>>SSL</option>
+              <option value="none" <?= $smtp['secure'] === 'none' ? 'selected' : '' ?>>Žádné</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>SMTP Uživatelské jméno (E-mail)</label>
+            <input type="text" name="smtp_user" value="<?= htmlspecialchars($smtp['user']) ?>" class="form-control" placeholder="např. notifikace@svobodnecechy.cz" />
+          </div>
+          <div class="form-group">
+            <label>SMTP Heslo</label>
+            <input type="password" name="smtp_pass" value="<?= htmlspecialchars($smtp['pass']) ?>" class="form-control" placeholder="Heslo k e-mailové schránce" />
+          </div>
+          <div class="form-group">
+            <label>Adresa odesílatele (From Email)</label>
+            <input type="email" name="smtp_from" value="<?= htmlspecialchars($smtp['from']) ?>" class="form-control" placeholder="info@svobodnecechy.cz" />
+          </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Uložit nastavení SMTP</button>
+        </div>
+      </form>
+    </div>
+
     <!-- SERVER DIAGNOSTICS CARD -->
     <div class="card">
       <h3 style="color:var(--accent); margin-bottom:1rem; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
-        <i class="bi bi-cpu"></i> Diagnostika Poštovního Serveru (PHP mail)
+        <i class="bi bi-cpu"></i> Diagnostika Poštovního Serveru
       </h3>
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1rem; font-size:0.9rem;">
+        <div>
+          <strong style="color:var(--text-muted);">Režim odesílání:</strong><br>
+          <?php if ($smtp['enabled'] === '1'): ?>
+            <span style="color:#25D366; font-weight:700;"><i class="bi bi-shield-check"></i> Přímé SMTP (<?= htmlspecialchars($smtp['host']) ?>)</span>
+          <?php else: ?>
+            <span style="color:#fbbf24; font-weight:700;"><i class="bi bi-hdd-network"></i> Standardní PHP mail()</span>
+          <?php endif; ?>
+        </div>
         <div>
           <strong style="color:var(--text-muted);">Funkce mail():</strong><br>
           <?php if ($mailFunctionExists && !$isMailDisabled): ?>
@@ -212,10 +297,6 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
         <div>
           <strong style="color:var(--text-muted);">Poskytovatel webhostingu:</strong><br>
           <span style="color:#60a5fa; font-weight:600;">Active24 (db.r4.active24.cz)</span>
-        </div>
-        <div>
-          <strong style="color:var(--text-muted);">Odesílací adresa (From):</strong><br>
-          <code>info@svobodnecechy.cz</code>
         </div>
         <div>
           <strong style="color:var(--text-muted);">Cesta sendmail (php.ini):</strong><br>
@@ -261,7 +342,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
               <th style="width:200px;">Příjemce</th>
               <th>Předmět a náhled</th>
               <th style="width:110px;">Status</th>
-              <th>Detail / Chyba</th>
+              <th>Detail / Odezva serveru</th>
             </tr>
           </thead>
           <tbody>
