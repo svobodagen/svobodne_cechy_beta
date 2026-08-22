@@ -382,7 +382,7 @@ HTML;
     .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 2.5rem; min-height: 60vh; }
     .hero-content { max-width: 580px; }
     .eyebrow { text-transform: uppercase; font-size: 0.78rem; letter-spacing: 2px; color: var(--color-accent); font-weight: 700; margin-bottom: 0.6rem; }
-    .hero h1 { font-family: var(--font-heading); font-size: clamp(1.4rem, 3.8vw, 2.4rem); color: var(--color-white); margin-bottom: 0.8rem; }
+    .hero h1 { font-family: var(--font-heading); font-size: clamp(1.8rem, 4.5vw, 3rem); color: var(--color-white); margin-bottom: 0.8rem; }
     .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
     .hero-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.4rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all .2s; min-height: 44px; cursor: pointer; border: none; }
@@ -391,18 +391,22 @@ HTML;
     .hero-image img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); }
 
     .section-title { text-align: center; margin-bottom: 2rem; }
-    .section-title h2, .primary-cta-box h2, .contact-card h3, .master-info h3 {
+    .section-title { text-align: center; margin-bottom: 2.5rem; }
+    .section-title h2 {
       font-family: var(--font-heading);
-      font-size: clamp(1.25rem, 3.2vw, 1.85rem);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
       color: var(--color-white);
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
     }
-    .section-title p { color: var(--text-muted); font-size: clamp(0.9rem, 1.8vw, 1.05rem); max-width: 680px; margin: auto; }
+    .primary-cta-box h2 { font-family: var(--font-heading); font-size: clamp(1.6rem, 3.5vw, 2.4rem); color: var(--color-white); margin-bottom: 1rem; }
+    .contact-card h3 { font-family: var(--font-heading); font-size: clamp(1.3rem, 2.8vw, 1.8rem); color: var(--color-white); margin-bottom: 1rem; }
+    .master-info h3 { font-family: var(--font-heading); font-size: clamp(1.8rem, 4vw, 2.8rem); color: var(--color-white); margin-bottom: 0.5rem; }
+    .section-title p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 680px; margin: auto; }
 
     .uvp-section { padding: 3.5rem 0; }
     .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .uvp-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.5rem; }
-    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.4vw, 1.35rem); color: var(--color-accent); margin-bottom: 0.4rem; }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: clamp(1.2rem, 2.5vw, 1.5rem); color: var(--color-accent); margin-bottom: 0.4rem; }
 
     .master-section { padding: 3.5rem 0; background: rgba(0,0,0,0.3); }
     .master-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; align-items: center; }
@@ -413,7 +417,7 @@ HTML;
     .outcomes-section { padding: 3.5rem 0; }
     .outcomes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .outcome-item { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 12px; padding: 1.25rem; }
-    .outcome-item h4, .step-content h4 { font-family: var(--font-heading); font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--color-white); margin-bottom: 0.3rem; }
+    .outcome-item h4, .step-content h4 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.2vw, 1.4rem); color: var(--color-white); margin-bottom: 0.3rem; }
 
     .timeline-section { padding: 3.5rem 0; background: rgba(0,0,0,0.2); }
     .timeline { display: flex; flex-direction: column; gap: 1rem; max-width: 850px; margin: auto; }
@@ -437,7 +441,7 @@ HTML;
     .faq-list { max-width: 800px; margin: auto; display: flex; flex-direction: column; gap: 0.7rem; }
     details { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 8px; padding: 0.9rem 1.1rem; }
     details[open] { border-color: var(--color-accent); background: rgba(232, 117, 22, 0.05); }
-    summary { font-family: var(--font-heading); font-size: clamp(1.05rem, 2.2vw, 1.25rem); font-weight: 600; color: var(--color-white); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; line-height: 1.25; }
+    summary { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.2vw, 1.4rem); font-weight: 600; color: var(--color-white); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; line-height: 1.15; }
     summary::after { content: '+'; font-size: 1.3rem; color: var(--color-accent); margin-left: 0.5rem; }
     details[open] summary::after { content: '−'; }
 
