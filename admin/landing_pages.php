@@ -1770,7 +1770,11 @@ if ($editingSlug) {
                     <div class="item-card uvp-item-box">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="margin:0;">Karta #<?= $idx+1 ?></h4>
-                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.uvp-item-box')">🗑️ Odebrat</button>
+                        <div style="display:flex; gap:0.3rem;">
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.uvp-item-box', -1)">⬆️</button>
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.uvp-item-box', 1)">⬇️</button>
+                          <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.uvp-item-box')">🗑️ Odebrat</button>
+                        </div>
                       </div>
                       <div class="form-group"><label>Titulek karty <span class="badge-typo h3">🎴 Karta H3</span></label><input type="text" class="form-control uvp-item-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
                       <div class="form-group"><label>Popis karty <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control uvp-item-desc"><?= htmlspecialchars($item['desc']) ?></textarea></div>
@@ -1874,7 +1878,11 @@ if ($editingSlug) {
                     <div class="item-card outcome-item-box">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="margin:0;">Dovednost #<?= $idx+1 ?></h4>
-                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.outcome-item-box')">🗑️ Odebrat</button>
+                        <div style="display:flex; gap:0.3rem;">
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.outcome-item-box', -1)">⬆️</button>
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.outcome-item-box', 1)">⬇️</button>
+                          <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.outcome-item-box')">🗑️ Odebrat</button>
+                        </div>
                       </div>
                       <div class="form-group"><label>Ikona (Emoji)</label><input type="text" class="form-control outcome-icon" value="<?= htmlspecialchars($item['icon']) ?>" /></div>
                       <div class="form-group"><label>Název dovednosti <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control outcome-title" value="<?= htmlspecialchars($item['title']) ?>" /></div>
@@ -1922,7 +1930,11 @@ if ($editingSlug) {
                     <div class="item-card timeline-step-box">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="margin:0;">Krok <?= htmlspecialchars($step['num']) ?></h4>
-                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.timeline-step-box')">🗑️ Odebrat</button>
+                        <div style="display:flex; gap:0.3rem;">
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.timeline-step-box', -1)">⬆️</button>
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.timeline-step-box', 1)">⬇️</button>
+                          <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.timeline-step-box')">🗑️ Odebrat</button>
+                        </div>
                       </div>
                       <div class="form-group"><label>Číslo kroku</label><input type="text" class="form-control step-num" value="<?= htmlspecialchars($step['num']) ?>" /></div>
                       <div class="form-group"><label>Název kroku <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control step-title" value="<?= htmlspecialchars($step['title']) ?>" /></div>
@@ -2002,7 +2014,11 @@ if ($editingSlug) {
                     <div class="item-card portfolio-item-box">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="margin:0;">Fotka #<?= $idx+1 ?></h4>
-                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.portfolio-item-box')">🗑️ Odebrat</button>
+                        <div style="display:flex; gap:0.3rem;">
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.portfolio-item-box', -1)">⬆️</button>
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.portfolio-item-box', 1)">⬇️</button>
+                          <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.portfolio-item-box')">🗑️ Odebrat</button>
+                        </div>
                       </div>
                       <div class="form-group">
                         <label>Fotka v galerii</label>
@@ -2070,7 +2086,11 @@ if ($editingSlug) {
                     <div class="item-card testimonial-item-box">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="margin:0;">Reference #<?= $idx+1 ?></h4>
-                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.testimonial-item-box')">🗑️ Odebrat</button>
+                        <div style="display:flex; gap:0.3rem;">
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.testimonial-item-box', -1)">⬆️</button>
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.testimonial-item-box', 1)">⬇️</button>
+                          <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.testimonial-item-box')">🗑️ Odebrat</button>
+                        </div>
                       </div>
                       <div class="form-group"><label>Nadpis reference (volitelné) <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control ts-title" value="<?= htmlspecialchars($item['title'] ?? '') ?>" placeholder="Např. Skvělá zkušenost s mistrem" /></div>
                       <div class="form-group"><label>Citace <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control ts-quote"><?= htmlspecialchars($item['quote']) ?></textarea></div>
@@ -2119,7 +2139,11 @@ if ($editingSlug) {
                     <div class="item-card faq-item-box">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="margin:0;">Otázka #<?= $idx+1 ?></h4>
-                        <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.faq-item-box')">🗑️ Odebrat</button>
+                        <div style="display:flex; gap:0.3rem;">
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.faq-item-box', -1)">⬆️</button>
+                          <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.faq-item-box', 1)">⬇️</button>
+                          <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.faq-item-box')">🗑️ Odebrat</button>
+                        </div>
                       </div>
                       <div class="form-group"><label>Otázka <span class="badge-typo h3">🎴 Otázka H4</span></label><input type="text" class="form-control faq-q" value="<?= htmlspecialchars($item['q']) ?>" /></div>
                       <div class="form-group"><label>Odpověď <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control faq-a"><?= htmlspecialchars($item['a']) ?></textarea></div>
@@ -2672,7 +2696,17 @@ if ($editingSlug) {
           }
         }
 
-        // ── ADD/REMOVE ITEMS IN SECTIONS ──────────────────────────────────
+        // ── ADD/REMOVE/MOVE ITEMS IN SECTIONS ───────────────────────────
+        function moveItem(btn, selector, direction) {
+          const box = btn.closest(selector);
+          if (!box) return;
+          if (direction === -1 && box.previousElementSibling) {
+            box.parentNode.insertBefore(box, box.previousElementSibling);
+          } else if (direction === 1 && box.nextElementSibling) {
+            box.parentNode.insertBefore(box.nextElementSibling, box);
+          }
+        }
+
         function removeItem(btn, selector) {
           const box = btn.closest(selector);
           if (!box) return;
@@ -2690,7 +2724,11 @@ if ($editingSlug) {
           div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
               <h4 style="margin:0;">${headerText}</h4>
-              <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.${cssClass}')">🗑️ Odebrat</button>
+              <div style="display:flex; gap:0.3rem;">
+                <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.${cssClass}', -1)">⬆️</button>
+                <button type="button" class="btn-action btn-copy" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="moveItem(this, '.${cssClass}', 1)">⬇️</button>
+                <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.${cssClass}')">🗑️ Odebrat</button>
+              </div>
             </div>
             ${innerHtml}
           `;
