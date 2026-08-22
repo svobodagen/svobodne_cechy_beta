@@ -309,17 +309,31 @@
     .form-control { width: 100%; padding: 0.8rem 1rem; background: rgba(0,0,0,0.5); border: 1px solid var(--color-glass-border); border-radius: 6px; color: #fff; font-size: 1rem; }
     .form-control:focus { outline: none; border-color: var(--color-accent); }
 
-    /* Sticky Mobile CTA */
+    /* Floating Sticky CTA (PC, Tablet & Mobile) */
     .mobile-sticky-cta {
-      display: none;
+      display: block;
       position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: rgba(11,10,8,0.95);
-      border-top: 1px solid var(--color-accent);
-      padding: 0.8rem 1rem;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 500px;
+      background: rgba(17, 14, 11, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--color-accent);
+      border-radius: 50px;
+      padding: 0.5rem 0.6rem;
       z-index: 999;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 15px rgba(232, 117, 22, 0.25);
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .mobile-sticky-cta .btn { width: 100%; }
+    .mobile-sticky-cta .btn {
+      width: 100%;
+      border-radius: 40px;
+      box-shadow: 0 4px 15px rgba(232, 117, 22, 0.4);
+    }
 
     /* Footer */
     footer { border-top: 1px solid var(--color-glass-border); padding: 3rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
@@ -333,7 +347,6 @@
       .master-grid { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
       .nav-menu { display: none; }
-      .mobile-sticky-cta { display: block; }
       .hero h1 { font-size: 2.6rem; }
     }
   </style>

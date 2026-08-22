@@ -737,7 +737,30 @@ HTML;
     .form-control { width: 100%; padding: 0.75rem 0.9rem; background: rgba(0,0,0,0.6); border: 1px solid var(--color-glass-border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
     textarea.form-control { min-height: 80px; resize: vertical; }
 
-    .mobile-sticky-cta { display: {$stickyCtaDisplay}; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,10,8,0.95); border-top: 1px solid var(--color-accent); padding: 0.7rem 1rem; z-index: 999; transition: opacity 0.3s ease; }
+    .mobile-sticky-cta {
+      display: {$stickyCtaDisplay};
+      position: fixed;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 500px;
+      background: rgba(17, 14, 11, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--color-accent);
+      border-radius: 50px;
+      padding: 0.5rem 0.6rem;
+      z-index: 999;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 15px rgba(232, 117, 22, 0.25);
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mobile-sticky-cta .btn {
+      width: 100%;
+      border-radius: 40px;
+      box-shadow: 0 4px 15px rgba(232, 117, 22, 0.4);
+    }
     footer { border-top: 1px solid var(--color-glass-border); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
 
     /* Lead Modal Popup Styles */
@@ -803,7 +826,6 @@ HTML;
       .master-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .contact-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .nav-menu { display: none; }
-      .mobile-sticky-cta { display: {$stickyCtaDisplay}; }
       .section-title { margin-bottom: 1.5rem; }
       .primary-cta-box { padding: 1.8rem 1rem; margin: 1.8rem auto; }
       .timeline-step { grid-template-columns: 40px 1fr; gap: 0.8rem; padding: 0.9rem 1rem; }
@@ -1352,19 +1374,19 @@ if ($editingSlug) {
                     Vyber si velikost tlačítka. Velikosti jsou responzivně vyladěné pro desktop i mobil.
                   </p>
                   <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.8rem;">
-                    <div class="btn-size-option <?= $btnSizeVal === 's' ? 'selected' : '' ?>" onclick="selectBtnSize('s')">
+                    <div class="btn-size-option <?= $btnSizeVal === 's' ? 'selected' : '' ?>" onclick="selectBtnSize('s', this)">
                       <strong>Malé (S)</strong>
                       <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.4rem 0.8rem; font-size:0.75rem; min-height:auto;">Tlačítko S</span></div>
                     </div>
-                    <div class="btn-size-option <?= $btnSizeVal === 'm' ? 'selected' : '' ?>" onclick="selectBtnSize('m')">
+                    <div class="btn-size-option <?= $btnSizeVal === 'm' ? 'selected' : '' ?>" onclick="selectBtnSize('m', this)">
                       <strong>Střední (M)</strong>
                       <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.6rem 1.1rem; font-size:0.85rem; min-height:auto;">Střední M</span></div>
                     </div>
-                    <div class="btn-size-option <?= $btnSizeVal === 'l' ? 'selected' : '' ?>" onclick="selectBtnSize('l')">
+                    <div class="btn-size-option <?= $btnSizeVal === 'l' ? 'selected' : '' ?>" onclick="selectBtnSize('l', this)">
                       <strong>Velké (L)</strong>
                       <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.75rem 1.3rem; font-size:0.95rem; min-height:auto;">Velké L</span></div>
                     </div>
-                    <div class="btn-size-option <?= $btnSizeVal === 'xl' ? 'selected' : '' ?>" onclick="selectBtnSize('xl')">
+                    <div class="btn-size-option <?= $btnSizeVal === 'xl' ? 'selected' : '' ?>" onclick="selectBtnSize('xl', this)">
                       <strong>Extra (XL)</strong>
                       <div style="margin-top:0.4rem;"><span class="btn btn-primary" style="padding:0.9rem 1.6rem; font-size:1.05rem; min-height:auto;">Extra XL</span></div>
                     </div>
@@ -1428,10 +1450,10 @@ if ($editingSlug) {
 
                 <!-- 3. FLOATING STICKY CTA BUTTON SWITCH & SECTION FILTERS -->
                 <div class="item-card">
-                  <h4>📌 Plovoucí Tlačítko na Mobilu (Sticky Mobile CTA)</h4>
+                  <h4>📌 Plovoucí Tlačítko (Floating Sticky CTA pro PC, Tablet i Mobil)</h4>
                   <div class="form-group" style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1rem;">
                     <input type="checkbox" id="design_sticky_enabled" style="width:20px; height:20px; accent-color:var(--accent);" <?= $stickyEnabled ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
-                    <label for="design_sticky_enabled" style="font-size:1rem; color:#fff; cursor:pointer; margin:0;">Zobrazovat plovoucí tlačítko na mobilních telefonech</label>
+                    <label for="design_sticky_enabled" style="font-size:1rem; color:#fff; cursor:pointer; margin:0;">Zobrazovat plovoucí tlačítko na dně obrazovky (pro PC, Tablet i Mobil)</label>
                   </div>
 
                   <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:6px; border:1px solid var(--border);">
@@ -2164,17 +2186,26 @@ if ($editingSlug) {
           xl: { pv: '1.25rem', ph: '2.2rem', fs: '1.1rem' }
         };
 
-        function selectTheme(key) {
-          document.querySelectorAll('.theme-card-option').forEach(el => el.classList.remove('selected'));
-          if (event && event.currentTarget) event.currentTarget.classList.add('selected');
+        function selectTheme(key, el) {
+          document.querySelectorAll('.theme-card-option').forEach(opt => opt.classList.remove('selected'));
+          if (el) {
+            el.classList.add('selected');
+          } else if (window.event && window.event.currentTarget) {
+            window.event.currentTarget.classList.add('selected');
+          }
           document.getElementById('design_color_theme').value = key;
           liveUpdateDesign();
         }
 
-        function selectBtnSize(key) {
-          document.querySelectorAll('.btn-size-option').forEach(el => el.classList.remove('selected'));
-          if (event && event.currentTarget) event.currentTarget.classList.add('selected');
-          document.getElementById('design_btn_size').value = key;
+        function selectBtnSize(key, el) {
+          document.querySelectorAll('.btn-size-option').forEach(opt => opt.classList.remove('selected'));
+          if (el) {
+            el.classList.add('selected');
+          } else if (window.event && window.event.currentTarget) {
+            window.event.currentTarget.classList.add('selected');
+          }
+          const hiddenInput = document.getElementById('design_btn_size');
+          if (hiddenInput) hiddenInput.value = key;
           liveUpdateDesign();
         }
 
@@ -2209,6 +2240,12 @@ if ($editingSlug) {
             root.style.setProperty('--btn-pad-v', bSize.pv);
             root.style.setProperty('--btn-pad-h', bSize.ph);
             root.style.setProperty('--btn-font-size', bSize.fs);
+
+            // Apply directly to all iframe buttons for instant live preview response
+            doc.querySelectorAll('.btn').forEach(btn => {
+              btn.style.padding = bSize.pv + ' ' + bSize.ph;
+              btn.style.fontSize = bSize.fs;
+            });
 
             const oddSide = document.getElementById('design_odd_side_padding').value;
             const oddVert = document.getElementById('design_odd_vert_padding').value;
