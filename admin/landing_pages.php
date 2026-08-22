@@ -448,10 +448,12 @@ HTML;
     $ts_sub = htmlspecialchars($data['testimonials']['subtitle'] ?? 'Reálné pohledy zástupců a rodin.');
     $testimonials_html = "";
     foreach (($data['testimonials']['items'] ?? []) as $item) {
+        $title = htmlspecialchars($item['title'] ?? '');
         $quote = htmlspecialchars($item['quote'] ?? '');
         $name = htmlspecialchars($item['name'] ?? '');
         $role = htmlspecialchars($item['role'] ?? '');
-        $testimonials_html .= "<div class='testimonial-card'><p class='quote-text'>{$quote}</p><div class='author-info'><div><strong>{$name}</strong><span>{$role}</span></div></div></div>";
+        $titleHtml = $title !== '' ? "<h4 class='testimonial-title' style='margin-top:0; margin-bottom:0.5rem; font-family:var(--font-heading); font-size:var(--card-h3-clamp); color:var(--color-white);'>{$title}</h4>" : "";
+        $testimonials_html .= "<div class='testimonial-card'>{$titleHtml}<p class='quote-text'>{$quote}</p><div class='author-info'><div><strong>{$name}</strong><span>{$role}</span></div></div></div>";
     }
     $testimonialsCtaHtml = $getSecCtaHtml('testimonials');
 
@@ -2070,6 +2072,7 @@ if ($editingSlug) {
                         <h4 style="margin:0;">Reference #<?= $idx+1 ?></h4>
                         <button type="button" class="btn-action" style="background:#7f1d1d; border-color:#dc2626; color:#fff; padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="removeItem(this, '.testimonial-item-box')">🗑️ Odebrat</button>
                       </div>
+                      <div class="form-group"><label>Nadpis reference (volitelné) <span class="badge-typo h3">🎴 Karta H4</span></label><input type="text" class="form-control ts-title" value="<?= htmlspecialchars($item['title'] ?? '') ?>" placeholder="Např. Skvělá zkušenost s mistrem" /></div>
                       <div class="form-group"><label>Citace <span class="badge-typo body">📝 Běžný text</span></label><textarea class="form-control ts-quote"><?= htmlspecialchars($item['quote']) ?></textarea></div>
                       <div class="form-group"><label>Jméno autora <span class="badge-typo body">📝 Běžný text</span></label><input type="text" class="form-control ts-name" value="<?= htmlspecialchars($item['name']) ?>" /></div>
                       <div class="form-group"><label>Role / Vztah k dílně <span class="badge-typo eyebrow">🏷️ Štítek</span></label><input type="text" class="form-control ts-role" value="<?= htmlspecialchars($item['role']) ?>" /></div>
@@ -2758,6 +2761,7 @@ if ($editingSlug) {
           const container = document.getElementById('testimonials_container');
           const n = container.querySelectorAll('.testimonial-item-box').length + 1;
           container.appendChild(makeItemBox('testimonial-item-box', `Reference #${n}`, `
+            <div class="form-group"><label>Nadpis reference (volitelné)</label><input type="text" class="form-control ts-title" value="" placeholder="Např. Skvělá zkušenost s mistrem" /></div>
             <div class="form-group"><label>Citace</label><textarea class="form-control ts-quote"></textarea></div>
             <div class="form-group"><label>Jméno autora</label><input type="text" class="form-control ts-name" value="" /></div>
             <div class="form-group"><label>Role / Vztah k dílně</label><input type="text" class="form-control ts-role" value="" /></div>
@@ -3020,6 +3024,7 @@ if ($editingSlug) {
               title: document.getElementById('ts_title').value,
               subtitle: document.getElementById('ts_sub').value,
               items: Array.from(document.querySelectorAll('.testimonial-item-box')).map(box => ({
+                title: box.querySelector('.ts-title') ? box.querySelector('.ts-title').value : '',
                 quote: box.querySelector('.ts-quote').value,
                 name: box.querySelector('.ts-name').value,
                 role: box.querySelector('.ts-role').value
