@@ -2466,8 +2466,35 @@ if ($editingSlug) {
             div.className = 'item-card';
             div.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:0.8rem 1.2rem; margin-bottom:0.6rem; opacity:${isVisible ? '1' : '0.45'}; border-color:${isVisible ? '' : '#374151'};`;
 
-            // Toggle switch HTML
-            const toggleId = `sec_vis_${key}`;
+            const hasCtaCheckbox = document.getElementById('sec_cta_show_' + key);
+            const ctaIsVisible = hasCtaCheckbox ? hasCtaCheckbox.checked : false;
+
+            let ctaToggleHtml = '';
+            if (hasCtaCheckbox) {
+              const ctaToggleId = `sec_cta_order_vis_${key}`;
+              ctaToggleHtml = `
+                <div style="display:flex; align-items:center; gap:0.4rem; background:rgba(0,0,0,0.2); padding:0.2rem 0.5rem; border-radius:6px; flex-shrink:0;">
+                  <span style="font-size:0.75rem; color: ${ctaIsVisible ? 'var(--text)' : 'var(--text-muted)'};"><i class="bi bi-hand-index-thumb"></i> Tlačítko</span>
+                  <label class="sec-vis-toggle" title="${ctaIsVisible ? 'Skrýt tlačítko v sekci' : 'Zobrazit tlačítko v sekci'}" style="cursor:pointer; flex-shrink:0;">
+                    <input type="checkbox" id="${ctaToggleId}" ${ctaIsVisible ? 'checked' : ''}
+                      onchange="toggleSectionCtaFromOrder('${key}')" style="display:none;" />
+                    <span style="
+                      display:inline-flex; align-items:center; justify-content:center;
+                      width:32px; height:18px; border-radius:9px; transition:all .2s;
+                      background:${ctaIsVisible ? 'var(--accent)' : '#374151'};
+                      position:relative;
+                    ">
+                      <span style="
+                        position:absolute; width:12px; height:12px; border-radius:50%; background:#fff;
+                        transition:transform .2s; transform:translateX(${ctaIsVisible ? '7px' : '-7px'});
+                        box-shadow:0 1px 3px rgba(0,0,0,0.4);
+                      "></span>
+                    </span>
+                  </label>
+                </div>
+              `;
+            }
+
             div.innerHTML = `
               <div style="display:flex; align-items:center; gap:0.8rem; flex:1; min-width:0;">
                 <label class="sec-vis-toggle" title="${isVisible ? 'Skrýt sekci' : 'Zobrazit sekci'}" style="cursor:pointer; flex-shrink:0;">
@@ -2486,9 +2513,10 @@ if ($editingSlug) {
                     "></span>
                   </span>
                 </label>
-                <span style="font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                <span style="font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">
                   <strong>${idx + 1}.</strong> ${sectionLabels[key] || key} ${isOddText}
                 </span>
+                ${ctaToggleHtml}
               </div>
               <div style="display:flex; gap:0.4rem; flex-shrink:0; margin-left:0.6rem;">
                 <button type="button" class="btn-action btn-copy" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}><i class="bi bi-arrow-up"></i></button>
@@ -2504,6 +2532,15 @@ if ($editingSlug) {
           currentSectionVisibility[key] = !isCurrentlyVisible;
           renderOrderList();
           liveReorderSectionsInIframe();
+        }
+
+        function toggleSectionCtaFromOrder(key) {
+          const chk = document.getElementById('sec_cta_show_' + key);
+          if (chk) {
+            chk.checked = !chk.checked;
+            liveUpdateSecCtaVisibility(); // Aktualizuje iframe (zavolá iframe code)
+            renderOrderList(); // Překreslí samotný order list s novým stavem tlačítka
+          }
         }
 
         function moveSection(index, direction) {
