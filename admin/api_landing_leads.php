@@ -6,6 +6,7 @@ require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../notification_helper.php';
 
 // Auto-create database table if not exists
+// Auto-create database table if not exists
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS landing_leads (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,12 +17,15 @@ try {
         phone VARCHAR(50) DEFAULT NULL,
         user_role VARCHAR(50) DEFAULT NULL,
         message TEXT DEFAULT NULL,
+        newsletter TINYINT(1) DEFAULT 0,
         status VARCHAR(50) DEFAULT 'novy',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX (landing_slug),
         INDEX (email)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    // Ensure newsletter column exists if table was created previously
+    try { $pdo->exec("ALTER TABLE landing_leads ADD COLUMN newsletter TINYINT(1) DEFAULT 0"); } catch(\PDOException $e) {}
 } catch (\PDOException $e) {
     // Silent fail if table already exists or database handles differently
 }
@@ -83,14 +87,15 @@ if ($action === 'update_lead') {
     $phone = trim($input['phone'] ?? '');
     $role = trim($input['user_role'] ?? '');
     $message = trim($input['message'] ?? '');
+    $newsletter = !empty($input['newsletter']) ? 1 : 0;
 
     try {
         if ($leadId > 0) {
-            $stmt = $pdo->prepare("UPDATE landing_leads SET name = ?, phone = ?, user_role = ?, message = ? WHERE id = ?");
-            $stmt->execute([$name, $phone, $role, $message, $leadId]);
+            $stmt = $pdo->prepare("UPDATE landing_leads SET name = ?, phone = ?, user_role = ?, message = ?, newsletter = ? WHERE id = ?");
+            $stmt->execute([$name, $phone, $role, $message, $newsletter, $leadId]);
         } else if (!empty($email)) {
-            $stmt = $pdo->prepare("UPDATE landing_leads SET name = ?, phone = ?, user_role = ?, message = ? WHERE email = ? AND landing_slug = ? ORDER BY id DESC LIMIT 1");
-            $stmt->execute([$name, $phone, $role, $message, $email, $slug]);
+            $stmt = $pdo->prepare("UPDATE landing_leads SET name = ?, phone = ?, user_role = ?, message = ?, newsletter = ? WHERE email = ? AND landing_slug = ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$name, $phone, $role, $message, $newsletter, $email, $slug]);
         }
 
         // Send Email Notification for updated info

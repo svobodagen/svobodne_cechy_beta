@@ -860,6 +860,9 @@ HTML;
             <input type="email" id="m_email" name="email" autocomplete="email" class="form-control" placeholder="např. jan.novak@seznam.cz" required />
           </div>
           <button type="submit" id="m_s1_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s1_btn}</button>
+          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+            Odesláním e-mailu berete na vědomí <a href="zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely zaslání informací o učednictví a navazující komunikaci.
+          </div>
         </form>
       </div>
 
@@ -888,6 +891,13 @@ HTML;
             <textarea id="m_msg" class="form-control" placeholder="Mám zájem o bližší informace..."></textarea>
           </div>
           <button type="submit" id="m_s2_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s2_btn}</button>
+          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+            Odesláním formuláře berete na vědomí <a href="zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely vyřízení vašeho dotazu.
+          </div>
+          <div class="newsletter-option" style="margin-top:0.6rem; text-align:left; font-size:0.82rem; color:var(--text-muted, #cbd5e1); display:flex; align-items:flex-start; gap:0.5rem;">
+            <input type="checkbox" id="m_newsletter" name="newsletter" style="accent-color:var(--color-accent, #e87516); width:16px; height:16px; margin-top:2px; cursor:pointer;" />
+            <label for="m_newsletter" style="cursor:pointer; margin:0; line-height:1.3;">Chci dostávat novinky a pravidelný newsletter od Svobodné Čechy.</label>
+          </div>
         </form>
         <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">
           <button type="button" onclick="submitStep2AndWhatsApp(event, 'https://wa.me/{$wa_num}?text={$wa_msg}')" class="btn-wa" style="width:100%; border:none; cursor:pointer;">{$m_s2_wa_text}</button>
@@ -968,7 +978,8 @@ HTML;
           name: document.getElementById('m_name').value,
           phone: document.getElementById('m_phone').value,
           user_role: document.getElementById('m_role').value,
-          message: document.getElementById('m_msg').value
+          message: document.getElementById('m_msg').value,
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
         })
       })
       .then(res => res.json())
@@ -1001,7 +1012,8 @@ HTML;
           name: nameVal,
           phone: document.getElementById('m_phone').value,
           user_role: document.getElementById('m_role').value,
-          message: msgVal
+          message: msgVal,
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
         })
       })
       .then(res => res.json())
