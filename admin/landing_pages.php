@@ -265,6 +265,11 @@ function renderLandingPageHtml($data) {
     $m_s3_title = htmlspecialchars($mc['step3_title'] ?? 'Děkujeme za váš zájem!');
     $m_s3_text = htmlspecialchars($mc['step3_text'] ?? 'Vaši zprávu jsme v pořádku přijali. Ozveme se vám do 24 hodin.');
     $m_s3_btn = htmlspecialchars($mc['step3_btn'] ?? 'ZAVŘÍT');
+    $m_s3_web_url = htmlspecialchars($mc['step3_web_url'] ?? '');
+    $m_s3_web_btn_text = htmlspecialchars($mc['step3_web_btn_text'] ?? 'Přejít na web');
+    $m_s3_web_desc = htmlspecialchars($mc['step3_web_desc'] ?? '');
+    $m_s3_web_box_display = !empty($mc['step3_web_url']) ? 'block' : 'none';
+    $m_s3_web_desc_display = !empty($mc['step3_web_desc']) ? 'block' : 'none';
 
     // 1. Hero
     $h_eyebrow = htmlspecialchars($data['hero']['eyebrow'] ?? 'UČEDNICTVÍ U MISTRA SKLÁŘE');
@@ -892,8 +897,12 @@ HTML;
       <!-- STEP 3: THANK YOU -->
       <div id="modalStep3" class="modal-step" style="display:none;">
         <h3>{$m_s3_title}</h3>
-        <p>{$m_s3_text}</p>
-        <button type="button" class="btn btn-primary" onclick="closeLeadModal()" style="width:100%; margin-top:1rem;">{$m_s3_btn}</button>
+        <p id="m_s3_text_el">{$m_s3_text}</p>
+        <div id="m_s3_web_box" style="margin-top:1.2rem; display:{$m_s3_web_box_display};">
+          <p id="m_s3_web_desc_el" style="font-size:0.95rem; opacity:0.9; margin-bottom:0.8rem; color:var(--color-text-muted, #d1d5db); display:{$m_s3_web_desc_display};">{$m_s3_web_desc}</p>
+          <a id="m_s3_web_link_el" href="{$m_s3_web_url}" target="_blank" rel="noopener" class="btn btn-secondary" style="display:block; text-align:center; text-decoration:none; width:100%; margin-bottom:0.5rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:0.75rem 1rem; border-radius:8px; font-weight:600; transition:all .2s;">{$m_s3_web_btn_text}</a>
+        </div>
+        <button type="button" id="m_s3_close_btn" class="btn btn-primary" onclick="closeLeadModal()" style="width:100%; margin-top:1rem;">{$m_s3_btn}</button>
       </div>
     </div>
   </div>
@@ -1490,6 +1499,9 @@ if ($editingSlug) {
                 $s3_title = $mc['step3_title'] ?? 'Děkujeme za váš zájem!';
                 $s3_text = $mc['step3_text'] ?? 'Vaši zprávu jsme v pořádku přijali. Ozveme se vám do 24 hodin.';
                 $s3_btn = $mc['step3_btn'] ?? 'ZAVŘÍT';
+                $s3_web_url = $mc['step3_web_url'] ?? '';
+                $s3_web_btn_text = $mc['step3_web_btn_text'] ?? 'Přejít na web';
+                $s3_web_desc = $mc['step3_web_desc'] ?? '';
                 ?>
 
                 <!-- INTERACTIVE PHASE PREVIEW SWITCHER -->
@@ -1555,8 +1567,20 @@ if ($editingSlug) {
                     <label>Text poděkování <span class="badge-typo body">📝 Běžný text</span></label>
                     <textarea class="form-control" id="mc_s3_text" oninput="liveUpdateModalContact()"><?= htmlspecialchars($s3_text) ?></textarea>
                   </div>
+                  <div class="form-group" style="margin-top:1rem; padding-top:0.8rem; border-top:1px dashed rgba(255,255,255,0.15);">
+                    <label>🌐 Odkaz na web (URL tlačítka v poděkování)</label>
+                    <input type="text" class="form-control" id="mc_s3_web_url" placeholder="https://pacinekglass.com" value="<?= htmlspecialchars($s3_web_url) ?>" oninput="liveUpdateModalContact()" />
+                  </div>
                   <div class="form-group">
-                    <label>Text tlačítka pro zavření <span class="badge-typo body">📝 Běžný text</span></label>
+                    <label>Text tlačítka pro odkaz na web</label>
+                    <input type="text" class="form-control" id="mc_s3_web_btn_text" placeholder="Přejít na web" value="<?= htmlspecialchars($s3_web_btn_text) ?>" oninput="liveUpdateModalContact()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Popis u tlačítka odkazu na web <span class="badge-typo body">📝 Běžný text</span></label>
+                    <textarea class="form-control" id="mc_s3_web_desc" placeholder="Chcete se dozvědět více? Navštivte mé webové stránky." oninput="liveUpdateModalContact()"><?= htmlspecialchars($s3_web_desc) ?></textarea>
+                  </div>
+                  <div class="form-group" style="margin-top:1rem; padding-top:0.8rem; border-top:1px dashed rgba(255,255,255,0.15);">
+                    <label>Text tlačítka pro zavření modal okna <span class="badge-typo body">📝 Běžný text</span></label>
                     <input type="text" class="form-control" id="mc_s3_btn" value="<?= htmlspecialchars($s3_btn) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                 </div>
@@ -2541,12 +2565,31 @@ if ($editingSlug) {
           const s3Title = document.getElementById('mc_s3_title')?.value;
           const s3Text = document.getElementById('mc_s3_text')?.value;
           const s3Btn = document.getElementById('mc_s3_btn')?.value;
+          const s3WebUrl = document.getElementById('mc_s3_web_url')?.value;
+          const s3WebBtnText = document.getElementById('mc_s3_web_btn_text')?.value;
+          const s3WebDesc = document.getElementById('mc_s3_web_desc')?.value;
 
           const step3 = doc.getElementById('modalStep3');
           if (step3) {
             if (s3Title !== undefined && step3.querySelector('h3')) step3.querySelector('h3').textContent = s3Title;
-            if (s3Text !== undefined && step3.querySelector('p')) step3.querySelector('p').textContent = s3Text;
-            if (s3Btn !== undefined && step3.querySelector('.btn')) step3.querySelector('.btn').textContent = s3Btn;
+            if (s3Text !== undefined && doc.getElementById('m_s3_text_el')) doc.getElementById('m_s3_text_el').textContent = s3Text;
+            if (s3Btn !== undefined && doc.getElementById('m_s3_close_btn')) doc.getElementById('m_s3_close_btn').textContent = s3Btn;
+
+            const webBox = doc.getElementById('m_s3_web_box');
+            if (webBox) {
+              const hasUrl = s3WebUrl && s3WebUrl.trim() !== '';
+              webBox.style.display = hasUrl ? 'block' : 'none';
+              const webLink = doc.getElementById('m_s3_web_link_el');
+              if (webLink) {
+                webLink.href = s3WebUrl || '#';
+                webLink.textContent = s3WebBtnText || 'Přejít na web';
+              }
+              const webDesc = doc.getElementById('m_s3_web_desc_el');
+              if (webDesc) {
+                webDesc.textContent = s3WebDesc || '';
+                webDesc.style.display = (s3WebDesc && s3WebDesc.trim() !== '') ? 'block' : 'none';
+              }
+            }
           }
         }
 
@@ -3093,7 +3136,10 @@ if ($editingSlug) {
               step2_wa_text: document.getElementById('mc_s2_wa_text').value,
               step3_title: document.getElementById('mc_s3_title').value,
               step3_text: document.getElementById('mc_s3_text').value,
-              step3_btn: document.getElementById('mc_s3_btn').value
+              step3_btn: document.getElementById('mc_s3_btn').value,
+              step3_web_url: document.getElementById('mc_s3_web_url').value,
+              step3_web_btn_text: document.getElementById('mc_s3_web_btn_text').value,
+              step3_web_desc: document.getElementById('mc_s3_web_desc').value
             },
             typography: {
               hero_h1: document.getElementById('typo_hero_h1').value,
