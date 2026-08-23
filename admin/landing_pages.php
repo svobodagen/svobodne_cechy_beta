@@ -1492,20 +1492,34 @@ if ($editingSlug) {
                 $s3_btn = $mc['step3_btn'] ?? 'ZAVŘÍT';
                 ?>
 
+                <!-- INTERACTIVE PHASE PREVIEW SWITCHER -->
+                <div class="item-card" style="background: rgba(232, 117, 22, 0.08); border-left: 4px solid var(--accent); margin-bottom: 1.5rem;">
+                  <h4 style="color:#fff; margin:0 0 0.5rem 0;">👁️ Náhled Fáze Popup Formuláře v Živém Náhledu</h4>
+                  <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">
+                    Klikněte na tlačítko fáze níže pro otevření popupu a přepnutí náhledu v iframe:
+                  </p>
+                  <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <button type="button" class="btn-action btn-copy modal-phase-btn active" onclick="previewModalPhase(1, this)" style="flex:1; justify-content:center; font-weight:700;">1️⃣ Fáze 1 (E-mail)</button>
+                    <button type="button" class="btn-action btn-copy modal-phase-btn" onclick="previewModalPhase(2, this)" style="flex:1; justify-content:center; font-weight:700;">2️⃣ Fáze 2 (Údaje & WA)</button>
+                    <button type="button" class="btn-action btn-copy modal-phase-btn" onclick="previewModalPhase(3, this)" style="flex:1; justify-content:center; font-weight:700;">3️⃣ Fáze 3 (Poděkování)</button>
+                    <button type="button" class="btn-action" onclick="closePreviewModal()" style="background:#374151; border-color:#4b5563; color:#fff; padding:0.4rem 0.8rem;" title="Zavřít náhled popupu">❌ Zavřít</button>
+                  </div>
+                </div>
+
                 <!-- FÁZE 1 -->
                 <div class="item-card" style="border-left:4px solid var(--accent);">
                   <h4>Fáze 1: Zachycení E-mailu (Okamžité uložení do DB)</h4>
                   <div class="form-group">
                     <label>Nadpis 1. fáze <span class="badge-typo h2">📌 Nadpis H2</span></label>
-                    <input type="text" class="form-control" id="mc_s1_title" value="<?= htmlspecialchars($s1_title) ?>" />
+                    <input type="text" class="form-control" id="mc_s1_title" value="<?= htmlspecialchars($s1_title) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                   <div class="form-group">
                     <label>Podtitul 1. fáze <span class="badge-typo body">📝 Běžný text</span></label>
-                    <textarea class="form-control" id="mc_s1_text"><?= htmlspecialchars($s1_text) ?></textarea>
+                    <textarea class="form-control" id="mc_s1_text" oninput="liveUpdateModalContact()"><?= htmlspecialchars($s1_text) ?></textarea>
                   </div>
                   <div class="form-group">
                     <label>Text tlačítka 1. fáze <span class="badge-typo body">📝 Běžný text</span></label>
-                    <input type="text" class="form-control" id="mc_s1_btn" value="<?= htmlspecialchars($s1_btn) ?>" />
+                    <input type="text" class="form-control" id="mc_s1_btn" value="<?= htmlspecialchars($s1_btn) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                 </div>
 
@@ -1514,19 +1528,19 @@ if ($editingSlug) {
                   <h4>Fáze 2: Doplňující údaje (Jméno, Telefon, Zpráva & WhatsApp)</h4>
                   <div class="form-group">
                     <label>Nadpis 2. fáze <span class="badge-typo h2">📌 Nadpis H2</span></label>
-                    <input type="text" class="form-control" id="mc_s2_title" value="<?= htmlspecialchars($s2_title) ?>" />
+                    <input type="text" class="form-control" id="mc_s2_title" value="<?= htmlspecialchars($s2_title) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                   <div class="form-group">
                     <label>Podtitul 2. fáze <span class="badge-typo body">📝 Běžný text</span></label>
-                    <textarea class="form-control" id="mc_s2_text"><?= htmlspecialchars($s2_text) ?></textarea>
+                    <textarea class="form-control" id="mc_s2_text" oninput="liveUpdateModalContact()"><?= htmlspecialchars($s2_text) ?></textarea>
                   </div>
                   <div class="form-group">
                     <label>Text tlačítka pro odeslání 2. fáze <span class="badge-typo body">📝 Běžný text</span></label>
-                    <input type="text" class="form-control" id="mc_s2_btn" value="<?= htmlspecialchars($s2_btn) ?>" />
+                    <input type="text" class="form-control" id="mc_s2_btn" value="<?= htmlspecialchars($s2_btn) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                   <div class="form-group">
                     <label>Text tlačítka "Napsat na WhatsApp" <span class="badge-typo body">📝 Běžný text</span></label>
-                    <input type="text" class="form-control" id="mc_s2_wa_text" value="<?= htmlspecialchars($s2_wa_text) ?>" />
+                    <input type="text" class="form-control" id="mc_s2_wa_text" value="<?= htmlspecialchars($s2_wa_text) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                 </div>
 
@@ -1535,15 +1549,15 @@ if ($editingSlug) {
                   <h4>Fáze 3: Poděkování po odeslání</h4>
                   <div class="form-group">
                     <label>Nadpis poděkování <span class="badge-typo h2">📌 Nadpis H2</span></label>
-                    <input type="text" class="form-control" id="mc_s3_title" value="<?= htmlspecialchars($s3_title) ?>" />
+                    <input type="text" class="form-control" id="mc_s3_title" value="<?= htmlspecialchars($s3_title) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                   <div class="form-group">
                     <label>Text poděkování <span class="badge-typo body">📝 Běžný text</span></label>
-                    <textarea class="form-control" id="mc_s3_text"><?= htmlspecialchars($s3_text) ?></textarea>
+                    <textarea class="form-control" id="mc_s3_text" oninput="liveUpdateModalContact()"><?= htmlspecialchars($s3_text) ?></textarea>
                   </div>
                   <div class="form-group">
                     <label>Text tlačítka pro zavření <span class="badge-typo body">📝 Běžný text</span></label>
-                    <input type="text" class="form-control" id="mc_s3_btn" value="<?= htmlspecialchars($s3_btn) ?>" />
+                    <input type="text" class="form-control" id="mc_s3_btn" value="<?= htmlspecialchars($s3_btn) ?>" oninput="liveUpdateModalContact()" />
                   </div>
                 </div>
               </div>
@@ -2491,8 +2505,78 @@ if ($editingSlug) {
           });
         }
 
-        // Real-Time Live Typography Updates on iframe
-        function liveUpdateTypography() {
+        // Real-Time Live Modal Contact Updates on iframe
+        function liveUpdateModalContact() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+
+          // Step 1
+          const s1Title = document.getElementById('mc_s1_title')?.value;
+          const s1Text = document.getElementById('mc_s1_text')?.value;
+          const s1Btn = document.getElementById('mc_s1_btn')?.value;
+
+          const step1 = doc.getElementById('modalStep1');
+          if (step1) {
+            if (s1Title !== undefined && step1.querySelector('h3')) step1.querySelector('h3').textContent = s1Title;
+            if (s1Text !== undefined && step1.querySelector('p')) step1.querySelector('p').textContent = s1Text;
+            if (s1Btn !== undefined && doc.getElementById('m_s1_submit_btn')) doc.getElementById('m_s1_submit_btn').textContent = s1Btn;
+          }
+
+          // Step 2
+          const s2Title = document.getElementById('mc_s2_title')?.value;
+          const s2Text = document.getElementById('mc_s2_text')?.value;
+          const s2Btn = document.getElementById('mc_s2_btn')?.value;
+          const s2WaText = document.getElementById('mc_s2_wa_text')?.value;
+
+          const step2 = doc.getElementById('modalStep2');
+          if (step2) {
+            if (s2Title !== undefined && step2.querySelector('h3')) step2.querySelector('h3').textContent = s2Title;
+            if (s2Text !== undefined && step2.querySelector('p')) step2.querySelector('p').textContent = s2Text;
+            if (s2Btn !== undefined && doc.getElementById('m_s2_submit_btn')) doc.getElementById('m_s2_submit_btn').textContent = s2Btn;
+            if (s2WaText !== undefined && step2.querySelector('.btn-wa')) step2.querySelector('.btn-wa').textContent = s2WaText;
+          }
+
+          // Step 3
+          const s3Title = document.getElementById('mc_s3_title')?.value;
+          const s3Text = document.getElementById('mc_s3_text')?.value;
+          const s3Btn = document.getElementById('mc_s3_btn')?.value;
+
+          const step3 = doc.getElementById('modalStep3');
+          if (step3) {
+            if (s3Title !== undefined && step3.querySelector('h3')) step3.querySelector('h3').textContent = s3Title;
+            if (s3Text !== undefined && step3.querySelector('p')) step3.querySelector('p').textContent = s3Text;
+            if (s3Btn !== undefined && step3.querySelector('.btn')) step3.querySelector('.btn').textContent = s3Btn;
+          }
+        }
+
+        function previewModalPhase(stepNum, btn) {
+          document.querySelectorAll('.modal-phase-btn').forEach(b => b.classList.remove('active'));
+          if (btn) btn.classList.add('active');
+
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+          const modal = doc.getElementById('leadModal');
+          if (!modal) return;
+
+          modal.style.display = 'flex';
+          const steps = ['modalStep1', 'modalStep2', 'modalStep3'];
+          steps.forEach((sId, idx) => {
+            const el = doc.getElementById(sId);
+            if (el) el.style.display = (idx + 1 === stepNum) ? 'block' : 'none';
+          });
+          liveUpdateModalContact();
+        }
+
+        function closePreviewModal() {
+          document.querySelectorAll('.modal-phase-btn').forEach(b => b.classList.remove('active'));
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+          const modal = doc.getElementById('leadModal');
+          if (modal) modal.style.display = 'none';
+        }
           const iframe = document.getElementById('livePreviewFrame');
           if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
           try {
@@ -2863,6 +2947,7 @@ if ($editingSlug) {
               liveUpdateSecCtaVisibility();
               liveUpdateSecCtaTexts();
               liveUpdatePortfolio();
+              liveUpdateModalContact();
 
               // Scroll iframe preview to current active tab section once iframe content is fully loaded
               const currentTabId = document.getElementById('active_tab')?.value || 'tab-order';
