@@ -1,5 +1,14 @@
 <?php
 // admin/landing_pages.php
+
+// Automatic HTTPS enforcement
+if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') && (empty($_SERVER['HTTP_X_FORWARDED_PROTO']) || $_SERVER['HTTP_X_FORWARDED_PROTO'] !== 'https')) {
+    if (!empty($_SERVER['HTTP_HOST']) && !in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
+        header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], true, 301);
+        exit;
+    }
+}
+
 $dir = __DIR__ . "/landing_pages";
 $uploadsDir = __DIR__ . "/../uploads";
 
@@ -588,6 +597,7 @@ HTML;
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
+  <script>if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') { location.replace('https://' + location.hostname + location.pathname + location.search + location.hash); }</script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
