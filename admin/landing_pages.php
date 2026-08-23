@@ -2577,6 +2577,9 @@ if ($editingSlug) {
           const modal = doc.getElementById('leadModal');
           if (modal) modal.style.display = 'none';
         }
+
+        // Real-Time Live Typography Updates on iframe
+        function liveUpdateTypography() {
           const iframe = document.getElementById('livePreviewFrame');
           if (!iframe || !iframe.contentWindow || !iframe.contentDocument) return;
           try {
