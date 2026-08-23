@@ -742,7 +742,185 @@
       <p>© 2026 Pačinek Glass & Svobodné Cechy. Všechna práva vyhrazena.</p>
       <p style="margin-top: 0.5rem; font-size: 0.8rem;">Soukromá stránka pro náborovou kampaň učednictví.</p>
     </div>
-  </footer>
+  <!-- LEAD CAPTURE POPUP MODAL (3 PHASES) -->
+  <div id="leadModal" class="lead-modal-overlay">
+    <div class="lead-modal-box">
+      <button type="button" class="lead-modal-close" onclick="closeLeadModal()">&times;</button>
+      
+      <!-- STEP 1: EMAIL CAPTURE -->
+      <div id="modalStep1" class="modal-step">
+        <h3>Zanechte nám svůj e-mail</h3>
+        <p>Zašleme vám podrobné informace o učednictví a propojíme vás s mistrem.</p>
+        <form onsubmit="submitStep1(event)">
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Váš E-mail *</label>
+            <input type="email" id="m_email" name="email" autocomplete="email" class="form-control" placeholder="např. jan.novak@seznam.cz" required />
+          </div>
+          <button type="submit" id="m_s1_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">POKRAČOVAT</button>
+          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+            Odesláním e-mailu berete na vědomí <a href="../../zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely zaslání informací o učednictví a navazující komunikaci.
+          </div>
+        </form>
+      </div>
 
+      <!-- STEP 2: ADDITIONAL DETAILS & WHATSAPP -->
+      <div id="modalStep2" class="modal-step" style="display:none;">
+        <h3>Doplňující údaje (volitelné)</h3>
+        <p>Chcete-li, abychom vám přímo zavolali nebo poslali zprávu, vyplňte vaše jméno a telefon.</p>
+        <form onsubmit="submitStep2(event)">
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jméno a příjmení</label>
+            <input type="text" id="m_name" name="name" autocomplete="name" class="form-control" placeholder="Jan Novák" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Telefon</label>
+            <input type="tel" id="m_phone" name="phone" autocomplete="tel" class="form-control" placeholder="+420 602 123 456" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jsem:</label>
+            <select id="m_role" class="form-control">
+              <option value="Budoucí učedník">Budoucí učedník</option>
+              <option value="Rodič">Rodič</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Zpráva nebo dotaz (volitelné)</label>
+            <textarea id="m_msg" class="form-control" placeholder="Mám zájem o bližší informace..."></textarea>
+          </div>
+          <button type="submit" id="m_s2_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">ODESLAT VŠECHNO</button>
+          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+            Odesláním formuláře berete na vědomí <a href="../../zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely vyřízení vašeho dotazu.
+          </div>
+          <div class="newsletter-option" style="margin-top:0.6rem; text-align:left; font-size:0.82rem; color:var(--text-muted, #cbd5e1); display:flex; align-items:flex-start; gap:0.5rem;">
+            <input type="checkbox" id="m_newsletter" name="newsletter" style="accent-color:var(--color-accent, #e87516); width:16px; height:16px; margin-top:2px; cursor:pointer;" />
+            <label for="m_newsletter" style="cursor:pointer; margin:0; line-height:1.3;">Chci dostávat novinky a pravidelný newsletter od Svobodné Cechy.</label>
+          </div>
+        </form>
+        <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">
+          <button type="button" onclick="submitStep2AndWhatsApp(event, 'https://wa.me/420602763599?text=Dobr%C3%BD%20den,%20cht%C4%9Bl/a%20bych%20zjistit,%20jestli%20je%20u%C4%8Dednictv%C3%AD%20u%20Ji%C5%99%C3%ADho%20Pa%C4%8Dinka%20pro%20m%C4%9B.')" class="btn-wa" style="width:100%; border:none; cursor:pointer;">NAPSAT ROVNOU NA WHATSAPP</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: THANK YOU -->
+      <div id="modalStep3" class="modal-step" style="display:none;">
+        <h3>Děkujeme za váš zájem!</h3>
+        <p id="m_s3_text_el">Vaši zprávu jsme v pořádku přijali. Ozveme se vám do 24 hodin.</p>
+        <button type="button" id="m_s3_close_btn" class="btn btn-primary" onclick="closeLeadModal()" style="width:100%; margin-top:1rem;">ZAVŘÍT</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentLeadId = null;
+
+    function openLeadModal(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const modal = document.getElementById('leadModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const emailInput = document.getElementById('m_email');
+        if (emailInput) setTimeout(() => emailInput.focus(), 100);
+      }
+    }
+
+    function closeLeadModal() {
+      const modal = document.getElementById('leadModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function submitStep1(e) {
+      e.preventDefault();
+      const btn = document.getElementById('m_s1_submit_btn');
+      if (btn) btn.disabled = true;
+
+      const email = document.getElementById('m_email').value;
+
+      fetch('../api_landing_leads.php?action=capture_email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          landing_slug: 'jiri-pacinek',
+          master_name: 'Jiří Pačinek'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.lead_id) currentLeadId = data.lead_id;
+        document.getElementById('modalStep1').style.display = 'none';
+        document.getElementById('modalStep2').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('modalStep1').style.display = 'none';
+        document.getElementById('modalStep2').style.display = 'block';
+      });
+    }
+
+    function submitStep2(e) {
+      e.preventDefault();
+      const btn = document.getElementById('m_s2_submit_btn');
+      if (btn) btn.disabled = true;
+
+      fetch('../api_landing_leads.php?action=update_lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: currentLeadId,
+          email: document.getElementById('m_email').value,
+          landing_slug: 'jiri-pacinek',
+          name: document.getElementById('m_name').value,
+          phone: document.getElementById('m_phone').value,
+          user_role: document.getElementById('m_role').value,
+          message: document.getElementById('m_msg').value,
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      });
+    }
+
+    function submitStep2AndWhatsApp(e, waUrl) {
+      if (e && e.preventDefault) e.preventDefault();
+
+      // Pre-open new tab to avoid popup blocker
+      const waWin = window.open('about:blank', '_blank');
+
+      const nameVal = document.getElementById('m_name').value.trim();
+      const msgVal = document.getElementById('m_msg').value.trim();
+
+      fetch('../api_landing_leads.php?action=update_lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: currentLeadId,
+          email: document.getElementById('m_email').value,
+          landing_slug: 'jiri-pacinek',
+          name: nameVal,
+          phone: document.getElementById('m_phone').value,
+          user_role: document.getElementById('m_role').value,
+          message: msgVal,
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (waWin) waWin.location.href = waUrl;
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      })
+      .catch(err => {
+        if (waWin) waWin.location.href = waUrl;
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      });
+    }
+  </script>
 </body>
 </html>

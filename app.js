@@ -464,9 +464,12 @@ async function openMasterRequestModal() {
             <textarea id="req-note" placeholder="Poznámka / doplňující info..." rows="3" style="width: 100%; margin-top: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;"></textarea>
           </div>
           
-          <div class="modal-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
-            <button type="button" id="btn-req-cancel" class="btn ghost">Zrušit</button>
-            <button type="submit" class="btn primary">Odeslat poptávku</button>
+          <div class="modal-actions" style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+            <div style="display: flex; gap: 12px; justify-content: flex-end; width: 100%;">
+              <button type="button" id="btn-req-cancel" class="btn ghost">Zrušit</button>
+              <button type="submit" class="btn primary">Odeslat poptávku</button>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted, #94a3b8); margin-top: 0.4rem; text-align: center;">Odesláním formuláře berete na vědomí <a href="zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely vyřízení vašeho dotazu.</p>
           </div>
         </form>
         <div id="req-notice" style="display: none; margin-top: 16px; padding: 12px; border-radius: 8px; text-align: center;"></div>
