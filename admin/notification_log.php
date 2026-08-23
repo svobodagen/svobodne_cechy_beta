@@ -117,6 +117,7 @@ $isMailDisabled = in_array('mail', array_map('trim', explode(',', $disabledFunct
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
+  <script>if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') { location.replace('https://' + location.hostname + location.pathname + location.search + location.hash); }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Notifikace a Logy e-mailů – Svobodné Cechy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">

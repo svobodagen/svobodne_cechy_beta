@@ -94,6 +94,7 @@ $resolvedLeadsCount = $pdo->query("SELECT COUNT(*) FROM landing_leads WHERE stat
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
+  <script>if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') { location.replace('https://' + location.hostname + location.pathname + location.search + location.hash); }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Zprávy a Kontakty z Landing Pages – Svobodné Cechy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
