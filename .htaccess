@@ -1,5 +1,13 @@
 DirectoryIndex index.html index.php
 
+# Vynucení zabezpečeného spojení HTTPS
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
 # Navýšení limitů pro nahrávání velkých fotek a audia
 php_value post_max_size 64M
 php_value upload_max_filesize 64M
