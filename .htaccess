@@ -1,8 +1,11 @@
 DirectoryIndex index.html index.php
 
-# Vynucení zabezpečeného spojení HTTPS (Active24)
+# Vynucení zabezpečeného spojení HTTPS (Active24 – za reverzním proxy)
 RewriteEngine On
+# Kontrola přes %{HTTPS} (přímé připojení)
 RewriteCond %{HTTPS} off
+# Kontrola přes X-Forwarded-Proto (za proxy/load balancerem)
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
 RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Navýšení limitů pro nahrávání velkých fotek a audia

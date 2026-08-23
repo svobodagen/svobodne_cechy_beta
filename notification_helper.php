@@ -123,9 +123,9 @@ function save_smtp_settings($settings) {
 }
 
 function get_base_url() {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || ($_SERVER['SERVER_PORT'] ?? 0) == 443) ? "https://" : "http://";
+    // Active24 hosting runs behind a proxy – always enforce https://
     $host = $_SERVER['HTTP_HOST'] ?? 'beta.svobodnecechy.cz';
-    return $protocol . $host;
+    return 'https://' . $host;
 }
 
 function log_notification($recipient, $subject, $bodySnippet, $status, $errorInfo = '') {
