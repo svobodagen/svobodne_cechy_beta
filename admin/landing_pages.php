@@ -571,6 +571,18 @@ HTML;
     $hideInHeroJson = json_encode($hideInHero);
     $hideInContactJson = json_encode($hideInContact);
 
+    // Prepare Header Brand & Menu HTML
+    $headerStyleAttr = !$headerVisible ? ' style="display:none;"' : '';
+    $headerBrandHtml = '';
+    if ($headerShowLogo && $headerShowText) {
+        $headerBrandHtml = '<a href="#" class="logo" style="display:inline-flex; align-items:center; gap:0.6rem;"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:34px; width:auto; vertical-align:middle; display:block;" /><span>SVOBODNÉ CECHY</span></a>';
+    } elseif ($headerShowLogo) {
+        $headerBrandHtml = '<a href="#" class="logo logo-img"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:38px; width:auto; vertical-align:middle; display:block;" /></a>';
+    } elseif ($headerShowText) {
+        $headerBrandHtml = '<a href="#" class="logo">SVOBODNÉ CECHY</a>';
+    }
+    $navMenuStyleAttr = !$headerShowMenu ? ' style="display:none;"' : '';
+
     return <<<HTML
 <!DOCTYPE html>
 <html lang="cs">
@@ -839,16 +851,10 @@ HTML;
   </style>
 </head>
 <body>
-  <header class="site-header" id="site-header"<?= !$headerVisible ? ' style="display:none;"' : '' ?>>
+  <header class="site-header" id="site-header"{$headerStyleAttr}>
     <div class="nav-container">
-<?php if ($headerShowLogo && $headerShowText): ?>
-      <a href="#" class="logo" style="display:inline-flex; align-items:center; gap:0.6rem;"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:34px; width:auto; vertical-align:middle; display:block;" /><span>SVOBODNÉ CECHY</span></a>
-<?php elseif ($headerShowLogo): ?>
-      <a href="#" class="logo logo-img"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:38px; width:auto; vertical-align:middle; display:block;" /></a>
-<?php elseif ($headerShowText): ?>
-      <a href="#" class="logo">SVOBODNÉ CECHY</a>
-<?php endif; ?>
-      <ul class="nav-menu" id="header-nav-menu"<?= !$headerShowMenu ? ' style="display:none;"' : '' ?>>
+      {$headerBrandHtml}
+      <ul class="nav-menu" id="header-nav-menu"{$navMenuStyleAttr}>
         <li><a href="#uvp">Proč?</a></li>
         <li><a href="#mistr">O mistrovi</a></li>
         <li><a href="#co-se-naucis">Co se naučíš</a></li>
