@@ -896,7 +896,7 @@ HTML;
           </div>
           <div class="newsletter-option" style="margin-top:0.6rem; text-align:left; font-size:0.82rem; color:var(--text-muted, #cbd5e1); display:flex; align-items:flex-start; gap:0.5rem;">
             <input type="checkbox" id="m_newsletter" name="newsletter" style="accent-color:var(--color-accent, #e87516); width:16px; height:16px; margin-top:2px; cursor:pointer;" />
-            <label for="m_newsletter" style="cursor:pointer; margin:0; line-height:1.3;">Chci dostávat novinky a pravidelný newsletter od Svobodné Čechy.</label>
+            <label for="m_newsletter" style="cursor:pointer; margin:0; line-height:1.3;">Chci dostávat novinky a pravidelný newsletter od Svobodné Cechy.</label>
           </div>
         </form>
         <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">

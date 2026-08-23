@@ -22,7 +22,7 @@ Umístěte pod tlačítko **ODESLAT VŠECHNO**:
 
 > *Odesláním formuláře berete na vědomí [zpracování osobních údajů](#) pro účely vyřízení vašeho dotazu.*
 >
-> ☐ *Chci dostávat novinky a pravidelný newsletter od Svobodné Čechy.* *(volitelné / nezaškrtnuté)*
+> ☐ *Chci dostávat novinky a pravidelný newsletter od Svobodné Cechy.* *(volitelné / nezaškrtnuté)*
 
 ---
 
