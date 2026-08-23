@@ -245,6 +245,12 @@ function renderLandingPageHtml($data) {
     $hideInHero = isset($design['sticky_cta_hide_in_hero']) && $design['sticky_cta_hide_in_hero'] == true;
     $hideInContact = isset($design['sticky_cta_hide_in_contact']) && $design['sticky_cta_hide_in_contact'] == true;
 
+    // Header toggles (defaults: menu ON, text ON, logo OFF)
+    $headerShowMenu = !isset($design['header_show_menu']) || $design['header_show_menu'] == true;
+    $headerShowText = !isset($design['header_show_text']) || $design['header_show_text'] == true;
+    $headerShowLogo = isset($design['header_show_logo']) && $design['header_show_logo'] == true;
+    $headerVisible  = $headerShowMenu || $headerShowText || $headerShowLogo;
+
     // Section CTA configuration & Same text setting
     $secCtaData = $data['section_cta'] ?? [];
     $secCtaSameText = !isset($secCtaData['same_text']) || $secCtaData['same_text'] == true;
@@ -826,10 +832,15 @@ HTML;
   </style>
 </head>
 <body>
-  <header class="site-header">
+  <header class="site-header" id="site-header"<?= !$headerVisible ? ' style="display:none;"' : '' ?>>
     <div class="nav-container">
+<?php if ($headerShowLogo): ?>
+      <a href="#" class="logo logo-img"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:38px; width:auto; vertical-align:middle; display:block;" /></a>
+<?php elseif ($headerShowText): ?>
       <a href="#" class="logo">SVOBODNÉ CECHY</a>
-      <ul class="nav-menu">
+<?php endif; ?>
+<?php if ($headerShowMenu): ?>
+      <ul class="nav-menu" id="header-nav-menu">
         <li><a href="#uvp">Proč?</a></li>
         <li><a href="#mistr">O mistrovi</a></li>
         <li><a href="#co-se-naucis">Co se naučíš</a></li>
@@ -839,6 +850,7 @@ HTML;
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#kontakt" class="cta-nav" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
       </ul>
+<?php endif; ?>
     </div>
   </header>
 
@@ -1337,6 +1349,9 @@ if ($editingSlug) {
                 $stickyEnabled = !isset($designData['sticky_cta_enabled']) || $designData['sticky_cta_enabled'] == true;
                 $stickyHideHero = isset($designData['sticky_cta_hide_in_hero']) && $designData['sticky_cta_hide_in_hero'] == true;
                 $stickyHideContact = isset($designData['sticky_cta_hide_in_contact']) && $designData['sticky_cta_hide_in_contact'] == true;
+                $edHeaderShowMenu = !isset($designData['header_show_menu']) || $designData['header_show_menu'] == true;
+                $edHeaderShowText = !isset($designData['header_show_text']) || $designData['header_show_text'] == true;
+                $edHeaderShowLogo = isset($designData['header_show_logo']) && $designData['header_show_logo'] == true;
                 ?>
 
                 <!-- 1. COLOR THEMES -->
@@ -1472,7 +1487,29 @@ if ($editingSlug) {
                   </div>
                 </div>
 
-                <!-- 3. FLOATING STICKY CTA BUTTON SWITCH & SECTION FILTERS -->
+                <!-- 3. HEADER VISIBILITY SWITCHES -->
+                <div class="item-card">
+                  <h4>🔝 Zobrazení Prvků v Hlavičce (Header)</h4>
+                  <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">
+                    Zapni nebo vypni jednotlivé prvky v hlavičce stránky. Pokud nejsou zapnuté žádné prvky, hlavička (proužek) se zcela skryje.
+                  </p>
+                  <div style="display:flex; flex-direction:column; gap:0.9rem;">
+                    <label style="color:#fff; font-weight:normal; cursor:pointer; display:flex; align-items:flex-start; gap:0.7rem;">
+                      <input type="checkbox" id="design_header_show_logo" style="width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0;" <?= $edHeaderShowLogo ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
+                      <span><strong>Logo Svobodných Cechů</strong> <span style="color:var(--text-muted); font-size:0.82rem;">(SVG ikona) – zobrazí se místo textového loga; pokud je zapnuto, text se ignoruje</span></span>
+                    </label>
+                    <label style="color:#fff; font-weight:normal; cursor:pointer; display:flex; align-items:flex-start; gap:0.7rem;">
+                      <input type="checkbox" id="design_header_show_text" style="width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0;" <?= $edHeaderShowText ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
+                      <span><strong>Text „SVOBODNÉ CECHY"</strong> <span style="color:var(--text-muted); font-size:0.82rem;">– textový název v hlavičce (ignoruje se pokud je zapnuto SVG logo)</span></span>
+                    </label>
+                    <label style="color:#fff; font-weight:normal; cursor:pointer; display:flex; align-items:flex-start; gap:0.7rem;">
+                      <input type="checkbox" id="design_header_show_menu" style="width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0;" <?= $edHeaderShowMenu ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
+                      <span><strong>Navigační menu</strong> <span style="color:var(--text-muted); font-size:0.82rem;">– odkazy na sekce stránky v pravé části hlavičky</span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 4. FLOATING STICKY CTA BUTTON SWITCH & SECTION FILTERS -->
                 <div class="item-card">
                   <h4>📌 Plovoucí Tlačítko (Floating Sticky CTA pro PC, Tablet i Mobil)</h4>
                   <div class="form-group" style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1rem;">
@@ -2407,6 +2444,49 @@ if ($editingSlug) {
             if (heroBtn2) {
               heroBtn2.style.display = heroBtn2Show ? 'inline-flex' : 'none';
             }
+
+            // Header toggles live update
+            const hShowLogo = document.getElementById('design_header_show_logo')?.checked ?? false;
+            const hShowText = document.getElementById('design_header_show_text')?.checked ?? true;
+            const hShowMenu = document.getElementById('design_header_show_menu')?.checked ?? true;
+            const hVisible  = hShowLogo || hShowText || hShowMenu;
+
+            const siteHeader = doc.getElementById('site-header');
+            if (siteHeader) {
+              siteHeader.style.display = hVisible ? '' : 'none';
+            }
+
+            // Rebuild logo / text node in live preview
+            const navCont = doc.querySelector('.nav-container');
+            if (navCont) {
+              const existingBrand = navCont.querySelector('a.logo');
+              if (existingBrand) existingBrand.remove();
+
+              if (hShowLogo) {
+                const img = doc.createElement('img');
+                img.src = '../../LOGO_SC2.svg';
+                img.alt = 'Svobodné Cechy';
+                img.style.cssText = 'height:38px; width:auto; vertical-align:middle; display:block;';
+                const a = doc.createElement('a');
+                a.href = '#';
+                a.className = 'logo logo-img';
+                a.appendChild(img);
+                navCont.insertBefore(a, navCont.firstChild);
+              } else if (hShowText) {
+                const a = doc.createElement('a');
+                a.href = '#';
+                a.className = 'logo';
+                a.textContent = 'SVOBODNÉ CECHY';
+                navCont.insertBefore(a, navCont.firstChild);
+              }
+            }
+
+            // Navigation menu toggle
+            const navMenu = doc.getElementById('header-nav-menu');
+            if (navMenu) {
+              navMenu.style.display = hShowMenu ? '' : 'none';
+            }
+
           } catch(e) { console.log('Design live update error:', e); }
         }
 
@@ -3153,7 +3233,10 @@ if ($editingSlug) {
               even_vert_padding: document.getElementById('design_even_vert_padding').value,
               sticky_cta_enabled: document.getElementById('design_sticky_enabled').checked,
               sticky_cta_hide_in_hero: document.getElementById('design_sticky_hide_hero').checked,
-              sticky_cta_hide_in_contact: document.getElementById('design_sticky_hide_contact').checked
+              sticky_cta_hide_in_contact: document.getElementById('design_sticky_hide_contact').checked,
+              header_show_logo: document.getElementById('design_header_show_logo')?.checked ?? false,
+              header_show_text: document.getElementById('design_header_show_text')?.checked ?? true,
+              header_show_menu: document.getElementById('design_header_show_menu')?.checked ?? true
             },
             modal_contact: {
               step1_title: document.getElementById('mc_s1_title').value,
