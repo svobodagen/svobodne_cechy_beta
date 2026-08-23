@@ -349,18 +349,25 @@
       .hero-buttons { justify-content: center; }
       .master-grid { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
-      .nav-menu { display: none; }
+      .nav-container { flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
+      .nav-menu { gap: 0.7rem 1rem; flex-wrap: wrap; justify-content: center; font-size: 0.82rem; }
+      .nav-menu a { font-size: 0.82rem; }
+      .cta-nav { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
       .hero h1 { font-size: 2.6rem; }
+    }
+    @media (max-width: 600px) {
+      .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
+      .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
     }
   </style>
 </head>
 <body>
 
   <!-- Sticky Header -->
-  <header class="site-header">
+  <header class="site-header" id="site-header">
     <div class="nav-container">
       <a href="#" class="logo">PAČINEK GLASS x SVOBODNÉ CECHY</a>
-      <ul class="nav-menu">
+      <ul class="nav-menu" id="header-nav-menu">
         <li><a href="#uvp">Proč?</a></li>
         <li><a href="#mistr">O mistrovi</a></li>
         <li><a href="#co-se-naucis">Co se naučíš</a></li>

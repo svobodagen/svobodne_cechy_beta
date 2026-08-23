@@ -824,23 +824,31 @@ HTML;
       .hero-buttons { justify-content: center; }
       .master-grid { grid-template-columns: 1fr; gap: 1.5rem; }
       .contact-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-      .nav-menu { display: none; }
+      .nav-container { flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
+      .nav-menu { gap: 0.7rem 1rem; flex-wrap: wrap; justify-content: center; font-size: 0.82rem; }
+      .nav-menu a { font-size: 0.82rem; }
+      .cta-nav { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
       .section-title { margin-bottom: 1.5rem; }
       .primary-cta-box { padding: 1.8rem 1rem; margin: 1.8rem auto; }
       .timeline-step { grid-template-columns: 40px 1fr; gap: 0.8rem; padding: 0.9rem 1rem; }
+    }
+    @media (max-width: 600px) {
+      .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
+      .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
     }
   </style>
 </head>
 <body>
   <header class="site-header" id="site-header"<?= !$headerVisible ? ' style="display:none;"' : '' ?>>
     <div class="nav-container">
-<?php if ($headerShowLogo): ?>
+<?php if ($headerShowLogo && $headerShowText): ?>
+      <a href="#" class="logo" style="display:inline-flex; align-items:center; gap:0.6rem;"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:34px; width:auto; vertical-align:middle; display:block;" /><span>SVOBODNÉ CECHY</span></a>
+<?php elseif ($headerShowLogo): ?>
       <a href="#" class="logo logo-img"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:38px; width:auto; vertical-align:middle; display:block;" /></a>
 <?php elseif ($headerShowText): ?>
       <a href="#" class="logo">SVOBODNÉ CECHY</a>
 <?php endif; ?>
-<?php if ($headerShowMenu): ?>
-      <ul class="nav-menu" id="header-nav-menu">
+      <ul class="nav-menu" id="header-nav-menu"<?= !$headerShowMenu ? ' style="display:none;"' : '' ?>>
         <li><a href="#uvp">Proč?</a></li>
         <li><a href="#mistr">O mistrovi</a></li>
         <li><a href="#co-se-naucis">Co se naučíš</a></li>
@@ -850,7 +858,6 @@ HTML;
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#kontakt" class="cta-nav" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
       </ul>
-<?php endif; ?>
     </div>
   </header>
 
@@ -1496,11 +1503,11 @@ if ($editingSlug) {
                   <div style="display:flex; flex-direction:column; gap:0.9rem;">
                     <label style="color:#fff; font-weight:normal; cursor:pointer; display:flex; align-items:flex-start; gap:0.7rem;">
                       <input type="checkbox" id="design_header_show_logo" style="width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0;" <?= $edHeaderShowLogo ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
-                      <span><strong>Logo Svobodných Cechů</strong> <span style="color:var(--text-muted); font-size:0.82rem;">(SVG ikona) – zobrazí se místo textového loga; pokud je zapnuto, text se ignoruje</span></span>
+                      <span><strong>Logo Svobodných Cechů</strong> <span style="color:var(--text-muted); font-size:0.82rem;">(SVG ikona) – grafický znak v hlavičce</span></span>
                     </label>
                     <label style="color:#fff; font-weight:normal; cursor:pointer; display:flex; align-items:flex-start; gap:0.7rem;">
                       <input type="checkbox" id="design_header_show_text" style="width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0;" <?= $edHeaderShowText ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
-                      <span><strong>Text „SVOBODNÉ CECHY"</strong> <span style="color:var(--text-muted); font-size:0.82rem;">– textový název v hlavičce (ignoruje se pokud je zapnuto SVG logo)</span></span>
+                      <span><strong>Text „SVOBODNÉ CECHY"</strong> <span style="color:var(--text-muted); font-size:0.82rem;">– textový název v hlavičce (lze kombinovat s logem – nejdřív logo, poté text)</span></span>
                     </label>
                     <label style="color:#fff; font-weight:normal; cursor:pointer; display:flex; align-items:flex-start; gap:0.7rem;">
                       <input type="checkbox" id="design_header_show_menu" style="width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0;" <?= $edHeaderShowMenu ? 'checked' : '' ?> onchange="liveUpdateDesign()" />
@@ -2462,7 +2469,24 @@ if ($editingSlug) {
               const existingBrand = navCont.querySelector('a.logo');
               if (existingBrand) existingBrand.remove();
 
-              if (hShowLogo) {
+              if (hShowLogo && hShowText) {
+                const a = doc.createElement('a');
+                a.href = '#';
+                a.className = 'logo';
+                a.style.cssText = 'display:inline-flex; align-items:center; gap:0.6rem;';
+                
+                const img = doc.createElement('img');
+                img.src = '../../LOGO_SC2.svg';
+                img.alt = 'Svobodné Cechy';
+                img.style.cssText = 'height:34px; width:auto; vertical-align:middle; display:block;';
+                
+                const span = doc.createElement('span');
+                span.textContent = 'SVOBODNÉ CECHY';
+                
+                a.appendChild(img);
+                a.appendChild(span);
+                navCont.insertBefore(a, navCont.firstChild);
+              } else if (hShowLogo) {
                 const img = doc.createElement('img');
                 img.src = '../../LOGO_SC2.svg';
                 img.alt = 'Svobodné Cechy';
