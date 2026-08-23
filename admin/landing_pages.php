@@ -265,10 +265,14 @@ function renderLandingPageHtml($data) {
     $m_s3_title = htmlspecialchars($mc['step3_title'] ?? 'Děkujeme za váš zájem!');
     $m_s3_text = htmlspecialchars($mc['step3_text'] ?? 'Vaši zprávu jsme v pořádku přijali. Ozveme se vám do 24 hodin.');
     $m_s3_btn = htmlspecialchars($mc['step3_btn'] ?? 'ZAVŘÍT');
-    $m_s3_web_url = htmlspecialchars($mc['step3_web_url'] ?? '');
+    $rawWebUrl = trim($mc['step3_web_url'] ?? '');
+    if ($rawWebUrl !== '' && !preg_match('~^https?://~i', $rawWebUrl) && !preg_match('~^/~', $rawWebUrl)) {
+        $rawWebUrl = 'https://' . $rawWebUrl;
+    }
+    $m_s3_web_url = htmlspecialchars($rawWebUrl);
     $m_s3_web_btn_text = htmlspecialchars($mc['step3_web_btn_text'] ?? 'Přejít na web');
     $m_s3_web_desc = htmlspecialchars($mc['step3_web_desc'] ?? '');
-    $m_s3_web_box_display = !empty($mc['step3_web_url']) ? 'block' : 'none';
+    $m_s3_web_box_display = !empty($rawWebUrl) ? 'block' : 'none';
     $m_s3_web_desc_display = !empty($mc['step3_web_desc']) ? 'block' : 'none';
 
     // 1. Hero
@@ -2593,11 +2597,15 @@ if ($editingSlug) {
 
             const webBox = doc.getElementById('m_s3_web_box');
             if (webBox) {
-              const hasUrl = s3WebUrl && s3WebUrl.trim() !== '';
+              let formattedUrl = s3WebUrl ? s3WebUrl.trim() : '';
+              if (formattedUrl && !/^https?:\/\//i.test(formattedUrl) && !/^\//.test(formattedUrl)) {
+                formattedUrl = 'https://' + formattedUrl;
+              }
+              const hasUrl = formattedUrl !== '';
               webBox.style.display = hasUrl ? 'block' : 'none';
               const webLink = doc.getElementById('m_s3_web_link_el');
               if (webLink) {
-                webLink.href = s3WebUrl || '#';
+                webLink.href = formattedUrl || '#';
                 webLink.textContent = s3WebBtnText || 'Přejít na web';
               }
               const webDesc = doc.getElementById('m_s3_web_desc_el');
@@ -3103,6 +3111,11 @@ if ($editingSlug) {
         }
 
         function prepareJsonData() {
+          let cleanWebUrl = document.getElementById('mc_s3_web_url')?.value?.trim() || '';
+          if (cleanWebUrl && !/^https?:\/\//i.test(cleanWebUrl) && !/^\//.test(cleanWebUrl)) {
+            cleanWebUrl = 'https://' + cleanWebUrl;
+          }
+
           const data = {
             slug: <?= json_encode($editingSlug) ?>,
             master_name: document.getElementById('m_name').value,
@@ -3153,7 +3166,7 @@ if ($editingSlug) {
               step3_title: document.getElementById('mc_s3_title').value,
               step3_text: document.getElementById('mc_s3_text').value,
               step3_btn: document.getElementById('mc_s3_btn').value,
-              step3_web_url: document.getElementById('mc_s3_web_url').value,
+              step3_web_url: cleanWebUrl,
               step3_web_btn_text: document.getElementById('mc_s3_web_btn_text').value,
               step3_web_desc: document.getElementById('mc_s3_web_desc').value
             },
