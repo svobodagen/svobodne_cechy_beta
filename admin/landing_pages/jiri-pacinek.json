@@ -24,7 +24,10 @@
         "odd_side_padding": "1.2rem",
         "odd_vert_padding": "2.8rem",
         "even_side_padding": "0.6rem",
-        "even_vert_padding": "2.2rem"
+        "even_vert_padding": "2.2rem",
+        "header_show_logo": true,
+        "header_show_text": true,
+        "header_show_menu": true
     },
     "typography": {
         "hero_h1": "step-3",
