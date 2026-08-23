@@ -1130,6 +1130,10 @@ if ($editingSlug) {
     $jsonFile = $dir . "/" . $editingSlug . ".json";
     if (file_exists($jsonFile)) {
         $editingData = json_decode(file_get_contents($jsonFile), true);
+        if (is_array($editingData)) {
+            $htmlFile = $dir . "/" . $editingSlug . ".html";
+            file_put_contents($htmlFile, renderLandingPageHtml($editingData));
+        }
     }
 }
 ?>
