@@ -1112,6 +1112,16 @@ $message = "";
 $messageType = "success";
 $savedActiveTab = "tab-order";
 
+if (isset($_GET['msg']) && $_GET['msg'] === 'deleted') {
+    $message = "Stránka byla úspěšně smazána.";
+}
+if (isset($_GET['created'])) {
+    $message = "Nová landing page byla úspěšně vytvořena!";
+}
+if (isset($_GET['duplicated'])) {
+    $message = "Landing page byla úspěšně zduplikována s novým názvem!";
+}
+
 // Handle Saving Visual Form Data
 if (isset($_POST['save_sections_form'])) {
     $slug = basename($_POST['edit_slug']);
@@ -1140,6 +1150,55 @@ if (isset($_GET['delete'])) {
     @unlink($dir . "/" . $deleteSlug . ".html");
     @unlink($dir . "/" . $deleteSlug . ".json");
     header("Location: landing_pages.php?msg=deleted");
+    exit;
+}
+
+// Handle Duplicating Existing Page
+if (isset($_POST['duplicate_page'])) {
+    $sourceSlug = str_replace('.html', '', basename($_POST['source_slug']));
+    $newName = trim($_POST['new_master_name']);
+    
+    if (empty($newName)) {
+        $newName = $sourceSlug . " (Kopie)";
+    }
+    
+    // Generate clean slug from new name
+    $transliterator = @iconv('UTF-8', 'ASCII//TRANSLIT', $newName);
+    $rawSlug = $transliterator !== false ? $transliterator : $newName;
+    $rawSlug = str_replace([' ', '_', '.'], '-', $rawSlug);
+    $cleanSlug = preg_replace('/[^a-z0-9\-]/', '', strtolower($rawSlug));
+    $cleanSlug = trim(preg_replace('/-+/', '-', $cleanSlug), '-');
+    if (empty($cleanSlug)) { $cleanSlug = "landing-" . time(); }
+    
+    // Ensure slug uniqueness
+    $slug = $cleanSlug;
+    $counter = 1;
+    while (file_exists($dir . "/" . $slug . ".json") || file_exists($dir . "/" . $slug . ".html")) {
+        $counter++;
+        $slug = $cleanSlug . "-" . $counter;
+    }
+    
+    // Load source data
+    $sourceJsonFile = $dir . "/" . $sourceSlug . ".json";
+    $data = [];
+    if (file_exists($sourceJsonFile)) {
+        $data = json_decode(file_get_contents($sourceJsonFile), true);
+    }
+    if (!is_array($data) || empty($data)) {
+        $defaultJson = file_exists($dir . "/jiri-pacinek.json") ? file_get_contents($dir . "/jiri-pacinek.json") : "{}";
+        $data = json_decode($defaultJson, true);
+    }
+    
+    $data['slug'] = $slug;
+    $data['master_name'] = $newName;
+    if (isset($data['master']) && is_array($data['master'])) {
+        $data['master']['name'] = mb_strtoupper($newName);
+    }
+    
+    file_put_contents($dir . "/" . $slug . ".json", json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    file_put_contents($dir . "/" . $slug . ".html", renderLandingPageHtml($data));
+    
+    header("Location: landing_pages.php?edit={$slug}&duplicated=1");
     exit;
 }
 
@@ -1241,10 +1300,18 @@ if ($editingSlug) {
     .btn-action { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: all .2s; }
     .btn-edit { background: #3b82f6; color: #fff; }
     .btn-edit:hover { background: #2563eb; }
+    .btn-duplicate { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .btn-duplicate:hover { background: #10b981; color: #fff; }
     .btn-view { background: var(--accent); color: #fff; }
     .btn-view:hover { background: var(--accent-hover); }
     .btn-copy { background: rgba(255,255,255,0.1); color: var(--text); border: 1px solid var(--border); }
     .btn-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+    /* Modal for Duplication */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--accent); border-radius: 12px; width: 100%; max-width: 480px; padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.8); animation: modalIn 0.2s ease-out; }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
     /* Visual Editor Layout */
     .editor-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
@@ -3418,8 +3485,9 @@ if ($editingSlug) {
             echo "<td><span class='badge-file'><i class='bi bi-file-earmark-text'></i> " . htmlspecialchars($slug) . "</span></td>";
             echo "<td style='font-family:monospace; color:var(--text-muted); font-size:0.85rem;'>" . htmlspecialchars($relPath) . "</td>";
             echo "<td>";
-            echo "<div style='display:flex; gap:0.5rem;'>";
+            echo "<div style='display:flex; gap:0.5rem; flex-wrap:wrap;'>";
             echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce, fotky, fonty, témata & pořadí</a>";
+            echo "<button type='button' class='btn-action btn-duplicate' onclick=\"openDuplicateModal('" . htmlspecialchars($slug, ENT_QUOTES) . "')\"><i class='bi bi-files'></i> Duplikovat</button>";
             echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
             echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
             echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";
@@ -3433,6 +3501,39 @@ if ($editingSlug) {
           ?>
         </tbody>
       </table>
+    </div>
+
+    <!-- DUPLICATE MODAL -->
+    <div id="duplicateModalOverlay" class="modal-overlay" onclick="if(event.target === this) closeDuplicateModal();">
+      <div class="modal-box">
+        <h3 style="color:#fff; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;">
+          <i class="bi bi-files" style="color:var(--accent);"></i> Duplikovat Landing Page
+        </h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+          Vytvoří přesnou kopii stránky <strong id="duplicateSourceSlug" style="color:var(--accent);"></strong> se všemi sekcemi, texty, fotkami i nastavením barev a fontů.
+        </p>
+
+        <form method="post" action="landing_pages.php">
+          <input type="hidden" name="source_slug" id="duplicate_source_slug" value="" />
+          
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label style="color:#fff; font-size:0.9rem; font-weight:600; display:block; margin-bottom:0.4rem;">
+              Zadej nový název / jméno mistra (New Name)
+            </label>
+            <input type="text" name="new_master_name" id="duplicate_new_name" class="form-control" placeholder="Např. Petr Novotný" required autofocus />
+            <span style="display:block; font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem;">
+              URL slug se vygeneruje automaticky z tohoto názvu.
+            </span>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.8rem;">
+            <button type="button" class="btn-action btn-copy" onclick="closeDuplicateModal()">Zrušit</button>
+            <button type="submit" name="duplicate_page" class="btn-action btn-view" style="padding:0.6rem 1.4rem;">
+              <i class="bi bi-files"></i> Vytvořit kopii
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- CREATE NEW LANDING PAGE -->
@@ -3454,5 +3555,28 @@ if ($editingSlug) {
     </div>
 
   </div>
+
+  <script>
+    function openDuplicateModal(sourceSlug) {
+      document.getElementById('duplicate_source_slug').value = sourceSlug;
+      document.getElementById('duplicateSourceSlug').textContent = sourceSlug + '.html';
+      document.getElementById('duplicate_new_name').value = '';
+      document.getElementById('duplicateModalOverlay').classList.add('active');
+      setTimeout(() => {
+        const input = document.getElementById('duplicate_new_name');
+        if (input) input.focus();
+      }, 100);
+    }
+
+    function closeDuplicateModal() {
+      document.getElementById('duplicateModalOverlay').classList.remove('active');
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeDuplicateModal();
+      }
+    });
+  </script>
 </body>
 </html>
