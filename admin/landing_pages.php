@@ -363,12 +363,13 @@ HTML;
     $m_quote = htmlspecialchars($data['master']['quote'] ?? '');
     $m_bio2 = htmlspecialchars($data['master']['bio2'] ?? 'V dílně sází na poctivý přístup a předávání sklářského umění další generaci.');
     $m_img = htmlspecialchars(fixImgUrl($data['master']['image'] ?? ''));
+    $m_bw = !empty($data['master']['bw']) ? ' is-bw' : '';
     $masterCtaHtml = $getSecCtaHtml('master');
 
     $masterSection = <<<HTML
     <section id="mistr" class="master-section">
       <div class="container master-grid">
-        <div class="master-photo"><img src="{$m_img}" alt="Mistr {$m_name}" /></div>
+        <div class="master-photo"><img src="{$m_img}" alt="Mistr {$m_name}" class="{$m_bw}" /></div>
         <div class="master-info">
           <p class="eyebrow">{$m_eyebrow}</p>
           <h3>{$m_name}</h3>
@@ -718,7 +719,8 @@ HTML;
     .uvp-card h3 { font-family: var(--font-heading); font-size: var(--card-h3-clamp); color: var(--color-accent); margin-bottom: 0.4rem; }
 
     .master-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem; align-items: center; }
-    .master-photo img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 14px; border: 1px solid var(--color-accent); }
+    .master-photo img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 14px; border: 1px solid var(--color-accent); transition: filter 0.3s ease; }
+    .master-photo img.is-bw { filter: grayscale(100%) contrast(108%); }
     .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; font-size: var(--eyebrow-size); }
     .quote-box { font-family: var(--font-heading); font-style: italic; font-size: clamp(1.05rem, 2.5vw, 1.25rem); color: var(--color-cream); border-left: 3px solid var(--color-accent); padding-left: 0.9rem; margin: 1rem 0; line-height: 1.3; }
 
@@ -1981,11 +1983,18 @@ if ($editingSlug) {
                 <div class="form-group">
                   <label>Fotka mistra</label>
                   <div class="upload-row">
-                    <img src="<?= htmlspecialchars(fixAdminPreviewUrl($editingData['master']['image'] ?? '')) ?>" id="prev_m_img" class="thumb-preview" />
+                    <img src="<?= htmlspecialchars(fixAdminPreviewUrl($editingData['master']['image'] ?? '')) ?>" id="prev_m_img" class="thumb-preview" style="<?= !empty($editingData['master']['bw']) ? 'filter: grayscale(100%);' : '' ?>" />
                     <input type="text" class="form-control" id="m_img" value="<?= htmlspecialchars($editingData['master']['image'] ?? '') ?>" />
                     <label class="upload-btn">
                       <i class="bi bi-upload"></i> Nahrát fotku mistra
                       <input type="file" accept="image/*" style="display:none;" onchange="uploadImage(this, 'm_img', 'prev_m_img')" />
+                    </label>
+                  </div>
+                  <div style="margin-top: 0.8rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem;">
+                    <label style="display:inline-flex; align-items:center; gap:0.6rem; margin:0; cursor:pointer; color:#fff;">
+                      <input type="checkbox" id="m_bw" style="width:18px; height:18px; accent-color:var(--accent); cursor:pointer;"
+                        <?= !empty($editingData['master']['bw']) ? 'checked' : '' ?> onchange="liveUpdateMasterPhotoBw()" />
+                      <span><strong>Zobrazit fotografii mistra pouze černobíle</strong> <small style="color:var(--text-muted); font-size:0.8rem; margin-left:0.3rem;">(fotka se na webu i v náhledu zobrazí v černobílé verzi)</small></span>
                     </label>
                   </div>
                 </div>
@@ -2665,6 +2674,26 @@ if ($editingSlug) {
           });
         }
 
+        // Real-Time Live Master Photo B&W Update on iframe
+        function liveUpdateMasterPhotoBw() {
+          const iframe = document.getElementById('livePreviewFrame');
+          const isBw = document.getElementById('m_bw')?.checked;
+          const prevImg = document.getElementById('prev_m_img');
+          if (prevImg) {
+            prevImg.style.filter = isBw ? 'grayscale(100%)' : 'none';
+          }
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+          const masterPhotoImg = doc.querySelector('#mistr .master-photo img');
+          if (masterPhotoImg) {
+            if (isBw) {
+              masterPhotoImg.classList.add('is-bw');
+            } else {
+              masterPhotoImg.classList.remove('is-bw');
+            }
+          }
+        }
+
         // Real-Time Live Portfolio Updates on iframe (aspect ratio, object fit, position)
         function liveUpdatePortfolio() {
           const iframe = document.getElementById('livePreviewFrame');
@@ -3204,6 +3233,7 @@ if ($editingSlug) {
               liveReorderSectionsInIframe();
               liveUpdateSecCtaVisibility();
               liveUpdateSecCtaTexts();
+              liveUpdateMasterPhotoBw();
               liveUpdatePortfolio();
               liveUpdateModalContact();
 
@@ -3394,7 +3424,8 @@ if ($editingSlug) {
               bio: document.getElementById('m_bio').value,
               quote: document.getElementById('m_quote').value,
               bio2: document.getElementById('m_bio2').value,
-              image: document.getElementById('m_img').value
+              image: document.getElementById('m_img').value,
+              bw: document.getElementById('m_bw')?.checked ?? false
             },
             outcomes: {
               eyebrow: document.getElementById('o_eyebrow').value,
