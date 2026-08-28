@@ -223,18 +223,22 @@ function renderLandingPageHtml($data) {
     $metaDesc = htmlspecialchars($data['meta_desc'] ?? '');
 
     // OG Image & Canonical URL handling
-    $rawOgImage = trim($data['og_image'] ?? ($data['hero']['image'] ?? ''));
+    // Note: empty string must explicitly fall back to hero image (PHP ?? only catches null/undefined, not "")
+    $rawOgImage = trim($data['og_image'] ?? '');
+    if (empty($rawOgImage)) {
+        $rawOgImage = trim($data['hero']['image'] ?? '');
+    }
+
     if (!empty($rawOgImage)) {
         if (strpos($rawOgImage, 'http://') === 0 || strpos($rawOgImage, 'https://') === 0) {
             $ogImageUrl = $rawOgImage;
         } else {
             $filename = basename($rawOgImage);
             $host = $_SERVER['HTTP_HOST'] ?? 'beta.svobodnecechy.cz';
-            $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'https';
             if (strpos($rawOgImage, 'uploads/') !== false) {
-                $ogImageUrl = $proto . '://' . $host . '/uploads/' . $filename;
+                $ogImageUrl = 'https://' . $host . '/uploads/' . $filename;
             } else {
-                $ogImageUrl = $proto . '://' . $host . '/' . ltrim($rawOgImage, './');
+                $ogImageUrl = 'https://' . $host . '/' . ltrim($rawOgImage, './');
             }
         }
     } else {
@@ -634,6 +638,10 @@ HTML;
   <meta property="og:title" content="{$metaTitle}" />
   <meta property="og:description" content="{$metaDesc}" />
   <meta property="og:image" content="{$ogImageUrl}" />
+  <meta property="og:image:secure_url" content="{$ogImageUrl}" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="{$metaTitle}" />
 
   <!-- Twitter Card -->
