@@ -221,6 +221,28 @@ function renderLandingPageHtml($data) {
     $masterName = htmlspecialchars($data['master_name'] ?? 'Mistr');
     $metaTitle = htmlspecialchars($data['meta_title'] ?? $masterName . ' – Svobodné Cechy');
     $metaDesc = htmlspecialchars($data['meta_desc'] ?? '');
+
+    // OG Image & Canonical URL handling
+    $rawOgImage = trim($data['og_image'] ?? ($data['hero']['image'] ?? ''));
+    if (!empty($rawOgImage)) {
+        if (strpos($rawOgImage, 'http://') === 0 || strpos($rawOgImage, 'https://') === 0) {
+            $ogImageUrl = $rawOgImage;
+        } else {
+            $filename = basename($rawOgImage);
+            $host = $_SERVER['HTTP_HOST'] ?? 'beta.svobodnecechy.cz';
+            $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'https';
+            if (strpos($rawOgImage, 'uploads/') !== false) {
+                $ogImageUrl = $proto . '://' . $host . '/uploads/' . $filename;
+            } else {
+                $ogImageUrl = $proto . '://' . $host . '/' . ltrim($rawOgImage, './');
+            }
+        }
+    } else {
+        $host = $_SERVER['HTTP_HOST'] ?? 'beta.svobodnecechy.cz';
+        $ogImageUrl = 'https://' . $host . '/images/sample_master.png';
+    }
+    $host = $_SERVER['HTTP_HOST'] ?? 'beta.svobodnecechy.cz';
+    $ogUrl = 'https://' . $host . '/admin/landing_pages/' . $slug . '.html';
     
     // Typography Configuration
     $typoConf = getTypoCssValues($data['typography'] ?? []);
@@ -605,6 +627,21 @@ HTML;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{$metaTitle}</title>
   <meta name="description" content="{$metaDesc}" />
+
+  <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="{$ogUrl}" />
+  <meta property="og:title" content="{$metaTitle}" />
+  <meta property="og:description" content="{$metaDesc}" />
+  <meta property="og:image" content="{$ogImageUrl}" />
+  <meta property="og:image:alt" content="{$metaTitle}" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="{$ogUrl}" />
+  <meta name="twitter:title" content="{$metaTitle}" />
+  <meta name="twitter:description" content="{$metaDesc}" />
+  <meta name="twitter:image" content="{$ogImageUrl}" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1399,6 +1436,7 @@ if ($editingSlug) {
                 <button type="button" class="tab-btn special-design" onclick="showTab('tab-design')"><i class="bi bi-palette"></i> 🎨 DESIGN & BARVY</button>
                 <button type="button" class="tab-btn special-design" onclick="showTab('tab-modal-contact')"><i class="bi bi-chat-square-dots"></i> 💬 POPUP FORMULÁŘ (3 FÁZE)</button>
                 <button type="button" class="tab-btn special-order" onclick="showTab('tab-typo')"><i class="bi bi-type"></i> 🔤 STUPNĚ FONTŮ</button>
+                <button type="button" class="tab-btn special-design" onclick="showTab('tab-seo')"><i class="bi bi-share"></i> 🖼️ NÁHLED PRO SOCIÁLNÍ SÍTĚ (OG IMAGE)</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-hero')">1. HERO</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-uvp')">2. UVP</button>
                 <button type="button" class="tab-btn" onclick="showTab('tab-master')">3. MISTR</button>
@@ -1842,6 +1880,77 @@ if ($editingSlug) {
                       <option value="step-5" <?= $eyebrowStep === 'step-5' ? 'selected' : '' ?>>Stupeň 5 – Velký (1.05rem ~ 17px)</option>
                       <option value="step-6" <?= $eyebrowStep === 'step-6' ? 'selected' : '' ?>>Stupeň 6 – Extra Velký (1.15rem ~ 18.5px)</option>
                     </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB SEO & OG IMAGE: SOCIAL MEDIA PREVIEW -->
+              <div id="tab-seo" class="tab-content">
+                <h3 style="color:#fff; margin-bottom:0.5rem;">🖼️ Náhledový Obrázek pro Sociální Sítě (OG Image & SEO)</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                  Tento obrázek, titulek a popisek se zobrazí, když odkaz na tuto landing page vložíte na <strong>Facebook, WhatsApp, LinkedIn, Twitter/X</strong> nebo do jiných aplikací a messengerů. Po kliknutí na náhled se návštěvníkovi přímo otevře tato Landing Page.
+                </p>
+
+                <?php
+                $ogImgVal = $editingData['og_image'] ?? '';
+                $ogTitleVal = $editingData['meta_title'] ?? (($editingData['hero']['h1'] ?? '') ? ($editingData['hero']['h1'] . ' | Svobodné Cechy') : '');
+                $ogDescVal = $editingData['meta_desc'] ?? ($editingData['hero']['subtitle'] ?? '');
+                $ogPreviewSrc = !empty($ogImgVal) ? fixAdminPreviewUrl($ogImgVal) : (!empty($editingData['hero']['image']) ? fixAdminPreviewUrl($editingData['hero']['image']) : '../images/sample_master.png');
+                ?>
+
+                <div class="item-card" style="border: 1px solid var(--accent); background: rgba(232,117,22,0.04);">
+                  <h4 style="color: var(--accent);"><i class="bi bi-image"></i> Náhledový Obrázek (Open Graph Image)</h4>
+                  <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+                    Doporučený rozměr: <strong>1200 × 630 px</strong> (poměr 1.91 : 1). Pokud obrázek nezadáte, automaticky se použije fotka z Hero sekce.
+                  </p>
+                  
+                  <div class="form-group">
+                    <label>URL obrázku nebo nahrání z počítače</label>
+                    <div class="upload-row">
+                      <img src="<?= htmlspecialchars($ogPreviewSrc) ?>" id="prev_og_img" class="thumb-preview" style="width:120px; height:63px; object-fit:cover; border-radius:6px; border:1px solid var(--border);" />
+                      <input type="text" class="form-control" id="og_image" value="<?= htmlspecialchars($ogImgVal) ?>" placeholder="../../uploads/priklad.jpg nebo ponechte prázdné pro Hero fotku" oninput="updateSocialPreviewLive()" />
+                      <label class="upload-btn">
+                        <i class="bi bi-upload"></i> Nahrát OG obrázek
+                        <input type="file" accept="image/*" style="display:none;" onchange="uploadImage(this, 'og_image', 'prev_og_img'); setTimeout(updateSocialPreviewLive, 800);" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="item-card">
+                  <h4><i class="bi bi-card-heading"></i> Texty pro Vyhledávače a Sociální Sítě</h4>
+                  <div class="form-group">
+                    <label>Titulek stránky a sdíleného příspěvku (Meta / OG Title)</label>
+                    <input type="text" class="form-control" id="meta_title" value="<?= htmlspecialchars($ogTitleVal) ?>" placeholder="Např. Učednictví u mistra skláře Jiřího Pačinka | Svobodné Cechy" oninput="updateSocialPreviewLive()" />
+                    <small style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">Doporučená délka: 50–60 znaků</small>
+                  </div>
+                  <div class="form-group">
+                    <label>Popis stránky a sdíleného příspěvku (Meta / OG Description)</label>
+                    <textarea class="form-control" id="meta_desc" rows="3" placeholder="Stručné a lákavé shrnutí, které zaujme uživatele na Facebooku a vyhledávačích..." oninput="updateSocialPreviewLive()"><?= htmlspecialchars($ogDescVal) ?></textarea>
+                    <small style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.3rem;">Doporučená délka: 120–160 znaků</small>
+                  </div>
+                </div>
+
+                <!-- LIVE SOCIAL CARD PREVIEW SIMULATOR -->
+                <div class="item-card" style="background:#18191a; border:1px solid #3a3b3c; padding:1.2rem; border-radius:10px;">
+                  <h4 style="color:#e4e6eb; margin-bottom:0.8rem;"><i class="bi bi-facebook" style="color:#1877f2;"></i> Živá simulace sdílení na Facebooku / WhatsAppu</h4>
+                  <p style="color:#b0b3b8; font-size:0.82rem; margin-bottom:1rem;">Takhle bude odkaz vypadat ve feedu nebo chatu po odeslání:</p>
+                  
+                  <div style="max-width:500px; background:#242526; border-radius:8px; overflow:hidden; border:1px solid #3e4042; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+                    <div style="width:100%; aspect-ratio:1.91/1; background:#18191a; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                      <img id="social_preview_img" src="<?= htmlspecialchars($ogPreviewSrc) ?>" alt="Social Preview" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='../images/sample_master.png'" />
+                    </div>
+                    <div style="padding:10px 12px; background:#242526;">
+                      <div style="font-size:0.75rem; text-transform:uppercase; color:#b0b3b8; letter-spacing:0.5px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        <?= htmlspecialchars($_SERVER['HTTP_HOST'] ?? 'SVOBODNECECHY.CZ') ?>
+                      </div>
+                      <div id="social_preview_title" style="font-size:0.98rem; font-weight:700; color:#e4e6eb; line-height:1.3; margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                        <?= htmlspecialchars($ogTitleVal ?: 'Učednictví u mistra skláře | Svobodné Cechy') ?>
+                      </div>
+                      <div id="social_preview_desc" style="font-size:0.82rem; color:#b0b3b8; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                        <?= htmlspecialchars($ogDescVal ?: 'Poznej poctivé sklářské řemeslo přímo v dílně mistra. Přihlas se k nezávaznému rozhovoru.') ?>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3249,6 +3358,35 @@ if ($editingSlug) {
             };
           }
 
+          // Sync Hero inputs to Social Preview
+          document.getElementById('h_h1')?.addEventListener('input', () => {
+            const metaTitleEl = document.getElementById('meta_title');
+            if (metaTitleEl && !metaTitleEl.dataset.userEdited) {
+              metaTitleEl.value = document.getElementById('h_h1').value + ' | Svobodné Cechy';
+            }
+            updateSocialPreviewLive();
+          });
+
+          document.getElementById('h_sub')?.addEventListener('input', () => {
+            const metaDescEl = document.getElementById('meta_desc');
+            if (metaDescEl && !metaDescEl.dataset.userEdited) {
+              metaDescEl.value = document.getElementById('h_sub').value;
+            }
+            updateSocialPreviewLive();
+          });
+
+          document.getElementById('meta_title')?.addEventListener('input', function() {
+            this.dataset.userEdited = "true";
+            updateSocialPreviewLive();
+          });
+
+          document.getElementById('meta_desc')?.addEventListener('input', function() {
+            this.dataset.userEdited = "true";
+            updateSocialPreviewLive();
+          });
+
+          document.getElementById('og_image')?.addEventListener('input', updateSocialPreviewLive);
+
           document.getElementById('h_btn1')?.addEventListener('input', () => {
             if (document.getElementById('sec_cta_same_text')?.checked) {
               const heroBtn1Val = document.getElementById('h_btn1').value;
@@ -3328,17 +3466,60 @@ if ($editingSlug) {
           });
         }
 
+        function updateSocialPreviewLive() {
+          const ogImgInput = document.getElementById('og_image')?.value?.trim() || '';
+          const heroImgInput = document.getElementById('h_img')?.value?.trim() || '';
+          const metaTitleInput = document.getElementById('meta_title')?.value?.trim() || '';
+          const heroH1Input = document.getElementById('h_h1')?.value?.trim() || '';
+          const metaDescInput = document.getElementById('meta_desc')?.value?.trim() || '';
+          const heroSubInput = document.getElementById('h_sub')?.value?.trim() || '';
+
+          // Preview image
+          const effectiveImg = ogImgInput || heroImgInput || '../images/sample_master.png';
+          let displaySrc = effectiveImg;
+          if (displaySrc.startsWith('../../')) displaySrc = displaySrc.replace('../../', '../');
+          if (document.getElementById('social_preview_img')) {
+            document.getElementById('social_preview_img').src = displaySrc;
+          }
+          if (document.getElementById('prev_og_img')) {
+            document.getElementById('prev_og_img').src = displaySrc;
+          }
+
+          // Preview Title
+          const effectiveTitle = metaTitleInput || (heroH1Input ? heroH1Input + ' | Svobodné Cechy' : 'Učednictví u mistra skláře | Svobodné Cechy');
+          if (document.getElementById('social_preview_title')) {
+            document.getElementById('social_preview_title').textContent = effectiveTitle;
+          }
+
+          // Preview Description
+          const effectiveDesc = metaDescInput || heroSubInput || 'Poznej poctivé sklářské řemeslo přímo v dílně mistra. Přihlas se k nezávaznému rozhovoru.';
+          if (document.getElementById('social_preview_desc')) {
+            document.getElementById('social_preview_desc').textContent = effectiveDesc;
+          }
+        }
+
         function prepareJsonData() {
           let cleanWebUrl = document.getElementById('mc_s3_web_url')?.value?.trim() || '';
           if (cleanWebUrl && !/^https?:\/\//i.test(cleanWebUrl) && !/^\//.test(cleanWebUrl)) {
             cleanWebUrl = 'https://' + cleanWebUrl;
           }
 
+          const rawMetaTitle = document.getElementById('meta_title')?.value?.trim();
+          const fallbackMetaTitle = (document.getElementById('h_h1')?.value?.trim() || '') + ' | Svobodné Cechy';
+          const finalMetaTitle = rawMetaTitle || fallbackMetaTitle;
+
+          const rawMetaDesc = document.getElementById('meta_desc')?.value?.trim();
+          const fallbackMetaDesc = document.getElementById('h_sub')?.value?.trim() || '';
+          const finalMetaDesc = rawMetaDesc !== undefined && rawMetaDesc !== '' ? rawMetaDesc : fallbackMetaDesc;
+
+          const ogImageVal = document.getElementById('og_image')?.value?.trim() || '';
+
           const data = {
             slug: <?= json_encode($editingSlug) ?>,
             master_name: document.getElementById('m_name').value,
-            meta_title: document.getElementById('h_h1').value + ' | Svobodné Cechy',
-            meta_desc: document.getElementById('h_sub').value,
+            og_image: ogImageVal,
+            meta_title: finalMetaTitle,
+            meta_desc: finalMetaDesc,
             section_order: currentSectionOrder,
             section_visibility: currentSectionVisibility,
             section_cta: {
