@@ -1933,25 +1933,47 @@ if ($editingSlug) {
 
                 <!-- LIVE SOCIAL CARD PREVIEW SIMULATOR -->
                 <div class="item-card" style="background:#18191a; border:1px solid #3a3b3c; padding:1.2rem; border-radius:10px;">
-                  <h4 style="color:#e4e6eb; margin-bottom:0.8rem;"><i class="bi bi-facebook" style="color:#1877f2;"></i> Živá simulace sdílení na Facebooku / WhatsAppu</h4>
-                  <p style="color:#b0b3b8; font-size:0.82rem; margin-bottom:1rem;">Takhle bude odkaz vypadat ve feedu nebo chatu po odeslání:</p>
-                  
-                  <div style="max-width:500px; background:#242526; border-radius:8px; overflow:hidden; border:1px solid #3e4042; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
-                    <div style="width:100%; aspect-ratio:1.91/1; background:#18191a; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
-                      <img id="social_preview_img" src="<?= htmlspecialchars($ogPreviewSrc) ?>" alt="Social Preview" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='../images/sample_master.png'" />
+                  <h4 style="color:#e4e6eb; margin-bottom:0.5rem;"><i class="bi bi-phone" style="color:#1877f2;"></i> Živá simulace sdílení</h4>
+                  <p style="color:#b0b3b8; font-size:0.82rem; margin-bottom:1rem;">Takhle bude odkaz/post vypadat po sdílení. Přepni formát dle platformy:</p>
+
+                  <!-- Format switcher -->
+                  <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.2rem;">
+                    <button type="button" id="og_fmt_landscape" onclick="setOgPreviewFormat('1.91/1', this)" style="padding:0.35rem 0.85rem; border-radius:20px; border:1px solid #1877f2; background:#1877f2; color:#fff; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                      🖥️ 1.91:1 &nbsp;<span style="font-weight:400; opacity:0.8;">FB / LinkedIn / WhatsApp (doporučeno)</span>
+                    </button>
+                    <button type="button" id="og_fmt_square" onclick="setOgPreviewFormat('1/1', this)" style="padding:0.35rem 0.85rem; border-radius:20px; border:1px solid #3e4042; background:transparent; color:#b0b3b8; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                      ⬛ 1:1 &nbsp;<span style="font-weight:400; opacity:0.8;">Instagram / Facebook čtvercový post</span>
+                    </button>
+                    <button type="button" id="og_fmt_portrait" onclick="setOgPreviewFormat('4/5', this)" style="padding:0.35rem 0.85rem; border-radius:20px; border:1px solid #3e4042; background:transparent; color:#b0b3b8; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                      📱 4:5 &nbsp;<span style="font-weight:400; opacity:0.8;">Instagram portrét</span>
+                    </button>
+                    <button type="button" id="og_fmt_story" onclick="setOgPreviewFormat('9/16', this)" style="padding:0.35rem 0.85rem; border-radius:20px; border:1px solid #3e4042; background:transparent; color:#b0b3b8; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                      🎬 9:16 &nbsp;<span style="font-weight:400; opacity:0.8;">Stories / TikTok / Reels</span>
+                    </button>
+                  </div>
+
+                  <!-- Card preview wrapper -->
+                  <div id="social_card_wrap" style="max-width:420px; background:#242526; border-radius:8px; overflow:hidden; border:1px solid #3e4042; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-shadow:0 4px 12px rgba(0,0,0,0.4); transition: all 0.3s;">
+                    <div id="social_preview_img_wrap" style="width:100%; aspect-ratio:1.91/1; background:#18191a; overflow:hidden; transition:aspect-ratio 0.3s;">
+                      <img id="social_preview_img" src="<?= htmlspecialchars($ogPreviewSrc) ?>" alt="Social Preview" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.src='../images/sample_master.png'" />
                     </div>
-                    <div style="padding:10px 12px; background:#242526;">
-                      <div style="font-size:0.75rem; text-transform:uppercase; color:#b0b3b8; letter-spacing:0.5px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <!-- Text meta (only for landscape / link card) -->
+                    <div id="social_preview_meta" style="padding:10px 12px; background:#242526;">
+                      <div style="font-size:0.72rem; text-transform:uppercase; color:#b0b3b8; letter-spacing:0.5px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         <?= htmlspecialchars($_SERVER['HTTP_HOST'] ?? 'SVOBODNECECHY.CZ') ?>
                       </div>
-                      <div id="social_preview_title" style="font-size:0.98rem; font-weight:700; color:#e4e6eb; line-height:1.3; margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                      <div id="social_preview_title" style="font-size:0.95rem; font-weight:700; color:#e4e6eb; line-height:1.3; margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
                         <?= htmlspecialchars($ogTitleVal ?: 'Učednictví u mistra skláře | Svobodné Cechy') ?>
                       </div>
-                      <div id="social_preview_desc" style="font-size:0.82rem; color:#b0b3b8; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                      <div id="social_preview_desc" style="font-size:0.8rem; color:#b0b3b8; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
                         <?= htmlspecialchars($ogDescVal ?: 'Poznej poctivé sklářské řemeslo přímo v dílně mistra. Přihlas se k nezávaznému rozhovoru.') ?>
                       </div>
                     </div>
                   </div>
+
+                  <p style="color:#8a8d91; font-size:0.75rem; margin-top:0.75rem;">
+                    <i class="bi bi-info-circle"></i>&nbsp; Formáty 1:1, 4:5 a 9:16 platí pro přímé příspěvky/posty. Formát 1.91:1 se zobrazí při sdílení <em>odkazu</em> v chatu nebo na zdi.
+                  </p>
                 </div>
               </div>
 
@@ -3464,6 +3486,43 @@ if ($editingSlug) {
           .catch(err => {
             alert('Chyba nahrávání souboru: ' + err.message);
           });
+        }
+
+        function setOgPreviewFormat(ratio, btn) {
+          // Update image wrap aspect ratio
+          const wrap = document.getElementById('social_preview_img_wrap');
+          if (wrap) wrap.style.aspectRatio = ratio;
+
+          // Hide text meta for non-link formats (1:1, 4:5, 9:16 are post formats, not link cards)
+          const meta = document.getElementById('social_preview_meta');
+          const isLinkCard = (ratio === '1.91/1');
+          if (meta) meta.style.display = isLinkCard ? 'block' : 'none';
+
+          // Adjust card width for portrait/story formats
+          const card = document.getElementById('social_card_wrap');
+          if (card) {
+            if (ratio === '9/16') {
+              card.style.maxWidth = '240px';
+            } else if (ratio === '4/5') {
+              card.style.maxWidth = '300px';
+            } else if (ratio === '1/1') {
+              card.style.maxWidth = '340px';
+            } else {
+              card.style.maxWidth = '420px';
+            }
+          }
+
+          // Highlight active button
+          document.querySelectorAll('#og_fmt_landscape, #og_fmt_square, #og_fmt_portrait, #og_fmt_story').forEach(b => {
+            b.style.background = 'transparent';
+            b.style.color = '#b0b3b8';
+            b.style.borderColor = '#3e4042';
+          });
+          if (btn) {
+            btn.style.background = '#1877f2';
+            btn.style.color = '#fff';
+            btn.style.borderColor = '#1877f2';
+          }
         }
 
         function updateSocialPreviewLive() {
