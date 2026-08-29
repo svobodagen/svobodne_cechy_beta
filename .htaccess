@@ -8,6 +8,9 @@ RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
 RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Upgrade všechny nebezpečné požadavky na HTTPS
+Header always set Content-Security-Policy "upgrade-insecure-requests"
+
 # Navýšení limitů pro nahrávání velkých fotek a audia
 php_value post_max_size 64M
 php_value upload_max_filesize 64M
@@ -33,6 +36,13 @@ php_value max_execution_time 300
   </FilesMatch>
   <FilesMatch "\.(css|js)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Obrázky v /uploads/ – kešovat a povolit přístup pro sociální sítě (OG image scrapers)
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg)$">
+    Header set Cache-Control "public, max-age=2592000"
+    Header set Access-Control-Allow-Origin "*"
+    Header set X-Robots-Tag "all"
   </FilesMatch>
 </IfModule>
 
