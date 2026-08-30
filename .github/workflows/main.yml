@@ -17,14 +17,9 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /beta.svobodnecechy.cz/web/
+          server-dir: /
           dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
-            uploads/**
-            admin/landing_pages/*.html
-            admin/landing_pages/*.json
-            lp_diag.php
-            lp_restore.php

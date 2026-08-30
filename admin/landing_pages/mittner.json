@@ -1,0 +1,248 @@
+{
+    "slug": "mittner",
+    "master_name": "Jiří Mittner",
+    "og_image": "../../uploads/pacinek_master.png",
+    "meta_title": "Učednictví u Jiřího Mittnera | Nauč se řemeslo – Svobodné Cechy",
+    "meta_desc": "Zajímá tě poctivé řemeslo? Poznej učednictví přímo v dílně Jiřího Mittnera. Zjisti, jak učednictví probíhá a jestli je pro tebe.",
+    "section_order": [
+        "hero",
+        "uvp",
+        "master",
+        "outcomes",
+        "timeline",
+        "portfolio",
+        "testimonials",
+        "faq",
+        "cta",
+        "contact"
+    ],
+    "design": {
+        "color_theme": "amber",
+        "sticky_cta_enabled": true,
+        "sticky_cta_hide_in_hero": true,
+        "sticky_cta_hide_in_contact": true,
+        "btn_size": "m",
+        "odd_side_padding": "1.2rem",
+        "odd_vert_padding": "2.8rem",
+        "even_side_padding": "0.6rem",
+        "even_vert_padding": "2.2rem",
+        "header_show_logo": true,
+        "header_show_text": true,
+        "header_show_menu": true
+    },
+    "typography": {
+        "hero_h1": "step-3",
+        "section_h2": "step-3",
+        "card_h3": "step-3",
+        "body_text": "step-3",
+        "eyebrow": "step-3"
+    },
+    "hero": {
+        "eyebrow": "UČEDNICTVÍ U MISTRA SKLÁŘE",
+        "h1": "NAUČ SE ŘEMESLO PŘÍMO OD MISTRA",
+        "subtitle": "Učednictví u Jiřího Mittnera pro mladé lidi (12–18 let / mladé dospělé), kteří chtějí poznat skutečné řemeslo, pracovat rukama a vytvořit si vlastní cestu.",
+        "btn_primary": "ZJISTIT, JESTLI JE TO PRO MĚ",
+        "btn_secondary": "PODÍVAT SE, JAK SE PRACUJE SE SKLEM",
+        "image": "../../images/sample_master.png"
+    },
+    "uvp": {
+        "eyebrow": "Proč toto učednictví?",
+        "title": "SKUTEČNÉ ŘEMESLO. SKUTEČNÝ MISTR. SKUTEČNÁ PRÁCE.",
+        "subtitle": "Zjisti, proč je učednictví v huti výjimečnou příležitostí oproti běžné škole nebo teoretickým kurzům.",
+        "items": [
+            {
+                "title": "Osobní vedení",
+                "desc": "Učedník není anonymní student v přeplněné třídě. Učíš se přímo od Jiřího a jeho týmu v komorním prostředí."
+            },
+            {
+                "title": "Učení přímo v dílně",
+                "desc": "Žádné hodiny sezení nad učebnicemi. Od prvního dne poznáváš žár pece, práci s píšťalou a horkým sklem."
+            },
+            {
+                "title": "Řemeslo od základů",
+                "desc": "Postupný rozvoj dovedností – od bezpečnosti a správného držení nástrojů až po vlastní tvarování."
+            },
+            {
+                "title": "Kontakt s reálnou výrobou",
+                "desc": "Vidíš, jak vzniká profesionální zakázková tvorba pro klienty a sběratele z celého světa."
+            },
+            {
+                "title": "Individuální přístup",
+                "desc": "Tempo výuky se přizpůsobuje tvým schopnostem, zájmu a fyzickým možnostem."
+            },
+            {
+                "title": "Možnost profesní cesty",
+                "desc": "Cílem není si sklo jen zkusit, ale zjistit, zda se z ručního řemesla může stát tvoje budoucnost."
+            }
+        ]
+    },
+    "master": {
+        "eyebrow": "KDO TĚ BUDE UČIT",
+        "name": "JIŘÍ MITTNER",
+        "title": "Mistr řemesla • Svobodné Cechy",
+        "bio": "Jiří Mittner se věnuje poctivému tradičnímu řemeslu a předávání zkušeností mladé generaci učedníků.",
+        "quote": "„Řemeslo není jen práce s materiálem. Je to pokora, soustředění a schopnost vtisknout žhavé hmotě tvar i myšlenku.“",
+        "bio2": "V dílně sází na poctivý přístup, precizní práci a rozvoj samostatnosti každého učedníka.",
+        "image": "../../images/sample_master.png"
+    },
+    "outcomes": {
+        "eyebrow": "Praktické dovednosti",
+        "title": "CO SE UČEDNÍK SKUTEČNĚ NAUČÍ",
+        "subtitle": "Konkrétní znalosti a návyky, které si z dílny odneseš do života.",
+        "items": [
+            {
+                "icon": "🔥",
+                "title": "Práce s nástroji",
+                "desc": "Poznáš sklářskou píšťalu, nůžky, svaláky i kleště a naučíš se s nimi bezpečně manipulovat."
+            },
+            {
+                "icon": "🧪",
+                "title": "Práce se sklem",
+                "desc": "Pochopíš chování roztaveného materiálu při teplotách přes 1100 °C a jeho chladnutí."
+            },
+            {
+                "icon": "🎨",
+                "title": "Tvarování & Barvy",
+                "desc": "Osvojíš si základy foukání, navíjení barvy a formování tvarů u sázecí pece."
+            },
+            {
+                "icon": "🏭",
+                "title": "Práce v huti",
+                "desc": "Zažiješ reálný rytmus týmu na sklářské huti a komunikaci při společném díle."
+            },
+            {
+                "icon": "🛡️",
+                "title": "Bezpečnost & Návyky",
+                "desc": "Získáš respekt k horkému prostředí a naučíš se přísným pravidlům ochrany zdraví."
+            },
+            {
+                "icon": "💪",
+                "title": "Samostatnost & Trpělivost",
+                "desc": "Rozvineš soustředění, vytrvalost a schopnost učit se z vlastních chyb."
+            }
+        ]
+    },
+    "timeline": {
+        "eyebrow": "Postup krok za krokem",
+        "title": "JAK PROBÍHÁ CESTA K UČEDNICTVÍ",
+        "subtitle": "Pět jasných kroků od prvního projevení zájmu až po začátek práce v dílně.",
+        "steps": [
+            {
+                "num": "01",
+                "title": "PRVNÍ ROZHOVOR",
+                "desc": "Nezávazný rozhovor se zástupcem Svobodných cechů (telefon/WhatsApp), kde zjistíme tvá očekávání a zodpovíme první dotazy."
+            },
+            {
+                "num": "02",
+                "title": "SETKÁNÍ S MISTREM",
+                "desc": "Navštívíš sklárnu Pačinek Glass v Kunraticích u Cvikova, potkáš se s Jiřím Pačinkem a prohlédneš si huť."
+            },
+            {
+                "num": "03",
+                "title": "ZKUŠEBNÍ DEN",
+                "desc": "Vyzkoušíš si reálný den v dílně. Obě strany si ověří, zda jim vzájemná spolupráce a atmosféra vyhovuje."
+            },
+            {
+                "num": "04",
+                "title": "DOMLUVÍME SE",
+                "desc": "Společně dohodneme konkrétní podmínky, časový rozvrh, věkové a praktické možnosti (včetně případného ubytování/strava)."
+            },
+            {
+                "num": "05",
+                "title": "ZAČÍNÁ UČEDNICTVÍ",
+                "desc": "Teprve po oboustranné dohodě začíná tvoje pravidelná řemeslná cesta přímo u sklářské pece."
+            }
+        ],
+        "disclaimer": "💡 Základní cesta vypadá takto. Konkrétní průběh se vždy přizpůsobuje člověku, jeho časovým možnostem a zkušenostem."
+    },
+    "portfolio": {
+        "eyebrow": "Ukázka z prostředí",
+        "title": "CO VZNIKÁ V DÍLNĚ",
+        "subtitle": "Nahlédni do živého procesu sklářského umění – od materiálu po hotové dílo.",
+        "items": [
+            {
+                "image": "../../images/sample_master.png",
+                "caption": "Žhavá sklovina u sázecí pece"
+            },
+            {
+                "image": "../../images/sample_master.png",
+                "caption": "Tvarování na sklářské lavici"
+            },
+            {
+                "image": "../../images/sample_master.png",
+                "caption": "Detail hutně tvarované skleněné plastiky"
+            },
+            {
+                "image": "../../images/sample_master.png",
+                "caption": "Křišťálová zahrada v Kunraticích"
+            }
+        ]
+    },
+    "testimonials": {
+        "eyebrow": "Zkušenosti a reference",
+        "title": "CO ŘÍKAJÍ LIDÉ, KTEŘÍ U TOHO BYLI",
+        "subtitle": "Reálné pohledy zástupců, rodin a spolupracovníků.",
+        "items": [
+            {
+                "quote": "„Sklářství je tvrdá práce, ale vidět syna, jak pod vedením Jiřího získává jistotu a respekt k materiálu, je neuvěřitelné.“",
+                "name": "Petr M.",
+                "role": "Rodič zájemce o řemeslo"
+            },
+            {
+                "quote": "„Možnost stoupnout si k peci v Kunraticích a sledovat mistra Pačinka při práci mi otevřela oči. Řemeslo má obrovskou budoucnost.“",
+                "name": "Martin K.",
+                "role": "Účastník zkušebního dne"
+            },
+            {
+                "quote": "„Spolupráce se Svobodnými Cechy pomáhá přivést k poctivým řemeslům mladé lidi, kteří mají chuť něco vytvořit vlastníma rukama.“",
+                "name": "Tým Pačinek Glass",
+                "role": "Kunratice u Cvikova"
+            }
+        ]
+    },
+    "faq": {
+        "eyebrow": "Odpovědi na dotazy",
+        "title": "ČASTÉ OTÁZKY",
+        "subtitle": "Vše, co tě (nebo tvoje rodiče) může zajímat před prvním kontaktem.",
+        "items": [
+            {
+                "q": "Pro koho je učednictví určeno?",
+                "a": "Prvořadě pro mladé lidi ve věku cca 12–18 let a mladé dospělé, kteří mají zájem o ruční řemeslo, sklo a praktickou tvorbu."
+            },
+            {
+                "q": "Musím mít předchozí zkušenosti se sklem?",
+                "a": "Není to nutné! Všechny základy bezpečnosti, manipulace s nářadím i práce s materiálem tě naučíme přímo v dílně."
+            },
+            {
+                "q": "Jak probíhá zkušební den?",
+                "a": "Během zkušebního dne se seznámíš s chodem huti, vyzkoušíš si základní úkony a zjistíš, zda ti atmosféra v dílně sedí."
+            },
+            {
+                "q": "Kde přesně se učednictví koná?",
+                "a": "Učednictví probíhá přímo v areálu sklárny Pačinek Glass v Kunraticích u Cvikova (Liberecký kraj)."
+            },
+            {
+                "q": "Je možné domluvit ubytování, pokud jsem zdaleka?",
+                "a": "Možnosti ubytování a dopravy řešíme individuálně při osobním rozhovoru podle konkrétních potřeb učedníka."
+            },
+            {
+                "q": "Musím se hned k nečemu zavázat?",
+                "a": "Vůbec ne. Prvním krokem je zcela nezávazný rozhovor, kde si vyjasníme dotazy a představíme možnosti."
+            }
+        ]
+    },
+    "cta": {
+        "title": "ZAJÍMÁ TĚ, JESTLI JE TO PRO TEBE?",
+        "text": "Nemusíš se hned k ničemu zavazovat. První krok je jednoduchý nezávazný rozhovor, kde společně probereme, co hledáš a jestli by ti učednictví vyhovovalo.",
+        "btn": "ZJISTIT, JESTLI JE TO PRO MĚ"
+    },
+    "contact": {
+        "eyebrow": "První krok",
+        "title": "NAVÁŽEME KONTAKT",
+        "subtitle": "Zvol si způsob, který je pro tě nejsnadnější.",
+        "whatsapp_num": "420602763599",
+        "whatsapp_msg": "Dobrý den, chtěl/a bych zjistit, jestli je učednictví u Jiřího Mittnera pro mě.",
+        "instagram_link": "https://instagram.com",
+        "phone_parent": "+420 602 763 599"
+    }
+}
