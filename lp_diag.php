@@ -1,41 +1,40 @@
 <?php
-// Temporary diagnostic - lists landing page files on server (extended)
-$rootDir = __DIR__;
-$lpDir = $rootDir . "/admin/landing_pages";
-$uploadsDir = $rootDir . "/uploads";
-
-$result = [
-    'server_time' => date('Y-m-d H:i:s'),
-    'lp_dir_exists' => is_dir($lpDir),
-    'lp_files' => [],
-    'uploads_dir_exists' => is_dir($uploadsDir),
-    'uploads_files' => [],
-    'root_files_landing' => [],
-];
-
-if (is_dir($lpDir)) {
-    foreach (array_diff(scandir($lpDir), ['.', '..']) as $f) {
-        $path = $lpDir . "/" . $f;
-        $result['lp_files'][] = [
-            'name' => $f,
-            'size' => filesize($path),
-            'modified' => date('Y-m-d H:i:s', filemtime($path))
-        ];
-    }
-}
-
-if (is_dir($uploadsDir)) {
-    foreach (array_diff(scandir($uploadsDir), ['.', '..']) as $f) {
-        $result['uploads_files'][] = $f;
-    }
-}
-
-// Also look for any .html files in root or landing_pages subdir
-foreach (glob($rootDir . "/*.html") as $f) {
-    if (strpos($f, 'mittner') !== false || strpos($f, 'pacinek') !== false) {
-        $result['root_files_landing'][] = basename($f);
-    }
-}
+// Download JSON content of any slug passed as ?slug=xxx
+$dir = __DIR__ . "/admin/landing_pages";
+$slug = $_GET['slug'] ?? '';
+$action = $_GET['action'] ?? 'list';
 
 header('Content-Type: application/json');
-echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+if ($action === 'getjson' && $slug) {
+    $file = $dir . "/" . $slug . ".json";
+    if (file_exists($file)) {
+        echo file_get_contents($file);
+    } else {
+        echo json_encode(['error' => 'not found', 'path' => $file]);
+    }
+    exit;
+}
+
+// List all files with sizes
+$files = is_dir($dir) ? array_diff(scandir($dir), ['.', '..']) : [];
+$result = [];
+foreach ($files as $f) {
+    $path = $dir . "/" . $f;
+    $result[] = ['name' => $f, 'size' => filesize($path)];
+}
+
+// Also check uploads/masters subfolder
+$mastersDir = __DIR__ . "/uploads/masters";
+$mastersFiles = [];
+if (is_dir($mastersDir)) {
+    foreach (array_diff(scandir($mastersDir), ['.', '..']) as $f) {
+        $mastersFiles[] = $f;
+    }
+}
+
+echo json_encode([
+    'lp_files' => $result,
+    'masters_uploads' => $mastersFiles,
+    'lp_dir' => $dir,
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
