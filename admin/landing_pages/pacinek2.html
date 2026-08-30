@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <script>if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') { location.replace('https://' + location.hostname + location.pathname + location.search + location.hash); }</script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Učednictví u Jiřího Pačinka | Nauč se sklářské řemeslo – Svobodné Cechy</title>
+  <meta name="description" content="Zajímá tě sklářské řemeslo? Poznej učednictví přímo v dílně Jiřího Pačinka v Kunraticích u Cvikova. Zjisti, jak učednictví probíhá a jestli je pro tebe." />
+
+  <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://beta.svobodnecechy.cz/admin/landing_pages/pacinek2.html" />
+  <meta property="og:title" content="Učednictví u Jiřího Pačinka | Nauč se sklářské řemeslo – Svobodné Cechy" />
+  <meta property="og:description" content="Zajímá tě sklářské řemeslo? Poznej učednictví přímo v dílně Jiřího Pačinka v Kunraticích u Cvikova. Zjisti, jak učednictví probíhá a jestli je pro tebe." />
+  <meta property="og:image" content="https://beta.svobodnecechy.cz/uploads/pacinek_master.png" />
+  <meta property="og:image:alt" content="Učednictví u Jiřího Pačinka | Nauč se sklářské řemeslo – Svobodné Cechy" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://beta.svobodnecechy.cz/admin/landing_pages/pacinek2.html" />
+  <meta name="twitter:title" content="Učednictví u Jiřího Pačinka | Nauč se sklářské řemeslo – Svobodné Cechy" />
+  <meta name="twitter:description" content="Zajímá tě sklářské řemeslo? Poznej učednictví přímo v dílně Jiřího Pačinka v Kunraticích u Cvikova. Zjisti, jak učednictví probíhá a jestli je pro tebe." />
+  <meta name="twitter:image" content="https://beta.svobodnecechy.cz/uploads/pacinek_master.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #0B0A08;
+      --color-dark: #17120E;
+      --color-cream: #F4EFE7;
+      --color-white: #FFFDF8;
+      --color-accent: #E87516;
+      --color-glass: rgba(255, 255, 255, 0.05);
+      --color-glass-border: rgba(255, 255, 255, 0.1);
+      --text: #F4EFE7;
+      --text-muted: #A39B8E;
+      --font-heading: 'Cormorant Garamond', serif;
+      --font-body: 'Inter', sans-serif;
+
+      /* Configured Fluid Typography Steps */
+      --hero-h1-clamp: clamp(2.0rem, 5vw, 3.4rem);
+      --section-h2-clamp: clamp(1.7rem, 4vw, 2.6rem);
+      --card-h3-clamp: clamp(1.25rem, 2.5vw, 1.5rem);
+      --body-text-size: 1.05rem;
+      --eyebrow-size: 0.85rem;
+
+      /* Button size configuration (Desktop & Mobile) */
+      --btn-pad-v: 0.9rem;
+      --btn-pad-h: 1.8rem;
+      --btn-font-size: 1.05rem;
+      --btn-pad-v-mob: 0.6rem;
+      --btn-pad-h-mob: 1.2rem;
+      --btn-font-size-mob: 0.85rem;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-dark));
+      color: var(--text);
+      line-height: 1.5;
+      font-size: var(--body-text-size);
+    }
+
+    .container { max-width: 1200px; margin: auto; padding: 0 1.5rem; }
+
+    /* Sticky Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      background: rgba(11, 10, 8, 0.92);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      border-bottom: 1px solid rgba(232, 117, 22, 0.2);
+    }
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      max-width: 1280px;
+      margin: auto;
+    }
+    .logo {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--color-accent);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .nav-menu { list-style: none; display: flex; gap: 1.5rem; align-items: center; }
+    .nav-menu a { color: var(--text); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color .2s; }
+    .nav-menu a:hover { color: var(--color-accent); }
+    .cta-nav {
+      background: var(--color-accent);
+      color: #fff !important;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 700;
+      transition: transform .2s, background .2s;
+    }
+    .cta-nav:hover { background: #d0640d; transform: scale(1.03); }
+
+    /* Unified heading typography — tight line-height prevents large gaps on line breaks */
+    h1, h2, h3, h4 {
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-wrapper { padding-bottom: 2.5rem; }
+    .hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2.5rem; padding: 3.5rem 0 1.5rem; min-height: 55vh; }
+    .hero-content { max-width: 580px; }
+    .eyebrow {
+      text-transform: uppercase;
+      font-size: var(--eyebrow-size);
+      letter-spacing: 2px;
+      color: var(--color-accent);
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: var(--hero-h1-clamp);
+      color: var(--color-white);
+      margin-bottom: 0.8rem;
+    }
+    .subtitle { font-size: clamp(0.95rem, 2vw, 1.1rem); color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
+    .hero-buttons-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center; padding-top: 1.8rem; width: 100%; text-align: center; }
+    .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center; text-align: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.9rem 1.8rem;
+      font-size: 1.05rem;
+      border-radius: 6px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all .2s;
+      min-height: 42px;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      .btn {
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.85rem !important;
+      }
+    }
+    .btn-primary { background: var(--color-accent); color: #fff; }
+    .btn-primary:hover { background: #d0640d; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232, 117, 22, 0.3); }
+    .btn-secondary { background: var(--color-glass); color: var(--text); border: 1px solid var(--color-accent); }
+    .btn-secondary:hover { background: rgba(232, 117, 22, 0.15); transform: translateY(-2px); }
+    .section-cta-wrap { display: flex; justify-content: center; align-items: center; text-align: center; margin-top: 2.5rem; padding-top: 0.5rem; width: 100%; }
+    .hero-image img {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border: 1px solid var(--color-glass-border);
+    }
+
+    /* Section title nadpisy */
+    .section-title { text-align: center; margin-bottom: 2.5rem; }
+    .section-title h2 {
+      font-family: var(--font-heading);
+      font-size: var(--section-h2-clamp);
+      color: var(--color-white);
+      margin-bottom: 0.5rem;
+    }
+    .section-title p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 680px; margin: auto; }
+
+    /* UVP Grid */
+    .uvp-section { padding: 3.5rem 0; }
+    .uvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
+    .uvp-card {
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color .3s;
+    }
+    .uvp-card:hover { border-color: var(--color-accent); }
+    .uvp-card h3 { font-family: var(--font-heading); font-size: var(--card-h3-clamp); color: var(--color-accent); margin-bottom: 0.4rem; }
+
+    /* Master Section */
+    .master-section { padding: 5rem 0; background: rgba(0,0,0,0.3); border-y: 1px solid var(--color-glass-border); }
+    .master-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 3.5rem; align-items: center; }
+    .master-photo img { width: 100%; border-radius: 14px; border: 1px solid var(--color-accent); }
+    .master-info h3 { font-family: var(--font-heading); font-size: var(--hero-h1-clamp); color: var(--color-white); margin-bottom: 0.5rem; }
+    .master-title { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; font-size: var(--eyebrow-size); }
+    .quote-box {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+      color: var(--color-cream);
+      border-left: 3px solid var(--color-accent);
+      padding-left: 1.2rem;
+      margin: 1.5rem 0;
+    }
+
+    /* Learning Outcomes */
+    .outcomes-section { padding: 5rem 0; }
+    .outcomes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.8rem; }
+    .outcome-item {
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      border-radius: 12px;
+      padding: 1.8rem;
+    }
+    .outcome-item h4 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.2vw, 1.4rem); color: var(--color-white); margin-bottom: 0.4rem; }
+
+    /* How It Works Timeline */
+    .timeline-section { padding: 5rem 0; background: rgba(0,0,0,0.2); }
+    .timeline { display: flex; flex-direction: column; gap: 1.5rem; max-width: 900px; margin: auto; }
+    .timeline-step {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 1.5rem;
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      border-left: 4px solid var(--color-accent);
+      border-radius: 8px;
+      padding: 1.5rem;
+      align-items: center;
+    }
+    .step-number { font-family: var(--font-heading); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; color: var(--color-accent); text-align: center; }
+    .step-content h4 { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.2vw, 1.4rem); color: var(--color-white); margin-bottom: 0.3rem; }
+    .disclaimer-box { text-align: center; font-size: 0.95rem; color: var(--text-muted); margin-top: 2rem; font-style: italic; }
+
+    /* Portfolio Gallery */
+    .portfolio-section { padding: 5rem 0; }
+    .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .portfolio-item { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--color-glass-border); }
+    .portfolio-item img { width: 100%; height: 260px; object-fit: cover; display: block; transition: transform .4s; }
+    .portfolio-item:hover img { transform: scale(1.05); }
+    .portfolio-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+      padding: 1.2rem 1rem 0.8rem; color: var(--color-white); font-weight: 600; font-size: 0.95rem;
+    }
+
+    /* Social Proof */
+    .testimonials-section { padding: 5rem 0; background: rgba(0,0,0,0.3); }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.8rem; }
+    .testimonial-card {
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+    .quote-text { font-style: italic; margin-bottom: 1.2rem; color: var(--color-cream); }
+    .author-info { display: flex; align-items: center; gap: 1rem; }
+    .author-info strong { color: var(--color-accent); display: block; font-size: 1rem; }
+    .author-info span { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* FAQ Section */
+    .faq-section { padding: 5rem 0; }
+    .faq-list { max-width: 850px; margin: auto; display: flex; flex-direction: column; gap: 1rem; }
+    details {
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      transition: background .2s;
+    }
+    details[open] { border-color: var(--color-accent); background: rgba(232, 117, 22, 0.05); }
+    summary {
+      font-family: var(--font-heading);
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+      font-weight: 600;
+      color: var(--color-white);
+      cursor: pointer;
+      outline: none;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.6rem; color: var(--color-accent); }
+    details[open] summary::after { content: '−'; }
+    details p { margin-top: 1rem; color: var(--text-muted); font-size: 1rem; }
+
+    /* Primary CTA Box */
+    .primary-cta-box {
+      background: linear-gradient(135deg, rgba(232,117,22,0.15), rgba(17,14,11,0.9));
+      border: 2px solid var(--color-accent);
+      border-radius: 16px;
+      padding: 4rem 2rem;
+      text-align: center;
+      margin: 4rem auto;
+      max-width: 900px;
+    }
+    .primary-cta-box h2 { font-family: var(--font-heading); font-size: clamp(1.6rem, 3.5vw, 2.4rem); color: var(--color-white); margin-bottom: 1rem; }
+    .primary-cta-box p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 650px; margin: 0 auto 2rem; }
+
+    /* Contact Section */
+    .contact-section { padding: 4rem 0 6rem; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+    .contact-card {
+      background: var(--color-glass);
+      border: 1px solid var(--color-glass-border);
+      border-radius: 14px;
+      padding: 2.5rem;
+    }
+    .contact-card h3 { font-family: var(--font-heading); font-size: clamp(1.3rem, 2.8vw, 1.8rem); color: var(--color-white); margin-bottom: 1rem; }
+    .contact-options { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+    .btn-wa { background: #25D366; color: #fff; text-decoration: none; font-weight: 700; border-radius: 6px; padding: 1rem; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; }
+    .btn-wa:hover { background: #1eb956; }
+    .btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff; text-decoration: none; font-weight: 700; border-radius: 6px; padding: 1rem; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; }
+
+    /* Parent Toggle & Form */
+    .parent-box { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--color-glass-border); }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .form-control { width: 100%; padding: 0.8rem 1rem; background: rgba(0,0,0,0.5); border: 1px solid var(--color-glass-border); border-radius: 6px; color: #fff; font-size: 1rem; }
+    .form-control:focus { outline: none; border-color: var(--color-accent); }
+
+    /* Floating Sticky CTA (PC, Tablet & Mobile) */
+    .mobile-sticky-cta {
+      display: block;
+      position: fixed;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 500px;
+      background: rgba(17, 14, 11, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--color-accent);
+      border-radius: 50px;
+      padding: 0.5rem 0.6rem;
+      z-index: 999;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 15px rgba(232, 117, 22, 0.25);
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mobile-sticky-cta .btn {
+      width: 100%;
+      border-radius: 40px;
+      box-shadow: 0 4px 15px rgba(232, 117, 22, 0.4);
+    }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--color-glass-border); padding: 3rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; min-height: auto; }
+      .hero-content { max-width: 100%; }
+      .hero-buttons-row { justify-content: center; padding-top: 1.2rem; }
+      .hero-buttons { justify-content: center; }
+      .master-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .nav-container { flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
+      .nav-menu { gap: 0.7rem 1rem; flex-wrap: wrap; justify-content: center; font-size: 0.82rem; }
+      .nav-menu a { font-size: 0.82rem; }
+      .cta-nav { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
+      .hero h1 { font-size: 2.6rem; }
+    }
+    @media (max-width: 600px) {
+      .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
+      .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header class="site-header" id="site-header">
+    <div class="nav-container">
+      <a href="#" class="logo" style="display:inline-flex; align-items:center; gap:0.6rem;"><img src="../../LOGO_SC2.svg" alt="Svobodné Cechy" style="height:34px; width:auto; vertical-align:middle; display:block;" /><span>SVOBODNÉ CECHY</span></a>
+      <ul class="nav-menu" id="header-nav-menu">
+        <li><a href="#uvp">Proč?</a></li>
+        <li><a href="#mistr">O mistrovi</a></li>
+        <li><a href="#co-se-naucis">Co se naučíš</a></li>
+        <li><a href="#jak-to-probiha">Jak to probíhá</a></li>
+        <li><a href="#realizace">Realizace</a></li>
+        <li><a href="#reference">Reference</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#kontakt" class="cta-nav">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <!-- Section 1: Hero -->
+    <section class="hero-wrapper">
+      <div class="container hero">
+        <div class="hero-content">
+          <p class="eyebrow">UČEDNICTVÍ U MISTRA SKLÁŘE</p>
+          <h1>NAUČ SE ŘEMESLO PŘÍMO OD MISTRA</h1>
+          <p class="subtitle">Učednictví u Jiřího Pačinka pro mladé lidi (12–18 let / mladé dospělé), kteří chtějí poznat skutečné řemeslo, pracovat rukama a vytvořit si vlastní cestu.</p>
+        </div>
+        <div class="hero-image">
+          <img src="../../images/sample_master.png" alt="Jiří Pačinek při práci s horkým sklem v huti" />
+        </div>
+      </div>
+      <div class="container hero-buttons-row">
+        <a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        <a href="#realizace" class="btn btn-secondary">PODÍVAT SE, JAK SE PRACUJE SE SKLEM</a>
+      </div>
+    </section>
+
+    <!-- Section 2: UVP -->
+    <section id="uvp" class="uvp-section container">
+      <div class="section-title">
+        <p class="eyebrow">Proč toto učednictví?</p>
+        <h2>SKUTEČNÉ ŘEMESLO. SKUTEČNÝ MISTR. SKUTEČNÁ PRÁCE.</h2>
+        <p>Zjisti, proč je učednictví v huti výjimečnou příležitostí oproti běžné škole nebo teoretickým kurzům.</p>
+      </div>
+
+      <div class="uvp-grid">
+        <div class="uvp-card">
+          <h3>Osobní vedení</h3>
+          <p>Učedník není anonymní student v přeplněné třídě. Učíš se přímo od Jiřího a jeho týmu v komorním prostředí.</p>
+        </div>
+        <div class="uvp-card">
+          <h3>Učení přímo v dílně</h3>
+          <p>Žádné hodiny sezení nad učebnicemi. Od prvního dne poznáváš žár pece, práci s píšťalou a horkým sklem.</p>
+        </div>
+        <div class="uvp-card">
+          <h3>Řemeslo od základů</h3>
+          <p>Postupný rozvoj dovedností – od bezpečnosti a správného držení nástrojů až po vlastní tvarování.</p>
+        </div>
+        <div class="uvp-card">
+          <h3>Kontakt s reálnou výrobou</h3>
+          <p>Vidíš, jak vzniká profesionální zakázková tvorba pro klienty a sběratele z celého světa.</p>
+                <div class="uvp-card">
+          <h3>Možnost profesní cesty</h3>
+          <p>Cílem není si sklo jen zkusit, ale zjistit, zda se z ručního řemesla může stát tvoje budoucnost.</p>
+        </div>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+      </div>
+    </section>
+
+    <!-- Section 3: Authority / Mistr -->
+    <section id="mistr" class="master-section">
+      <div class="container master-grid">
+        <div class="master-photo">
+          <img src="../../images/sample_master.png" alt="Mistr Jiří Pačinek" />
+        </div>
+        <div class="master-info">
+          <p class="eyebrow">KDO TĚ BUDE UČIT</p>
+          <h3>JIŘÍ PAČINEK</h3>
+          <p class="master-title">Umělecký sklář a mistr řemesla • Sklárna Kunratice u Cvikova</p>
+          <p>Jiří Pačinek vybudoval rodinnou sklárnu Pačinek Glass a unikátní Křišťálovou zahradu v Kunraticích u Cvikova. Jeho ručně tvarované objekty, plastiky a svítidla obdivují sběratelé po celém světě.</p>
+          <div class="quote-box">
+            „Řemeslo není jen práce s materiálem. Je to pokora, soustředění a schopnost vtisknout žhavé hmotě tvar i myšlenku.“
+          </div>
+          <p>V dílně sází na poctivý přístup, týmovou spolupráci u pece a předávání sklářského umění další generaci.</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="section-cta-wrap">
+          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Learning Outcomes -->
+    <section id="co-se-naucis" class="outcomes-section container">
+      <div class="section-title">
+        <p class="eyebrow">Praktické dovednosti</p>
+        <h2>CO SE UČEDNÍK SKUTEČNĚ NAUČÍ</h2>
+        <p>Konkrétní znalosti a návyky, které si z dílny odneseš do života.</p>
+      </div>
+
+      <div class="outcomes-grid">
+        <div class="outcome-item">
+          <h4>🔥 Práce s nástroji</h4>
+          <p>Poznáš sklářskou píšťalu, nůžky, svaláky i kleště a naučíš se s nimi bezpečně manipulovat.</p>
+        </div>
+        <div class="outcome-item">
+          <h4>🧪 Práce se sklem</h4>
+          <p>Pochopíš chování roztaveného materiálu při teplotách přes 1100 °C a jeho chladnutí.</p>
+        </div>
+        <div class="outcome-item">
+          <h4>🎨 Tvarování & Barvy</h4>
+          <p>Osvojíš si základy foukání, navíjení barvy a formování tvarů u sázecí pece.</p>
+        </div>
+        <div class="outcome-item">
+          <h4>🏭 Práce v huti</h4>
+          <p>Zažiješ reálný rytmus týmu na sklářské huti a komunikaci při společném díle.</p>
+        </div>
+        <div class="outcome-item">
+          <h4>🛡️ Bezpečnost & Návyky</h4>
+          <p>Získáš respekt k horkému prostředí a naučíš se přísným pravidlům ochrany zdraví.</p>
+        </div>
+        <div class="outcome-item">
+          <h4>💪 Samostatnost & Trpělivost</h4>
+          <p>Rozvineš soustředění, vytrvalost a schopnost učit se z vlastních chyb.</p>
+        </div>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+      </div>
+    </section>
+
+    <!-- Section 5: How It Works -->
+    <section id="jak-to-probiha" class="timeline-section">
+      <div class="container">
+        <div class="section-title">
+          <p class="eyebrow">Postup krok za krokem</p>
+          <h2>JAK PROBÍHÁ CESTA K UČEDNICTVÍ</h2>
+          <p>Pět jasných kroků od prvního projevení zájmu až po začátek práce v dílně.</p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-step">
+            <div class="step-number">01</div>
+            <div class="step-content">
+              <h4>PRVNÍ ROZHOVOR</h4>
+              <p>Nezávazný rozhovor se zástupcem Svobodných cechů (telefon/WhatsApp), kde zjistíme tvá očekávání a zodpovíme první dotazy.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-number">02</div>
+            <div class="step-content">
+              <h4>SETKÁNÍ S MISTREM</h4>
+              <p>Navštívíš sklárnu Pačinek Glass v Kunraticích u Cvikova, potkáš se s Jiřím Pačinkem a prohlédneš si huť.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-number">03</div>
+            <div class="step-content">
+              <h4>ZKUŠEBNÍ DEN</h4>
+              <p>Vyzkoušíš si reálný den v dílně. Obě strany si ověří, zda jim vzájemná spolupráce a atmosféra vyhovuje.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-number">04</div>
+            <div class="step-content">
+              <h4>DOMLUVÍME SE</h4>
+              <p>Společně dohodneme konkrétní podmínky, časový rozvrh, věkové a praktické možnosti (včetně případného ubytování/strava).</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-number">05</div>
+            <div class="step-content">
+              <h4>ZAČÍNÁ UČEDNICTVÍ</h4>
+              <p>Teprve po oboustranné dohodě začíná tvoje pravidelná řemeslná cesta přímo u sklářské pece.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="disclaimer-box">💡 Základní cesta vypadá takto. Konkrétní průběh se vždy přizpůsobuje člověku, jeho časovým možnostem a zkušenostem.</p>
+        <div class="section-cta-wrap">
+          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Portfolio -->
+    <section id="realizace" class="portfolio-section container">
+      <div class="section-title">
+        <p class="eyebrow">Ukázka z prostředí</p>
+        <h2>CO VZNIKÁ V DÍLNĚ</h2>
+        <p>Nahlédni do živého procesu sklářského umění – od materiálu po hotové dílo.</p>
+      </div>
+
+      <div class="portfolio-grid">
+        <div class="portfolio-item">
+          <img src="../../images/sample_master.png" alt="Práce se sklovinou" />
+          <div class="portfolio-caption">Žhavá sklovina u sázecí pece</div>
+        </div>
+        <div class="portfolio-item">
+          <img src="../../images/sample_master.png" alt="Foukání a tvarování" />
+          <div class="portfolio-caption">Tvarování na sklářské lavici</div>
+        </div>
+        <div class="portfolio-item">
+          <img src="../../images/sample_master.png" alt="Detail objektu" />
+          <div class="portfolio-caption">Detail hutně tvarované skleněné plastiky</div>
+        </div>
+        <div class="portfolio-item">
+          <img src="../../images/sample_master.png" alt="Křišťálová zahrada" />
+          <div class="portfolio-caption">Křišťálová zahrada v Kunraticích</div>
+        </div>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+      </div>
+    </section>
+
+    <!-- Section 7: Social Proof / Reference -->
+    <section id="reference" class="testimonials-section">
+      <div class="container">
+        <div class="section-title">
+          <p class="eyebrow">Zkušenosti a reference</p>
+          <h2>CO ŘÍKAJÍ LIDÉ, KTEŘÍ U TOHO BYLI</h2>
+          <p>Reálné pohledy zástupců, rodin a spolupracovníků.</p>
+        </div>
+
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <p class="quote-text">„Sklářství je tvrdá práce, ale vidět syna, jak pod vedením Jiřího získává jistotu a respekt k materiálu, je neuvěřitelné.“</p>
+            <div class="author-info">
+              <div>
+                <strong>Petr M.</strong>
+                <span>Rodič zájemce o řemeslo</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="quote-text">„Možnost stoupnout si k peci v Kunraticích a sledovat mistra Pačinka při práci mi otevřela oči. Řemeslo má obrovskou budoucnost.“</p>
+            <div class="author-info">
+              <div>
+                <strong>Martin K.</strong>
+                <span>Účastník zkušebního dne</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="quote-text">„Spolupráce se Svobodnými Cechy pomáhá přivést k poctivým řemeslům mladé lidi, kteří mají chuť něco vytvořit vlastníma rukama.“</p>
+            <div class="author-info">
+              <div>
+                <strong>Tým Pačinek Glass</strong>
+                <span>Kunratice u Cvikova</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section-cta-wrap">
+          <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: FAQ -->
+    <section id="faq" class="faq-section container">
+      <div class="section-title">
+        <p class="eyebrow">Odpovědi na dotazy</p>
+        <h2>ČASTÉ OTÁZKY</h2>
+        <p>Vše, co tě (nebo tvoje rodiče) může zajímat před prvním kontaktem.</p>
+      </div>
+
+      <div class="faq-list">
+        <details>
+          <summary>Pro koho je učednictví určeno?</summary>
+          <p>Prvořadě pro mladé lidi ve věku cca 12–18 let a mladé dospělé, kteří mají zájem o ruční řemeslo, sklo a praktickou tvorbu.</p>
+        </details>
+        <details>
+          <summary>Musím mít předchozí zkušenosti se sklem?</summary>
+          <p>Není to nutné! Všechny základy bezpečnosti, manipulace s nářadím i práce s materiálem tě naučíme přímo v dílně.</p>
+        </details>
+        <details>
+          <summary>Jak probíhá zkušební den?</summary>
+          <p>Během zkušebního dne se seznámíš s chodem huti, vyzkoušíš si základní úkony a zjistíš, zda ti atmosféra v dílně sedí.</p>
+        </details>
+        <details>
+          <summary>Kde přesně se učednictví koná?</summary>
+          <p>Učednictví probíhá přímo v areálu sklárny Pačinek Glass v Kunraticích u Cvikova (Liberecký kraj).</p>
+        </details>
+        <details>
+          <summary>Je možné domluvit ubytování, pokud jsem zdaleka?</summary>
+          <p>Možnosti ubytování a dopravy řešíme individuálně při osobním rozhovoru podle konkrétních potřeb učedníka.</p>
+        </details>
+        <details>
+          <summary>Musím se hned k nečemu zavázat?</summary>
+          <p>Vůbec ne. Prvním krokem je zcela nezávazný rozhovor, kde si vyjasníme dotazy a představíme možnosti.</p>
+        </details>
+      </div>
+      <div class="section-cta-wrap">
+        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+      </div>
+    </section>
+
+    <!-- Section 9: Primary CTA -->
+    <div class="container">
+      <div class="primary-cta-box">
+        <h2>ZAJÍMÁ TĚ, JESTLI JE TO PRO TEBE?</h2>
+        <p>Nemusíš se hned k ničemu zavazovat. První krok je jednoduchý nezávazný rozhovor, kde společně probereme, co hledáš a jestli by ti učednictví vyhovovalo.</p>
+        <a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+      </div>
+    </div>
+
+    <!-- Section 10: Contact / Lead Capture -->
+    <section id="kontakt" class="contact-section container">
+      <div class="section-title">
+        <p class="eyebrow">První krok</p>
+        <h2>NAVÁŽEME KONTAKT</h2>
+        <p>Zvol si způsob, který je pro tě nejsnadnější.</p>
+      </div>
+
+      <div class="contact-grid">
+        <!-- Variant A: Youth / Quick Contact -->
+        <div class="contact-card">
+          <h3>💬 Rychlá zpráva (pro zájemce)</h3>
+          <p>Nejrychlejší cesta je napsat nám přímo na WhatsApp nebo Instagram. Zpráva je předvyplněná, stačí odeslat.</p>
+          
+          <div class="contact-options">
+            <a href="https://wa.me/420602763599?text=Dobr%C3%BD%20den,%20cht%C4%9Bl/a%20bych%20zjistit,%20jestli%20je%20u%C4%8Dednictv%C3%AD%20u%20Ji%C5%99%C3%ADho%20Pa%C4%8Dinka%20pro%20m%C4%9B." class="btn-wa" target="_blank">
+              NAPSAT NA WHATSAPP (+420 602 763 599)
+            </a>
+            <a href="https://instagram.com" class="btn-ig" target="_blank">
+              NAPSAT NA INSTAGRAM
+            </a>
+          </div>
+
+          <div class="parent-box">
+            <h4 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--color-white); margin-bottom: 0.5rem;">👨‍👩‍👦 Jste rodič?</h4>
+            <p style="font-size: 0.95rem; color: var(--text-muted);">Pokud se ptáte za svého syna nebo dceru, rádi vám vše podrobně vysvětlíme telefonicky nebo e-mailem.</p>
+            <a href="tel:+420602763599" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">CHCI SI ZAVOLAT (+420 602 763 599)</a>
+          </div>
+        </div>
+
+        <!-- Form option -->
+        <div class="contact-card">
+          <h3>📝 Kontaktní formulář</h3>
+          <form id="lead-form" onsubmit="event.preventDefault(); alert('Děkujeme za zprávu! Vaši poptávku jsme přijali a brzy se vám ozveme.');">
+            <div class="form-group">
+              <label for="form-name">Tvoje jméno / Jméno rodiče</label>
+              <input type="text" id="form-name" class="form-control" placeholder="Jan Novák" required />
+            </div>
+            
+            <div class="form-group">
+              <label for="form-role">Jsem:</label>
+              <select id="form-role" class="form-control" required>
+                <option value="student">Budoucí učedník</option>
+                <option value="parent">Rodič zájemce</option>
+                <option value="other">Jiný zájemce</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="form-contact">Telefon / WhatsApp / E-mail</label>
+              <input type="text" id="form-contact" class="form-control" placeholder="+420 ... nebo email@seznam.cz" required />
+            </div>
+
+            <div class="form-group">
+              <label for="form-note">Co tě na učednictví zajímá? (dobrovolné)</label>
+              <textarea id="form-note" class="form-control" rows="3" placeholder="Chci se zeptat na..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">ODESLAT DOTAZ</button>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.8rem; text-align: center;">Odesláním formuláře berete na vědomí <a href="../../zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely vyřízení vašeho dotazu.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Mobile CTA Bar -->
+  <div class="mobile-sticky-cta">
+    <a href="#kontakt" class="btn btn-primary">ZJISTIT, JESTLI JE TO PRO MĚ</a>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 Pačinek Glass & Svobodné Cechy. Všechna práva vyhrazena.</p>
+      <p style="margin-top: 0.5rem; font-size: 0.8rem;">Soukromá stránka pro náborovou kampaň učednictví.</p>
+    </div>
+  <!-- LEAD CAPTURE POPUP MODAL (3 PHASES) -->
+  <div id="leadModal" class="lead-modal-overlay">
+    <div class="lead-modal-box">
+      <button type="button" class="lead-modal-close" onclick="closeLeadModal()">&times;</button>
+      
+      <!-- STEP 1: EMAIL CAPTURE -->
+      <div id="modalStep1" class="modal-step">
+        <h3>Zanechte nám svůj e-mail</h3>
+        <p>Zašleme vám podrobné informace o učednictví a propojíme vás s mistrem.</p>
+        <form onsubmit="submitStep1(event)">
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Váš E-mail *</label>
+            <input type="email" id="m_email" name="email" autocomplete="email" class="form-control" placeholder="např. jan.novak@seznam.cz" required />
+          </div>
+          <button type="submit" id="m_s1_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">POKRAČOVAT</button>
+          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+            Odesláním e-mailu berete na vědomí <a href="../../zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely zaslání informací o učednictví a navazující komunikaci.
+          </div>
+        </form>
+      </div>
+
+      <!-- STEP 2: ADDITIONAL DETAILS & WHATSAPP -->
+      <div id="modalStep2" class="modal-step" style="display:none;">
+        <h3>Doplňující údaje (volitelné)</h3>
+        <p>Chcete-li, abychom vám přímo zavolali nebo poslali zprávu, vyplňte vaše jméno a telefon.</p>
+        <form onsubmit="submitStep2(event)">
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jméno a příjmení</label>
+            <input type="text" id="m_name" name="name" autocomplete="name" class="form-control" placeholder="Jan Novák" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Telefon</label>
+            <input type="tel" id="m_phone" name="phone" autocomplete="tel" class="form-control" placeholder="+420 602 123 456" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jsem:</label>
+            <select id="m_role" class="form-control">
+              <option value="Budoucí učedník">Budoucí učedník</option>
+              <option value="Rodič">Rodič</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Zpráva nebo dotaz (volitelné)</label>
+            <textarea id="m_msg" class="form-control" placeholder="Mám zájem o bližší informace..."></textarea>
+          </div>
+          <button type="submit" id="m_s2_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">ODESLAT VŠECHNO</button>
+          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+            Odesláním formuláře berete na vědomí <a href="../../zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely vyřízení vašeho dotazu.
+          </div>
+          <div class="newsletter-option" style="margin-top:0.6rem; text-align:left; font-size:0.82rem; color:var(--text-muted, #cbd5e1); display:flex; align-items:flex-start; gap:0.5rem;">
+            <input type="checkbox" id="m_newsletter" name="newsletter" style="accent-color:var(--color-accent, #e87516); width:16px; height:16px; margin-top:2px; cursor:pointer;" />
+            <label for="m_newsletter" style="cursor:pointer; margin:0; line-height:1.3;">Chci dostávat novinky a pravidelný newsletter od Svobodné Cechy.</label>
+          </div>
+        </form>
+        <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">
+          <button type="button" onclick="submitStep2AndWhatsApp(event, 'https://wa.me/420602763599?text=Dobr%C3%BD%20den,%20cht%C4%9Bl/a%20bych%20zjistit,%20jestli%20je%20u%C4%8Dednictv%C3%AD%20u%20Ji%C5%99%C3%ADho%20Pa%C4%8Dinka%20pro%20m%C4%9B.')" class="btn-wa" style="width:100%; border:none; cursor:pointer;">NAPSAT ROVNOU NA WHATSAPP</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: THANK YOU -->
+      <div id="modalStep3" class="modal-step" style="display:none;">
+        <h3>Děkujeme za váš zájem!</h3>
+        <p id="m_s3_text_el">Vaši zprávu jsme v pořádku přijali. Ozveme se vám do 24 hodin.</p>
+        <button type="button" id="m_s3_close_btn" class="btn btn-primary" onclick="closeLeadModal()" style="width:100%; margin-top:1rem;">ZAVŘÍT</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentLeadId = null;
+
+    function openLeadModal(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const modal = document.getElementById('leadModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const emailInput = document.getElementById('m_email');
+        if (emailInput) setTimeout(() => emailInput.focus(), 100);
+      }
+    }
+
+    function closeLeadModal() {
+      const modal = document.getElementById('leadModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function submitStep1(e) {
+      e.preventDefault();
+      const btn = document.getElementById('m_s1_submit_btn');
+      if (btn) btn.disabled = true;
+
+      const email = document.getElementById('m_email').value;
+
+      fetch('../api_landing_leads.php?action=capture_email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          landing_slug: 'pacinek2',
+          master_name: 'Jiří Pačinek'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.lead_id) currentLeadId = data.lead_id;
+        document.getElementById('modalStep1').style.display = 'none';
+        document.getElementById('modalStep2').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('modalStep1').style.display = 'none';
+        document.getElementById('modalStep2').style.display = 'block';
+      });
+    }
+
+    function submitStep2(e) {
+      e.preventDefault();
+      const btn = document.getElementById('m_s2_submit_btn');
+      if (btn) btn.disabled = true;
+
+      fetch('../api_landing_leads.php?action=update_lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: currentLeadId,
+          email: document.getElementById('m_email').value,
+          landing_slug: 'pacinek2',
+          name: document.getElementById('m_name').value,
+          phone: document.getElementById('m_phone').value,
+          user_role: document.getElementById('m_role').value,
+          message: document.getElementById('m_msg').value,
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      });
+    }
+
+    function submitStep2AndWhatsApp(e, waUrl) {
+      if (e && e.preventDefault) e.preventDefault();
+
+      // Pre-open new tab to avoid popup blocker
+      const waWin = window.open('about:blank', '_blank');
+
+      const nameVal = document.getElementById('m_name').value.trim();
+      const msgVal = document.getElementById('m_msg').value.trim();
+
+      fetch('../api_landing_leads.php?action=update_lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: currentLeadId,
+          email: document.getElementById('m_email').value,
+          landing_slug: 'pacinek2',
+          name: nameVal,
+          phone: document.getElementById('m_phone').value,
+          user_role: document.getElementById('m_role').value,
+          message: msgVal,
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (waWin) waWin.location.href = waUrl;
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      })
+      .catch(err => {
+        if (waWin) waWin.location.href = waUrl;
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'block';
+      });
+    }
+  </script>
+</body>
+</html>
+
+<!-- sync -->
