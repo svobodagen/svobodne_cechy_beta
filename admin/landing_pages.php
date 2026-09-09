@@ -870,23 +870,32 @@ HTML;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 10000;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
     }
     .lead-modal-box {
-      background: var(--color-dark);
-      border: 2px solid var(--color-accent);
+      background: var(--color-dark, #110e0b);
+      border: 2px solid var(--color-accent, #e87516);
       border-radius: 16px;
       max-width: 480px;
       width: 100%;
-      padding: 2.2rem 1.8rem;
+      max-height: calc(100vh - 2rem);
+      max-height: calc(100dvh - 2rem);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 2rem 1.6rem;
       position: relative;
       box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-      color: var(--text);
+      color: var(--text, #f1f5f9);
       animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      margin: auto;
     }
     @keyframes modalFadeIn {
       from { opacity: 0; transform: translateY(15px) scale(0.95); }
@@ -897,14 +906,15 @@ HTML;
       top: 0.8rem; right: 1rem;
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      color: var(--text-muted, #94a3b8);
       font-size: 1.8rem;
       cursor: pointer;
       line-height: 1;
+      z-index: 10;
     }
-    .lead-modal-close:hover { color: var(--color-accent); }
-    .modal-step h3 { font-family: var(--font-heading); font-size: var(--section-h2-clamp); color: var(--color-white); margin-bottom: 0.5rem; text-align: center; }
-    .modal-step p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.4rem; text-align: center; line-height: 1.4; }
+    .lead-modal-close:hover { color: var(--color-accent, #e87516); }
+    .modal-step h3 { font-family: var(--font-heading); font-size: var(--section-h2-clamp); color: var(--color-white, #fff); margin-bottom: 0.5rem; text-align: center; }
+    .modal-step p { font-size: 0.95rem; color: var(--text-muted, #94a3b8); margin-bottom: 1.2rem; text-align: center; line-height: 1.4; }
 
     /* Mobile Responsive Custom Margins & Padding */
     @media (max-width: 900px) {
@@ -937,6 +947,22 @@ HTML;
     @media (max-width: 600px) {
       .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
       .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
+      .lead-modal-overlay {
+        padding: 0.75rem 0.5rem;
+        align-items: flex-start;
+      }
+      .lead-modal-box {
+        padding: 1.4rem 1rem;
+        max-height: calc(100vh - 1.5rem);
+        max-height: calc(100dvh - 1.5rem);
+        border-radius: 12px;
+      }
+      .lead-modal-box .form-group {
+        margin-bottom: 0.75rem;
+      }
+      .lead-modal-box textarea {
+        height: 70px;
+      }
     }
   </style>
 </head>
@@ -1053,6 +1079,17 @@ HTML;
       const modal = document.getElementById('leadModal');
       if (modal) modal.style.display = 'none';
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('leadModal');
+      if (modal) {
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            closeLeadModal();
+          }
+        });
+      }
+    });
 
     function submitStep1(e) {
       e.preventDefault();
