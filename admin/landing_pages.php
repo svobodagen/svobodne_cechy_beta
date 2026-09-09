@@ -417,10 +417,11 @@ HTML;
     $o_sub = htmlspecialchars($data['outcomes']['subtitle'] ?? 'Konkrétní znalosti a návyky, které si z dílny odneseš do života.');
     $outcomes_html = "";
     foreach (($data['outcomes']['items'] ?? []) as $item) {
-        $icon = htmlspecialchars($item['icon'] ?? '🔥');
+        $rawIcon = trim($item['icon'] ?? '');
+        $icon = $rawIcon !== '' ? htmlspecialchars($rawIcon) . ' ' : '';
         $t = htmlspecialchars($item['title'] ?? '');
         $d = htmlspecialchars($item['desc'] ?? '');
-        $outcomes_html .= "<div class='outcome-item'><h4>{$icon} {$t}</h4><p>{$d}</p></div>";
+        $outcomes_html .= "<div class='outcome-item'><h4>{$icon}{$t}</h4><p>{$d}</p></div>";
     }
     $outcomesCtaHtml = $getSecCtaHtml('outcomes');
 
