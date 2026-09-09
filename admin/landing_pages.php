@@ -867,8 +867,6 @@ HTML;
     /* Body scroll locking when modal is open */
     body.lead-modal-open {
       overflow: hidden !important;
-      height: 100vh !important;
-      touch-action: none !important;
     }
 
     /* Lead Modal Popup Styles */
@@ -880,27 +878,21 @@ HTML;
       -webkit-backdrop-filter: blur(8px);
       z-index: 10000;
       display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 2rem 1rem 4rem 1rem;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
     }
     .lead-modal-box {
       background: var(--color-dark, #110e0b);
       border: 2px solid var(--color-accent, #e87516);
       border-radius: 16px;
       max-width: 480px;
-      width: 100%;
+      width: calc(100% - 1.5rem);
       padding: 2rem 1.6rem;
       position: relative;
       box-shadow: 0 20px 50px rgba(0,0,0,0.9);
       color: var(--text, #f1f5f9);
       animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      margin: auto 0;
-      flex-shrink: 0;
+      margin: 2rem auto 5rem auto;
     }
     @keyframes modalFadeIn {
       from { opacity: 0; transform: translateY(15px) scale(0.95); }
@@ -952,13 +944,11 @@ HTML;
     @media (max-width: 600px) {
       .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
       .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
-      .lead-modal-overlay {
-        padding: 1rem 0.75rem 5rem 0.75rem;
-      }
       .lead-modal-box {
-        padding: 1.4rem 1rem;
+        padding: 1.4rem 1.1rem;
         border-radius: 12px;
-        margin: 0 auto;
+        margin: 1rem auto 6rem auto;
+        width: calc(100% - 1rem);
       }
       .lead-modal-box .form-group {
         margin-bottom: 0.75rem;
@@ -1073,7 +1063,7 @@ HTML;
       const modal = document.getElementById('leadModal');
       if (modal) {
         modal.scrollTop = 0;
-        modal.style.display = 'flex';
+        modal.style.display = 'block';
         document.body.classList.add('lead-modal-open');
         const emailInput = document.getElementById('m_email');
         if (emailInput) setTimeout(() => emailInput.focus(), 100);
