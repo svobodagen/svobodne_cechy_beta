@@ -25,8 +25,6 @@ jobs:
             **/node_modules/**
             database.sqlite*
             uploads/**
-            admin/landing_pages/**
             admin/landing_pages/*.json
-            admin/landing_pages/*.html
             admin/landing_pages/backups/**
             landing_pages/**
