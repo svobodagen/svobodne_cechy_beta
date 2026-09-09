@@ -1231,6 +1231,12 @@ if (isset($_POST['save_sections_form'])) {
 
     $formData = json_decode($_POST['sections_json_data'], true);
     if (is_array($formData)) {
+        // Automatická záloha před přepsáním na serveru
+        $backupDir = $dir . "/backups";
+        if (!is_dir($backupDir)) { @mkdir($backupDir, 0777, true); }
+        if (file_exists($jsonPath)) {
+            @copy($jsonPath, $backupDir . "/" . $slug . "_" . date("Ymd_His") . ".json");
+        }
         file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $generatedHtml = renderLandingPageHtml($formData);
         file_put_contents($htmlPath, $generatedHtml);

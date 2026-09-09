@@ -13,10 +13,12 @@ Follow these rules strictly. They override any default behaviors.
 - **NEVER** ask the user to clear their cache. YOU must handle versioning programmatically.
 - **NEVER** disable cache globally in `.htaccess` (affecting users). Use versioning instead.
 
-## 2. 🚀 GIT WORKFLOW
-- **Commit Immediately:** After implementing a functional change, run `git add .`, `git commit -m "..."`, and `git push`.
-- **Do NOT Batch:** Do not wait for multiple unrelated tasks. Push often.
-- **Messages:** Use Czech language for commit messages.
+## 2. 🚀 GIT WORKFLOW & OCHRANA DAT NA SERVERU (KRITICKÉ!)
+- **DATA ŽIJÍ POUZE NA SERVERU:** Živá data (`admin/landing_pages/*.json`, `admin/landing_pages/*.html`, `database.sqlite`, `uploads/`) patří výhradně na server.
+- **NIKDY nepřepisovat data na serveru:** Při deployi se nasazuje POUZE kód (PHP, JS, CSS, šablony). Všechna live data jsou v GitHub Actions FTP deployi striktně vyloučena (`exclude`).
+- **ZÁKAZ `git add .` bez rozmyslu:** Vždy stageuj pouze konkrétní změněné soubory kódu (např. `git add admin/landing_pages.php styles.css`). NIKDY nepřidávat do commitu live data, která by mohla přepsat změny zadané uživatelem v administraci na webu.
+- **Commit Immediately:** Po funkční změně kódu commitni změny a pushni na GitHub.
+- **Messages:** Zprávy ke commitům piš česky.
 
 ## 3. 🔐 AUTHENTICATION & SECURITY
 - **Unauthenticated Access:** If a user is NOT logged in, clicking "Profil" or accessing admin pages must redirect **immediately** to `login.html`.

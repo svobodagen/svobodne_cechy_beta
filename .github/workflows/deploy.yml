@@ -21,3 +21,15 @@ jobs:
         server-dir: /beta.svobodnecechy.cz/web/
         protocol: ftps
         port: 21
+        dangerous-clean-slate: false
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          database.sqlite
+          database.sqlite*
+          uploads/**
+          admin/landing_pages/*.json
+          admin/landing_pages/*.html
+          admin/landing_pages/backups/**
+          landing_pages/**

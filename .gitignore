@@ -1,0 +1,7 @@
+# Live server data & uploads (lives only on server, never overwrite)
+database.sqlite
+database.sqlite*
+uploads/
+admin/landing_pages/backups/
+landing_pages/prtscr/
+.DS_Store
