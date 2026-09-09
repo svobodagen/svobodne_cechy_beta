@@ -204,6 +204,7 @@
         "eyebrow": "Odpovědi na dotazy",
         "title": "ČASTÉ OTÁZKY",
         "subtitle": "Vše, co tě (nebo tvoje rodiče) může zajímat před prvním kontaktem.",
+        "exclusive_accordion": true,
         "items": [
             {
                 "q": "Pro koho je učednictví určeno?",

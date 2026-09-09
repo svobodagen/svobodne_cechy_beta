@@ -529,11 +529,14 @@ HTML;
     $f_eyebrow = htmlspecialchars($data['faq']['eyebrow'] ?? 'Odpovědi na dotazy');
     $f_title = htmlspecialchars($data['faq']['title'] ?? 'ČASTÉ OTÁZKY');
     $f_sub = htmlspecialchars($data['faq']['subtitle'] ?? 'Vše, co tě může zajímat před prvním kontaktem.');
+    $f_exclusive = !empty($data['faq']['exclusive_accordion']);
+    $f_exclusive_json = json_encode($f_exclusive);
+    $detailsNameAttr = $f_exclusive ? ' name="faq"' : '';
     $faq_html = "";
     foreach (($data['faq']['items'] ?? []) as $item) {
         $q = htmlspecialchars($item['q'] ?? '');
-        $a = htmlspecialchars($item['a'] ?? '');
-        $faq_html .= "<details><summary>{$q}</summary><p>{$a}</p></details>";
+        $a = nl2br(htmlspecialchars($item['a'] ?? ''));
+        $faq_html .= "<details{$detailsNameAttr}><summary>{$q}</summary><p>{$a}</p></details>";
     }
     $faqCtaHtml = $getSecCtaHtml('faq');
 
@@ -1177,6 +1180,23 @@ HTML;
       document.querySelectorAll('a[href="#kontakt"], .cta-nav').forEach(el => {
         el.addEventListener('click', openLeadModal);
       });
+
+      // FAQ Exclusive Accordion
+      const isFaqExclusive = {$f_exclusive_json};
+      if (isFaqExclusive) {
+        const detailsList = document.querySelectorAll('#faq .faq-list details');
+        detailsList.forEach(d => {
+          d.addEventListener('toggle', () => {
+            if (d.open) {
+              detailsList.forEach(other => {
+                if (other !== d && other.open) {
+                  other.removeAttribute('open');
+                }
+              });
+            }
+          });
+        });
+      }
     });
   </script>
 </body>
@@ -2456,6 +2476,16 @@ if ($editingSlug) {
                   <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
                   <input type="text" class="form-control" id="f_sub" value="<?= htmlspecialchars($editingData['faq']['subtitle'] ?? 'Vše, co tě může zajímat před prvním kontaktem.') ?>" />
                 </div>
+                <div class="item-card" style="border-left: 3px solid var(--accent); margin-bottom: 1.2rem;">
+                  <label style="display:flex; align-items:flex-start; gap:0.6rem; margin:0; cursor:pointer;">
+                    <input type="checkbox" id="f_exclusive_accordion" style="width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0;"
+                      <?= !empty($editingData['faq']['exclusive_accordion']) ? 'checked' : '' ?> onchange="liveUpdateFaqAccordion()" />
+                    <div>
+                      <strong style="color:#fff; display:block;">Zavírat ostatní otázky při otevření další</strong>
+                      <span style="color:var(--text-muted); font-size:0.82rem; display:block; margin-top:0.2rem;">Jen jedno otevřené okno v jeden okamžik (akordeon efekt).</span>
+                    </div>
+                  </label>
+                </div>
                 <div id="faq_container">
                   <?php foreach (($editingData['faq']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card faq-item-box">
@@ -2862,6 +2892,35 @@ if ($editingSlug) {
           }
         }
 
+        // Real-Time Live FAQ Accordion Update on iframe
+        function liveUpdateFaqAccordion() {
+          const iframe = document.getElementById('livePreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          const doc = iframe.contentDocument;
+          const isExclusive = document.getElementById('f_exclusive_accordion')?.checked ?? false;
+          const detailsList = doc.querySelectorAll('#faq .faq-list details');
+          detailsList.forEach(d => {
+            if (isExclusive) {
+              d.setAttribute('name', 'faq');
+            } else {
+              d.removeAttribute('name');
+            }
+            if (!d._hasFaqToggleListener) {
+              d._hasFaqToggleListener = true;
+              d.addEventListener('toggle', () => {
+                const currentlyExclusive = document.getElementById('f_exclusive_accordion')?.checked ?? false;
+                if (currentlyExclusive && d.open) {
+                  doc.querySelectorAll('#faq .faq-list details').forEach(other => {
+                    if (other !== d && other.open) {
+                      other.removeAttribute('open');
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+
         // Real-Time Live Portfolio Updates on iframe (aspect ratio, object fit, position)
         function liveUpdatePortfolio() {
           const iframe = document.getElementById('livePreviewFrame');
@@ -3124,6 +3183,10 @@ if ($editingSlug) {
               liveReorderSectionsInIframe();
               liveUpdateSecCtaVisibility();
               liveUpdateSecCtaTexts();
+              liveUpdateMasterPhotoBw();
+              liveUpdatePortfolio();
+              liveUpdateModalContact();
+              liveUpdateFaqAccordion();
             };
           }
         }
@@ -3404,6 +3467,7 @@ if ($editingSlug) {
               liveUpdateMasterPhotoBw();
               liveUpdatePortfolio();
               liveUpdateModalContact();
+              liveUpdateFaqAccordion();
 
               // Scroll iframe preview to current active tab section once iframe content is fully loaded
               const currentTabId = document.getElementById('active_tab')?.value || 'tab-order';
@@ -3752,6 +3816,7 @@ if ($editingSlug) {
               eyebrow: document.getElementById('f_eyebrow').value,
               title: document.getElementById('f_title').value,
               subtitle: document.getElementById('f_sub').value,
+              exclusive_accordion: document.getElementById('f_exclusive_accordion')?.checked ?? false,
               items: Array.from(document.querySelectorAll('.faq-item-box')).map(box => ({
                 q: box.querySelector('.faq-q').value,
                 a: box.querySelector('.faq-a').value

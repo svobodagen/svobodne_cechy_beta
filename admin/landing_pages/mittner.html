@@ -668,27 +668,27 @@
       </div>
 
       <div class="faq-list">
-        <details>
+        <details name="faq">
           <summary>Pro koho je učednictví určeno?</summary>
           <p>Prvořadě pro mladé lidi ve věku cca 12–18 let a mladé dospělé, kteří mají zájem o ruční řemeslo, sklo a praktickou tvorbu.</p>
         </details>
-        <details>
+        <details name="faq">
           <summary>Musím mít předchozí zkušenosti se sklem?</summary>
           <p>Není to nutné! Všechny základy bezpečnosti, manipulace s nářadím i práce s materiálem tě naučíme přímo v dílně.</p>
         </details>
-        <details>
+        <details name="faq">
           <summary>Jak probíhá zkušební den?</summary>
           <p>Během zkušebního dne se seznámíš s chodem huti, vyzkoušíš si základní úkony a zjistíš, zda ti atmosféra v dílně sedí.</p>
         </details>
-        <details>
+        <details name="faq">
           <summary>Kde přesně se učednictví koná?</summary>
           <p>Učednictví probíhá přímo v areálu sklárny Dílna Jiřího Mittnera v Kunraticích u Cvikova (Liberecký kraj).</p>
         </details>
-        <details>
+        <details name="faq">
           <summary>Je možné domluvit ubytování, pokud jsem zdaleka?</summary>
           <p>Možnosti ubytování a dopravy řešíme individuálně při osobním rozhovoru podle konkrétních potřeb učedníka.</p>
         </details>
-        <details>
+        <details name="faq">
           <summary>Musím se hned k nečemu zavázat?</summary>
           <p>Vůbec ne. Prvním krokem je zcela nezávazný rozhovor, kde si vyjasníme dotazy a představíme možnosti.</p>
         </details>
@@ -962,6 +962,21 @@
         document.getElementById('modalStep3').style.display = 'block';
       });
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const detailsList = document.querySelectorAll('#faq .faq-list details');
+      detailsList.forEach(d => {
+        d.addEventListener('toggle', () => {
+          if (d.open) {
+            detailsList.forEach(other => {
+              if (other !== d && other.open) {
+                other.removeAttribute('open');
+              }
+            });
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>
