@@ -867,6 +867,8 @@ HTML;
     /* Body scroll locking when modal is open */
     body.lead-modal-open {
       overflow: hidden !important;
+      position: fixed !important;
+      width: 100% !important;
     }
 
     /* Lead Modal Popup Styles */
@@ -880,7 +882,7 @@ HTML;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 0.75rem;
     }
     .lead-modal-box {
       background: var(--color-dark, #110e0b);
@@ -888,8 +890,7 @@ HTML;
       border-radius: 16px;
       max-width: 480px;
       width: 100%;
-      max-height: calc(100vh - 2rem);
-      max-height: calc(100dvh - 2rem);
+      /* max-height is set dynamically by JS via visualViewport */
       position: relative;
       box-shadow: 0 20px 50px rgba(0,0,0,0.9);
       color: var(--text, #f1f5f9);
@@ -915,10 +916,13 @@ HTML;
     }
     .lead-modal-close:hover { color: var(--color-accent, #e87516); }
     .lead-modal-scroll-content {
+      flex: 1 1 auto;    /* grow & shrink in flex container */
+      min-height: 0;     /* CRITICAL: allows flex child to shrink below content height */
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       padding: 2.2rem 1.8rem;
-      max-height: 100%;
       width: 100%;
     }
     .modal-step h3 { font-family: var(--font-heading); font-size: var(--section-h2-clamp); color: var(--color-white, #fff); margin-bottom: 0.5rem; text-align: center; }
@@ -956,21 +960,19 @@ HTML;
       .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
       .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
       .lead-modal-overlay {
-        padding: 0.5rem;
+        padding: 0.4rem;
       }
       .lead-modal-box {
-        max-height: calc(100vh - 1rem);
-        max-height: calc(100dvh - 1rem);
         border-radius: 12px;
       }
       .lead-modal-scroll-content {
-        padding: 1.4rem 1.1rem;
+        padding: 1.4rem 1rem;
       }
       .lead-modal-box .form-group {
         margin-bottom: 0.75rem;
       }
       .lead-modal-box textarea {
-        height: 65px;
+        height: 60px;
       }
     }
   </style>
@@ -1076,12 +1078,37 @@ HTML;
   <script>
     let currentLeadId = null;
 
+    /* ---- Visual Viewport fix for mobile browsers ---- */
+    function _updateModalHeight() {
+      const modal = document.getElementById('leadModal');
+      const box = document.querySelector('#leadModal .lead-modal-box');
+      if (!modal || modal.style.display === 'none' || !box) return;
+      const vv = window.visualViewport;
+      const vh = vv ? vv.height : window.innerHeight;
+      const padding = 16; /* 0.75rem * 2 + tiny buffer */
+      box.style.maxHeight = Math.floor(vh - padding * 2) + 'px';
+      /* Reposition overlay to match visual viewport (handles keyboard shift) */
+      if (vv) {
+        modal.style.top = vv.offsetTop + 'px';
+        modal.style.left = vv.offsetLeft + 'px';
+        modal.style.width = vv.width + 'px';
+        modal.style.height = vv.height + 'px';
+      }
+    }
+
     function openLeadModal(e) {
       if (e && e.preventDefault) e.preventDefault();
       const modal = document.getElementById('leadModal');
       if (modal) {
         modal.style.display = 'flex';
         document.body.classList.add('lead-modal-open');
+        _updateModalHeight();
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', _updateModalHeight);
+          window.visualViewport.addEventListener('scroll', _updateModalHeight);
+        } else {
+          window.addEventListener('resize', _updateModalHeight);
+        }
         const scrollBox = document.getElementById('leadModalScrollContent');
         if (scrollBox) scrollBox.scrollTop = 0;
         const emailInput = document.getElementById('m_email');
@@ -1093,7 +1120,14 @@ HTML;
       const modal = document.getElementById('leadModal');
       if (modal) {
         modal.style.display = 'none';
+        modal.style.top = ''; modal.style.left = ''; modal.style.width = ''; modal.style.height = '';
         document.body.classList.remove('lead-modal-open');
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', _updateModalHeight);
+          window.visualViewport.removeEventListener('scroll', _updateModalHeight);
+        } else {
+          window.removeEventListener('resize', _updateModalHeight);
+        }
       }
     }
 
@@ -1101,9 +1135,7 @@ HTML;
       const modal = document.getElementById('leadModal');
       if (modal) {
         modal.addEventListener('click', function(e) {
-          if (e.target === modal) {
-            closeLeadModal();
-          }
+          if (e.target === modal) closeLeadModal();
         });
       }
     });
