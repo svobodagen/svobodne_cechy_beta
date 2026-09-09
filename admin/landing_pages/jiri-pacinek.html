@@ -372,11 +372,9 @@
       box-shadow: 0 4px 15px rgba(232, 117, 22, 0.4);
     }
 
-    /* Body scroll locking when modal is open */
+    /* Body scroll locking - handled via JS body-scroll-lock pattern */
     body.lead-modal-open {
       overflow: hidden !important;
-      position: fixed !important;
-      width: 100% !important;
     }
 
     /* Lead Modal Popup Styles */
@@ -425,11 +423,12 @@
     .lead-modal-close:hover { color: var(--color-accent, #e87516); }
     .lead-modal-scroll-content {
       flex: 1 1 auto;
-      min-height: 0; /* CRITICAL: flex child must shrink below content height */
-      overflow-y: auto;
+      min-height: 0;
+      overflow-y: scroll;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+      touch-action: pan-y pinch-zoom;
       padding: 2.2rem 1.8rem;
       width: 100%;
     }
@@ -922,56 +921,87 @@
 
   <script>
     let currentLeadId = null;
+    let _modalScrollY = 0;
+    let _modalTouchStartY = 0;
 
-    /* ---- Visual Viewport fix for mobile browsers ---- */
+    /* ---- Prevent body scroll while modal is open (iOS/Android) ---- */
+    function _onOverlayTouchStart(e) {
+      _modalTouchStartY = e.touches[0].clientY;
+    }
+
+    function _onOverlayTouchMove(e) {
+      const scrollEl = document.getElementById('leadModalScrollContent');
+      if (!scrollEl) { e.preventDefault(); return; }
+      if (!scrollEl.contains(e.target)) {
+        e.preventDefault();
+        return;
+      }
+      const deltaY = _modalTouchStartY - e.touches[0].clientY;
+      const atTop    = scrollEl.scrollTop <= 0;
+      const atBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 1;
+      if ((atTop && deltaY < 0) || (atBottom && deltaY > 0)) {
+        e.preventDefault();
+      }
+    }
+
+    /* ---- Size modal to actual visual viewport (keyboard-aware) ---- */
     function _updateModalHeight() {
-      const modal = document.getElementById('leadModal');
       const box = document.querySelector('#leadModal .lead-modal-box');
-      if (!modal || modal.style.display === 'none' || !box) return;
+      if (!box) return;
       const vv = window.visualViewport;
       const vh = vv ? vv.height : window.innerHeight;
-      const padding = 16;
-      box.style.maxHeight = Math.floor(vh - padding * 2) + 'px';
-      if (vv) {
-        modal.style.top = vv.offsetTop + 'px';
-        modal.style.left = vv.offsetLeft + 'px';
-        modal.style.width = vv.width + 'px';
-        modal.style.height = vv.height + 'px';
-      }
+      box.style.maxHeight = Math.floor(vh - 24) + 'px';
     }
 
     function openLeadModal(e) {
       if (e && e.preventDefault) e.preventDefault();
       const modal = document.getElementById('leadModal');
-      if (modal) {
-        modal.style.display = 'flex';
-        document.body.classList.add('lead-modal-open');
-        _updateModalHeight();
-        if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', _updateModalHeight);
-          window.visualViewport.addEventListener('scroll', _updateModalHeight);
-        } else {
-          window.addEventListener('resize', _updateModalHeight);
-        }
-        const scrollBox = document.getElementById('leadModalScrollContent');
-        if (scrollBox) scrollBox.scrollTop = 0;
-        const emailInput = document.getElementById('m_email');
-        if (emailInput) setTimeout(() => emailInput.focus(), 100);
+      if (!modal) return;
+
+      _modalScrollY = window.scrollY || document.documentElement.scrollTop;
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + _modalScrollY + 'px';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('lead-modal-open');
+
+      modal.style.display = 'flex';
+      _updateModalHeight();
+
+      modal.addEventListener('touchstart', _onOverlayTouchStart, { passive: true });
+      modal.addEventListener('touchmove',  _onOverlayTouchMove,  { passive: false });
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', _updateModalHeight);
+      } else {
+        window.addEventListener('resize', _updateModalHeight);
       }
+
+      const scrollBox = document.getElementById('leadModalScrollContent');
+      if (scrollBox) scrollBox.scrollTop = 0;
+      const emailInput = document.getElementById('m_email');
+      if (emailInput) setTimeout(() => emailInput.focus(), 100);
     }
 
     function closeLeadModal() {
       const modal = document.getElementById('leadModal');
-      if (modal) {
-        modal.style.display = 'none';
-        modal.style.top = ''; modal.style.left = ''; modal.style.width = ''; modal.style.height = '';
-        document.body.classList.remove('lead-modal-open');
-        if (window.visualViewport) {
-          window.visualViewport.removeEventListener('resize', _updateModalHeight);
-          window.visualViewport.removeEventListener('scroll', _updateModalHeight);
-        } else {
-          window.removeEventListener('resize', _updateModalHeight);
-        }
+      if (!modal) return;
+
+      modal.style.display = 'none';
+      modal.removeEventListener('touchstart', _onOverlayTouchStart);
+      modal.removeEventListener('touchmove',  _onOverlayTouchMove);
+
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      document.body.classList.remove('lead-modal-open');
+      window.scrollTo(0, _modalScrollY);
+
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', _updateModalHeight);
+      } else {
+        window.removeEventListener('resize', _updateModalHeight);
       }
     }
 
