@@ -864,6 +864,13 @@ HTML;
     }
     footer { border-top: 1px solid var(--color-glass-border); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
 
+    /* Body scroll locking when modal is open */
+    body.lead-modal-open {
+      overflow: hidden !important;
+      height: 100vh !important;
+      touch-action: none !important;
+    }
+
     /* Lead Modal Popup Styles */
     .lead-modal-overlay {
       position: fixed;
@@ -873,12 +880,13 @@ HTML;
       -webkit-backdrop-filter: blur(8px);
       z-index: 10000;
       display: none;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 1.5rem 1rem;
+      justify-content: flex-start;
+      padding: 2rem 1rem 4rem 1rem;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
+      overscroll-behavior: contain;
     }
     .lead-modal-box {
       background: var(--color-dark, #110e0b);
@@ -886,16 +894,13 @@ HTML;
       border-radius: 16px;
       max-width: 480px;
       width: 100%;
-      max-height: calc(100vh - 2rem);
-      max-height: calc(100dvh - 2rem);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
       padding: 2rem 1.6rem;
       position: relative;
       box-shadow: 0 20px 50px rgba(0,0,0,0.9);
       color: var(--text, #f1f5f9);
       animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      margin: auto;
+      margin: auto 0;
+      flex-shrink: 0;
     }
     @keyframes modalFadeIn {
       from { opacity: 0; transform: translateY(15px) scale(0.95); }
@@ -948,20 +953,18 @@ HTML;
       .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
       .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
       .lead-modal-overlay {
-        padding: 0.75rem 0.5rem;
-        align-items: flex-start;
+        padding: 1rem 0.75rem 5rem 0.75rem;
       }
       .lead-modal-box {
         padding: 1.4rem 1rem;
-        max-height: calc(100vh - 1.5rem);
-        max-height: calc(100dvh - 1.5rem);
         border-radius: 12px;
+        margin: 0 auto;
       }
       .lead-modal-box .form-group {
         margin-bottom: 0.75rem;
       }
       .lead-modal-box textarea {
-        height: 70px;
+        height: 65px;
       }
     }
   </style>
@@ -1069,7 +1072,9 @@ HTML;
       if (e && e.preventDefault) e.preventDefault();
       const modal = document.getElementById('leadModal');
       if (modal) {
+        modal.scrollTop = 0;
         modal.style.display = 'flex';
+        document.body.classList.add('lead-modal-open');
         const emailInput = document.getElementById('m_email');
         if (emailInput) setTimeout(() => emailInput.focus(), 100);
       }
@@ -1077,7 +1082,10 @@ HTML;
 
     function closeLeadModal() {
       const modal = document.getElementById('leadModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.classList.remove('lead-modal-open');
+      }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1112,10 +1120,14 @@ HTML;
         if (data.lead_id) currentLeadId = data.lead_id;
         document.getElementById('modalStep1').style.display = 'none';
         document.getElementById('modalStep2').style.display = 'block';
+        const modal = document.getElementById('leadModal');
+        if (modal) modal.scrollTop = 0;
       })
       .catch(err => {
         document.getElementById('modalStep1').style.display = 'none';
         document.getElementById('modalStep2').style.display = 'block';
+        const modal = document.getElementById('leadModal');
+        if (modal) modal.scrollTop = 0;
       });
     }
 
