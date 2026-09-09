@@ -878,21 +878,25 @@ HTML;
       -webkit-backdrop-filter: blur(8px);
       z-index: 10000;
       display: none;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
     }
     .lead-modal-box {
       background: var(--color-dark, #110e0b);
       border: 2px solid var(--color-accent, #e87516);
       border-radius: 16px;
       max-width: 480px;
-      width: calc(100% - 1.5rem);
-      padding: 2rem 1.6rem;
+      width: 100%;
+      max-height: calc(100vh - 2rem);
+      max-height: calc(100dvh - 2rem);
       position: relative;
       box-shadow: 0 20px 50px rgba(0,0,0,0.9);
       color: var(--text, #f1f5f9);
       animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      margin: 2rem auto 5rem auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
     @keyframes modalFadeIn {
       from { opacity: 0; transform: translateY(15px) scale(0.95); }
@@ -907,9 +911,16 @@ HTML;
       font-size: 1.8rem;
       cursor: pointer;
       line-height: 1;
-      z-index: 10;
+      z-index: 20;
     }
     .lead-modal-close:hover { color: var(--color-accent, #e87516); }
+    .lead-modal-scroll-content {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 2.2rem 1.8rem;
+      max-height: 100%;
+      width: 100%;
+    }
     .modal-step h3 { font-family: var(--font-heading); font-size: var(--section-h2-clamp); color: var(--color-white, #fff); margin-bottom: 0.5rem; text-align: center; }
     .modal-step p { font-size: 0.95rem; color: var(--text-muted, #94a3b8); margin-bottom: 1.2rem; text-align: center; line-height: 1.4; }
 
@@ -944,11 +955,16 @@ HTML;
     @media (max-width: 600px) {
       .nav-container { flex-direction: column; text-align: center; gap: 0.6rem; }
       .nav-menu { gap: 0.5rem 0.8rem; justify-content: center; }
+      .lead-modal-overlay {
+        padding: 0.5rem;
+      }
       .lead-modal-box {
-        padding: 1.4rem 1.1rem;
+        max-height: calc(100vh - 1rem);
+        max-height: calc(100dvh - 1rem);
         border-radius: 12px;
-        margin: 1rem auto 6rem auto;
-        width: calc(100% - 1rem);
+      }
+      .lead-modal-scroll-content {
+        padding: 1.4rem 1.1rem;
       }
       .lead-modal-box .form-group {
         margin-bottom: 0.75rem;
@@ -988,69 +1004,71 @@ HTML;
     <div class="lead-modal-box">
       <button type="button" class="lead-modal-close" onclick="closeLeadModal()">&times;</button>
       
-      <!-- STEP 1: EMAIL CAPTURE -->
-      <div id="modalStep1" class="modal-step">
-        <h3>{$m_s1_title}</h3>
-        <p>{$m_s1_text}</p>
-        <form onsubmit="submitStep1(event)">
-          <div class="form-group">
-            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Váš E-mail *</label>
-            <input type="email" id="m_email" name="email" autocomplete="email" class="form-control" placeholder="např. jan.novak@seznam.cz" required />
-          </div>
-          <button type="submit" id="m_s1_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s1_btn}</button>
-          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
-            Odesláním e-mailu berete na vědomí <a href="zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely zaslání informací o učednictví a navazující komunikaci.
-          </div>
-        </form>
-      </div>
-
-      <!-- STEP 2: ADDITIONAL DETAILS & WHATSAPP -->
-      <div id="modalStep2" class="modal-step" style="display:none;">
-        <h3>{$m_s2_title}</h3>
-        <p>{$m_s2_text}</p>
-        <form onsubmit="submitStep2(event)">
-          <div class="form-group">
-            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jméno a příjmení</label>
-            <input type="text" id="m_name" name="name" autocomplete="name" class="form-control" placeholder="Jan Novák" />
-          </div>
-          <div class="form-group">
-            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Telefon</label>
-            <input type="tel" id="m_phone" name="phone" autocomplete="tel" class="form-control" placeholder="+420 602 123 456" />
-          </div>
-          <div class="form-group">
-            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jsem:</label>
-            <select id="m_role" class="form-control">
-              <option value="Budoucí učedník">Budoucí učedník</option>
-              <option value="Rodič">Rodič</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Zpráva nebo dotaz (volitelné)</label>
-            <textarea id="m_msg" class="form-control" placeholder="Mám zájem o bližší informace..."></textarea>
-          </div>
-          <button type="submit" id="m_s2_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s2_btn}</button>
-          <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
-            Odesláním formuláře berete na vědomí <a href="zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely vyřízení vašeho dotazu.
-          </div>
-          <div class="newsletter-option" style="margin-top:0.6rem; text-align:left; font-size:0.82rem; color:var(--text-muted, #cbd5e1); display:flex; align-items:flex-start; gap:0.5rem;">
-            <input type="checkbox" id="m_newsletter" name="newsletter" style="accent-color:var(--color-accent, #e87516); width:16px; height:16px; margin-top:2px; cursor:pointer;" />
-            <label for="m_newsletter" style="cursor:pointer; margin:0; line-height:1.3;">Chci dostávat novinky a pravidelný newsletter od Svobodné Cechy.</label>
-          </div>
-        </form>
-        <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">
-          <button type="button" onclick="submitStep2AndWhatsApp(event, 'https://wa.me/{$wa_num}?text={$wa_msg}')" class="btn-wa" style="width:100%; border:none; cursor:pointer;">{$m_s2_wa_text}</button>
+      <div id="leadModalScrollContent" class="lead-modal-scroll-content">
+        <!-- STEP 1: EMAIL CAPTURE -->
+        <div id="modalStep1" class="modal-step">
+          <h3>{$m_s1_title}</h3>
+          <p>{$m_s1_text}</p>
+          <form onsubmit="submitStep1(event)">
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Váš E-mail *</label>
+              <input type="email" id="m_email" name="email" autocomplete="email" class="form-control" placeholder="např. jan.novak@seznam.cz" required />
+            </div>
+            <button type="submit" id="m_s1_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s1_btn}</button>
+            <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+              Odesláním e-mailu berete na vědomí <a href="zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely zaslání informací o učednictví a navazující komunikaci.
+            </div>
+          </form>
         </div>
-      </div>
 
-      <!-- STEP 3: THANK YOU -->
-      <div id="modalStep3" class="modal-step" style="display:none;">
-        <h3>{$m_s3_title}</h3>
-        <p id="m_s3_text_el">{$m_s3_text}</p>
-        <div id="m_s3_web_box" style="margin-top:1.2rem; display:{$m_s3_web_box_display};">
-          <p id="m_s3_web_desc_el" style="font-size:0.95rem; opacity:0.9; margin-bottom:0.8rem; color:var(--color-text-muted, #d1d5db); display:{$m_s3_web_desc_display};">{$m_s3_web_desc}</p>
-          <a id="m_s3_web_link_el" href="{$m_s3_web_url}" target="_blank" rel="noopener" class="btn btn-secondary" style="display:block; text-align:center; text-decoration:none; width:100%; margin-bottom:0.5rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:0.75rem 1rem; border-radius:8px; font-weight:600; transition:all .2s;">{$m_s3_web_btn_text}</a>
+        <!-- STEP 2: ADDITIONAL DETAILS & WHATSAPP -->
+        <div id="modalStep2" class="modal-step" style="display:none;">
+          <h3>{$m_s2_title}</h3>
+          <p>{$m_s2_text}</p>
+          <form onsubmit="submitStep2(event)">
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jméno a příjmení</label>
+              <input type="text" id="m_name" name="name" autocomplete="name" class="form-control" placeholder="Jan Novák" />
+            </div>
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Telefon</label>
+              <input type="tel" id="m_phone" name="phone" autocomplete="tel" class="form-control" placeholder="+420 602 123 456" />
+            </div>
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Jsem:</label>
+              <select id="m_role" class="form-control">
+                <option value="Budoucí učedník">Budoucí učedník</option>
+                <option value="Rodič">Rodič</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; margin-bottom:0.3rem; color:var(--color-accent); font-weight:700;">Zpráva nebo dotaz (volitelné)</label>
+              <textarea id="m_msg" class="form-control" placeholder="Mám zájem o bližší informace..."></textarea>
+            </div>
+            <button type="submit" id="m_s2_submit_btn" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">{$m_s2_btn}</button>
+            <div class="gdpr-notice" style="margin-top:0.8rem; font-size:0.78rem; color:var(--text-muted, #94a3b8); text-align:center; line-height:1.4;">
+              Odesláním formuláře berete na vědomí <a href="zasady-ochrany-osobnich-udaju.html" target="_blank" style="color:var(--color-accent, #e87516); text-decoration:underline;">zpracování osobních údajů</a> pro účely vyřízení vašeho dotazu.
+            </div>
+            <div class="newsletter-option" style="margin-top:0.6rem; text-align:left; font-size:0.82rem; color:var(--text-muted, #cbd5e1); display:flex; align-items:flex-start; gap:0.5rem;">
+              <input type="checkbox" id="m_newsletter" name="newsletter" style="accent-color:var(--color-accent, #e87516); width:16px; height:16px; margin-top:2px; cursor:pointer;" />
+              <label for="m_newsletter" style="cursor:pointer; margin:0; line-height:1.3;">Chci dostávat novinky a pravidelný newsletter od Svobodné Cechy.</label>
+            </div>
+          </form>
+          <div style="text-align:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--color-glass-border);">
+            <button type="button" onclick="submitStep2AndWhatsApp(event, 'https://wa.me/{$wa_num}?text={$wa_msg}')" class="btn-wa" style="width:100%; border:none; cursor:pointer;">{$m_s2_wa_text}</button>
+          </div>
         </div>
-        <button type="button" id="m_s3_close_btn" class="btn btn-primary" onclick="closeLeadModal()" style="width:100%; margin-top:1rem;">{$m_s3_btn}</button>
+
+        <!-- STEP 3: THANK YOU -->
+        <div id="modalStep3" class="modal-step" style="display:none;">
+          <h3>{$m_s3_title}</h3>
+          <p id="m_s3_text_el">{$m_s3_text}</p>
+          <div id="m_s3_web_box" style="margin-top:1.2rem; display:{$m_s3_web_box_display};">
+            <p id="m_s3_web_desc_el" style="font-size:0.95rem; opacity:0.9; margin-bottom:0.8rem; color:var(--color-text-muted, #d1d5db); display:{$m_s3_web_desc_display};">{$m_s3_web_desc}</p>
+            <a id="m_s3_web_link_el" href="{$m_s3_web_url}" target="_blank" rel="noopener" class="btn btn-secondary" style="display:block; text-align:center; text-decoration:none; width:100%; margin-bottom:0.5rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:0.75rem 1rem; border-radius:8px; font-weight:600; transition:all .2s;">{$m_s3_web_btn_text}</a>
+          </div>
+          <button type="button" id="m_s3_close_btn" class="btn btn-primary" onclick="closeLeadModal()" style="width:100%; margin-top:1rem;">{$m_s3_btn}</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1062,9 +1080,10 @@ HTML;
       if (e && e.preventDefault) e.preventDefault();
       const modal = document.getElementById('leadModal');
       if (modal) {
-        modal.scrollTop = 0;
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
         document.body.classList.add('lead-modal-open');
+        const scrollBox = document.getElementById('leadModalScrollContent');
+        if (scrollBox) scrollBox.scrollTop = 0;
         const emailInput = document.getElementById('m_email');
         if (emailInput) setTimeout(() => emailInput.focus(), 100);
       }
@@ -1110,14 +1129,14 @@ HTML;
         if (data.lead_id) currentLeadId = data.lead_id;
         document.getElementById('modalStep1').style.display = 'none';
         document.getElementById('modalStep2').style.display = 'block';
-        const modal = document.getElementById('leadModal');
-        if (modal) modal.scrollTop = 0;
+        const scrollBox = document.getElementById('leadModalScrollContent');
+        if (scrollBox) scrollBox.scrollTop = 0;
       })
       .catch(err => {
         document.getElementById('modalStep1').style.display = 'none';
         document.getElementById('modalStep2').style.display = 'block';
-        const modal = document.getElementById('leadModal');
-        if (modal) modal.scrollTop = 0;
+        const scrollBox = document.getElementById('leadModalScrollContent');
+        if (scrollBox) scrollBox.scrollTop = 0;
       });
     }
 
