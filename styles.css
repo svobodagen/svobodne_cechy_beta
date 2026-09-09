@@ -1,4 +1,4 @@
-/* VERZE: 202605072051 */
+/* VERZE: 202609092032 */
 html {
   scrollbar-gutter: stable;
 }
@@ -26,6 +26,8 @@ body {
   background: radial-gradient(circle at top left, #2a2f66, var(--bg) 45%) fixed,
     radial-gradient(circle at 20% 80%, #2a0f48, transparent 40%) fixed;
   min-height: 100vh;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .page {

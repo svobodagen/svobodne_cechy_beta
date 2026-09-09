@@ -65,7 +65,10 @@
       color: var(--text);
       line-height: 1.5;
       font-size: var(--body-text-size);
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
+    p, span, a, li, blockquote { overflow-wrap: anywhere; word-break: break-word; }
 
     .container { max-width: 1200px; margin: auto; padding: 0 1.5rem; }
 
@@ -259,11 +262,26 @@
       border: 1px solid var(--color-glass-border);
       border-radius: 12px;
       padding: 2rem;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      hyphens: auto;
     }
-    .quote-text { font-style: italic; margin-bottom: 1.2rem; color: var(--color-cream); }
-    .author-info { display: flex; align-items: center; gap: 1rem; }
-    .author-info strong { color: var(--color-accent); display: block; font-size: 1rem; }
-    .author-info span { font-size: 0.85rem; color: var(--text-muted); }
+    .testimonial-title {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .quote-text { 
+      font-style: italic; 
+      margin-bottom: 1.2rem; 
+      color: var(--color-cream); 
+      overflow-wrap: anywhere; 
+      word-break: break-word; 
+      hyphens: auto; 
+    }
+    .author-info { display: flex; align-items: center; gap: 1rem; overflow-wrap: anywhere; word-break: break-word; }
+    .author-info strong { color: var(--color-accent); display: block; font-size: 1rem; overflow-wrap: anywhere; word-break: break-word; }
+    .author-info span { font-size: 0.85rem; color: var(--text-muted); overflow-wrap: anywhere; word-break: break-word; }
 
     /* FAQ Section */
     .faq-section { padding: 5rem 0; }
