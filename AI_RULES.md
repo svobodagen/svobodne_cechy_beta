@@ -14,10 +14,11 @@ Follow these rules strictly. They override any default behaviors.
 - **NEVER** disable cache globally in `.htaccess` (affecting users). Use versioning instead.
 
 ## 2. 🚀 GIT WORKFLOW & OCHRANA DAT NA SERVERU (KRITICKÉ!)
-- **DATA ŽIJÍ POUZE NA SERVERU:** Živá data (`admin/landing_pages/*.json`, `admin/landing_pages/*.html`, `database.sqlite`, `uploads/`) patří výhradně na server.
-- **NIKDY nepřepisovat data na serveru:** Při deployi se nasazuje POUZE kód (PHP, JS, CSS, šablony). Všechna live data jsou v GitHub Actions FTP deployi striktně vyloučena (`exclude`).
-- **ZÁKAZ `git add .` bez rozmyslu:** Vždy stageuj pouze konkrétní změněné soubory kódu (např. `git add admin/landing_pages.php styles.css`). NIKDY nepřidávat do commitu live data, která by mohla přepsat změny zadané uživatelem v administraci na webu.
-- **Commit Immediately:** Po funkční změně kódu commitni změny a pushni na GitHub.
+- **DATA ŽIJÍ POUZE NA SERVERU (V MYSQL A UPLOADS):** Živá produkční data (`admin/landing_pages/*.json`, `admin/landing_pages/*.html`, MySQL databáze, `uploads/`) patří výhradně na server. Lokální počítač nesmí mít na živá data žádný vliv.
+- **ZÁKAZ editovat či verzovat HTML/JSON v `admin/landing_pages/`:** Soubory v `admin/landing_pages/` jsou generované výstupy z administrace a MySQL databáze. Šablona se upravuje VÝHRADNĚ v `admin/landing_pages.php` (funkce `renderLandingPageHtml`). Po nasazení se stránky na serveru přegenerují kliknutím na tlačítko „🔄 Přegenerovat všechny stránky novým kódem“.
+- **ZÁKAZ odstraňovat pravidla v `.github/workflows/main.yml`:** Složka `admin/landing_pages/**` a `uploads/**` MUSÍ zůstat trvale v `exclude:`. Nikdy tato pravidla nemaž ani neměň.
+- **NIKDY nepřepisovat data na serveru:** Při deployi se nasazuje POUZE kód (PHP, JS, CSS). Všechna live data jsou v GitHub Actions FTP deployi striktně vyloučena.
+- **Commit & Push:** Po dokončení funkční změny kódu zkontroluj `git status`, commitni změny a pushni na GitHub.
 - **Messages:** Zprávy ke commitům piš česky.
 
 ## 3. 🔐 AUTHENTICATION & SECURITY

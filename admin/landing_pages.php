@@ -15,6 +15,27 @@ $uploadsDir = __DIR__ . "/../uploads";
 if (!file_exists($dir)) { mkdir($dir, 0777, true); }
 if (!file_exists($uploadsDir)) { mkdir($uploadsDir, 0777, true); }
 
+// Database connection & landing_pages table initialization
+$pdo = null;
+if (file_exists(__DIR__ . '/../db.php')) {
+    try {
+        require_once __DIR__ . '/../db.php';
+        if (isset($pdo) && $pdo instanceof PDO) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS landing_pages (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                slug VARCHAR(100) NOT NULL UNIQUE,
+                master_name VARCHAR(150) DEFAULT NULL,
+                data_json LONGTEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX (slug)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+    } catch (\Exception $e) {
+        // Fallback gracefully to file storage if DB is temporarily unavailable
+    }
+}
+
 // Helper to fix image URL for landing page (located in admin/landing_pages/)
 function fixImgUrl($url) {
     if (empty($url)) return '../../images/sample_master.png';
@@ -1331,25 +1352,128 @@ HTML;
 HTML;
 }
 
+// Helper to get landing page data (MySQL DB first, fallback to JSON with automatic DB import)
+function getLandingPageData($slug, $dir, $pdo) {
+    if ($pdo) {
+        try {
+            $stmt = $pdo->prepare("SELECT data_json FROM landing_pages WHERE slug = ?");
+            $stmt->execute([$slug]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row && !empty($row['data_json'])) {
+                $decoded = json_decode($row['data_json'], true);
+                if (is_array($decoded)) {
+                    return $decoded;
+                }
+            }
+        } catch (\Exception $e) {}
+    }
+
+    $jsonFile = $dir . "/" . $slug . ".json";
+    if (file_exists($jsonFile)) {
+        $content = file_get_contents($jsonFile);
+        $decoded = json_decode($content, true);
+        if (is_array($decoded)) {
+            // Auto-migrate to MySQL DB if connected
+            if ($pdo) {
+                try {
+                    $masterName = $decoded['master_name'] ?? $decoded['master']['name'] ?? $slug;
+                    $stmt = $pdo->prepare("INSERT INTO landing_pages (slug, master_name, data_json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE master_name = VALUES(master_name), data_json = VALUES(data_json)");
+                    $stmt->execute([$slug, $masterName, json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)]);
+                } catch (\Exception $e) {}
+            }
+            return $decoded;
+        }
+    }
+    return null;
+}
+
+// Helper to save landing page data (MySQL DB + local server JSON backup/cache + static HTML render)
+function saveLandingPageData($slug, $formData, $dir, $pdo) {
+    // 1. Save to MySQL DB
+    if ($pdo) {
+        try {
+            $masterName = $formData['master_name'] ?? $formData['master']['name'] ?? $slug;
+            $jsonStr = json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            $stmt = $pdo->prepare("INSERT INTO landing_pages (slug, master_name, data_json, updated_at) 
+                VALUES (:slug, :master_name, :data_json, NOW()) 
+                ON DUPLICATE KEY UPDATE master_name = :master_name_u, data_json = :data_json_u, updated_at = NOW()");
+            $stmt->execute([
+                ':slug' => $slug,
+                ':master_name' => $masterName,
+                ':data_json' => $jsonStr,
+                ':master_name_u' => $masterName,
+                ':data_json_u' => $jsonStr
+            ]);
+        } catch (\Exception $e) {}
+    }
+
+    // 2. Backup and save local server JSON file (disk cache)
+    $backupDir = $dir . "/backups";
+    if (!is_dir($backupDir)) { @mkdir($backupDir, 0777, true); }
+    $jsonPath = $dir . "/" . $slug . ".json";
+    if (file_exists($jsonPath)) {
+        @copy($jsonPath, $backupDir . "/" . $slug . "_" . date("Ymd_His") . ".json");
+    }
+    file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    // 3. Render static HTML file (high-speed static cache for web visitors)
+    $htmlPath = $dir . "/" . $slug . ".html";
+    $generatedHtml = renderLandingPageHtml($formData);
+    file_put_contents($htmlPath, $generatedHtml);
+
+    return true;
+}
+
 $message = "";
 $messageType = "success";
 $savedActiveTab = "tab-order";
 
 if (isset($_GET['msg']) && $_GET['msg'] === 'deleted') {
-    $message = "Stránka byla úspěšně smazána.";
+    $message = "Stránka byla úspěšně smazána z databáze i serveru.";
 }
 if (isset($_GET['created'])) {
-    $message = "Nová landing page byla úspěšně vytvořena!";
+    $message = "Nová landing page byla úspěšně vytvořena a uložena do databáze!";
 }
 if (isset($_GET['duplicated'])) {
-    $message = "Landing page byla úspěšně zduplikována s novým názvem!";
+    $message = "Landing page byla úspěšně zduplikována v databázi s novým názvem!";
+}
+
+// Handle Regenerating All Landing Pages using current PHP template
+if (isset($_POST['regenerate_all'])) {
+    $count = 0;
+    $slugs = [];
+    if (is_dir($dir)) {
+        foreach (scandir($dir) as $f) {
+            if (str_ends_with($f, '.json')) {
+                $slugs[str_replace('.json', '', $f)] = true;
+            } elseif (str_ends_with($f, '.html')) {
+                $slugs[str_replace('.html', '', $f)] = true;
+            }
+        }
+    }
+    if ($pdo) {
+        try {
+            $stmt = $pdo->query("SELECT slug FROM landing_pages");
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $slugs[$row['slug']] = true;
+            }
+        } catch (\Exception $e) {}
+    }
+
+    foreach (array_keys($slugs) as $s) {
+        $pData = getLandingPageData($s, $dir, $pdo);
+        if (is_array($pData)) {
+            $html = renderLandingPageHtml($pData);
+            file_put_contents($dir . "/" . $s . ".html", $html);
+            $count++;
+        }
+    }
+    $message = "Úspěšně přegenerováno {$count} landing pages s nejnovějším kódem šablony!";
 }
 
 // Handle Saving Visual Form Data
 if (isset($_POST['save_sections_form'])) {
     $slug = basename($_POST['edit_slug']);
-    $jsonPath = $dir . "/" . $slug . ".json";
-    $htmlPath = $dir . "/" . $slug . ".html";
 
     if (!empty($_POST['active_tab'])) {
         $savedActiveTab = basename($_POST['active_tab']);
@@ -1357,16 +1481,8 @@ if (isset($_POST['save_sections_form'])) {
 
     $formData = json_decode($_POST['sections_json_data'], true);
     if (is_array($formData)) {
-        // Automatická záloha před přepsáním na serveru
-        $backupDir = $dir . "/backups";
-        if (!is_dir($backupDir)) { @mkdir($backupDir, 0777, true); }
-        if (file_exists($jsonPath)) {
-            @copy($jsonPath, $backupDir . "/" . $slug . "_" . date("Ymd_His") . ".json");
-        }
-        file_put_contents($jsonPath, json_encode($formData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        $generatedHtml = renderLandingPageHtml($formData);
-        file_put_contents($htmlPath, $generatedHtml);
-        $message = "Všechny sekce, fotky, pořadí, barevná témata a 3-fázový kontaktní formulář pro '{$slug}' byly úspěšně uloženy!";
+        saveLandingPageData($slug, $formData, $dir, $pdo);
+        $message = "Všechny sekce, fotky, pořadí, barevná témata a kontaktní formulář pro '{$slug}' byly úspěšně uloženy do databáze a vygenerovány!";
     } else {
         $message = "Chyba při zpracování dat sekcí.";
         $messageType = "error";
@@ -1376,6 +1492,12 @@ if (isset($_POST['save_sections_form'])) {
 // Handle Deleting Pages
 if (isset($_GET['delete'])) {
     $deleteSlug = str_replace('.html', '', basename($_GET['delete']));
+    if ($pdo) {
+        try {
+            $stmt = $pdo->prepare("DELETE FROM landing_pages WHERE slug = ?");
+            $stmt->execute([$deleteSlug]);
+        } catch (\Exception $e) {}
+    }
     @unlink($dir . "/" . $deleteSlug . ".html");
     @unlink($dir . "/" . $deleteSlug . ".json");
     header("Location: landing_pages.php?msg=deleted");
@@ -1407,16 +1529,12 @@ if (isset($_POST['duplicate_page'])) {
         $slug = $cleanSlug . "-" . $counter;
     }
     
-    // Load source data
-    $sourceJsonFile = $dir . "/" . $sourceSlug . ".json";
-    $data = [];
-    if (file_exists($sourceJsonFile)) {
-        $data = json_decode(file_get_contents($sourceJsonFile), true);
-    }
+    // Load source data (DB first, then fallback)
+    $data = getLandingPageData($sourceSlug, $dir, $pdo);
     if (!is_array($data) || empty($data)) {
-        $defaultJson = file_exists($dir . "/jiri-pacinek.json") ? file_get_contents($dir . "/jiri-pacinek.json") : "{}";
-        $data = json_decode($defaultJson, true);
+        $data = getLandingPageData('jiri-pacinek', $dir, $pdo);
     }
+    if (!is_array($data)) { $data = []; }
     
     $data['slug'] = $slug;
     $data['master_name'] = $newName;
@@ -1424,9 +1542,7 @@ if (isset($_POST['duplicate_page'])) {
         $data['master']['name'] = mb_strtoupper($newName);
     }
     
-    file_put_contents($dir . "/" . $slug . ".json", json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    file_put_contents($dir . "/" . $slug . ".html", renderLandingPageHtml($data));
-    
+    saveLandingPageData($slug, $data, $dir, $pdo);
     header("Location: landing_pages.php?edit={$slug}&duplicated=1");
     exit;
 }
@@ -1438,15 +1554,20 @@ if (isset($_POST['create_new'])) {
     $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(str_replace(' ', '-', $rawSlug)));
     if (empty($slug)) { $slug = "landing-" . time(); }
 
-    $defaultJson = file_exists($dir . "/jiri-pacinek.json") ? file_get_contents($dir . "/jiri-pacinek.json") : "{}";
-    $data = json_decode($defaultJson, true);
+    $data = getLandingPageData('jiri-pacinek', $dir, $pdo);
+    if (!is_array($data) || empty($data)) {
+        $defaultJson = file_exists($dir . "/jiri-pacinek.json") ? file_get_contents($dir . "/jiri-pacinek.json") : "{}";
+        $data = json_decode($defaultJson, true);
+    }
+    if (!is_array($data)) { $data = []; }
+
     $data['slug'] = $slug;
     $data['master_name'] = $name;
-    $data['master']['name'] = mb_strtoupper($name);
+    if (isset($data['master']) && is_array($data['master'])) {
+        $data['master']['name'] = mb_strtoupper($name);
+    }
 
-    file_put_contents($dir . "/" . $slug . ".json", json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    file_put_contents($dir . "/" . $slug . ".html", renderLandingPageHtml($data));
-
+    saveLandingPageData($slug, $data, $dir, $pdo);
     header("Location: landing_pages.php?edit={$slug}&created=1");
     exit;
 }
@@ -1454,13 +1575,10 @@ if (isset($_POST['create_new'])) {
 $editingSlug = isset($_GET['edit']) ? str_replace('.html', '', basename($_GET['edit'])) : null;
 $editingData = null;
 if ($editingSlug) {
-    $jsonFile = $dir . "/" . $editingSlug . ".json";
-    if (file_exists($jsonFile)) {
-        $editingData = json_decode(file_get_contents($jsonFile), true);
-        if (is_array($editingData)) {
-            $htmlFile = $dir . "/" . $editingSlug . ".html";
-            file_put_contents($htmlFile, renderLandingPageHtml($editingData));
-        }
+    $editingData = getLandingPageData($editingSlug, $dir, $pdo);
+    if (is_array($editingData)) {
+        $htmlFile = $dir . "/" . $editingSlug . ".html";
+        file_put_contents($htmlFile, renderLandingPageHtml($editingData));
     }
 }
 ?>
@@ -3969,7 +4087,14 @@ if ($editingSlug) {
 
     <!-- LIST OF LANDING PAGES -->
     <div class="card">
-      <h2><i class="bi bi-files" style="color: var(--accent);"></i> Přehled Landing Pages</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+        <h2 style="margin:0;"><i class="bi bi-files" style="color: var(--accent);"></i> Přehled Landing Pages</h2>
+        <form method="post" action="landing_pages.php" onsubmit="return confirm('Opravdu přegenerovat všechny landing pages novým kódem šablony? Žádná data, texty ani fotky se nezmění, pouze se zaktualizuje kód šablony.');">
+          <button type="submit" name="regenerate_all" class="btn btn-secondary" style="font-size:0.85rem; padding:0.5rem 1rem; display:inline-flex; align-items:center; gap:0.5rem; background:rgba(217, 119, 6, 0.15); border:1px solid var(--accent); color:#fff; border-radius:6px; cursor:pointer;">
+            <i class="bi bi-arrow-repeat"></i> 🔄 Přegenerovat všechny stránky novým kódem
+          </button>
+        </form>
+      </div>
       <table>
         <thead>
           <tr>
@@ -3980,12 +4105,30 @@ if ($editingSlug) {
         </thead>
         <tbody>
           <?php
-          $files = array_diff(scandir($dir), ['..', '.', '.gitkeep']);
+          $slugs = [];
+          if (is_dir($dir)) {
+            $files = array_diff(scandir($dir), ['..', '.', '.gitkeep', 'backups']);
+            foreach ($files as $file) {
+              if (str_ends_with($file, '.html')) {
+                $slugs[str_replace('.html', '', $file)] = true;
+              } elseif (str_ends_with($file, '.json')) {
+                $slugs[str_replace('.json', '', $file)] = true;
+              }
+            }
+          }
+          if ($pdo) {
+            try {
+              $stmt = $pdo->query("SELECT slug FROM landing_pages");
+              while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $slugs[$row['slug']] = true;
+              }
+            } catch (\Exception $e) {}
+          }
+          ksort($slugs);
           $hasPages = false;
-          foreach ($files as $file) {
-            if (!str_ends_with($file, '.html')) continue;
+          foreach (array_keys($slugs) as $slug) {
             $hasPages = true;
-            $slug = str_replace('.html', '', $file);
+            $file = $slug . ".html";
             $relPath = "admin/landing_pages/" . $file;
             echo "<tr>";
             echo "<td><span class='badge-file'><i class='bi bi-file-earmark-text'></i> " . htmlspecialchars($slug) . "</span></td>";
@@ -3995,8 +4138,8 @@ if ($editingSlug) {
             echo "<a class='btn-action btn-edit' href='landing_pages.php?edit=" . urlencode($slug) . "'><i class='bi bi-sliders'></i> Vizuálně upravit sekce, fotky, fonty, témata & pořadí</a>";
             echo "<button type='button' class='btn-action btn-duplicate' onclick=\"openDuplicateModal('" . htmlspecialchars($slug, ENT_QUOTES) . "')\"><i class='bi bi-files'></i> Duplikovat</button>";
             echo "<a class='btn-action btn-view' href='landing_pages/" . htmlspecialchars($file) . "' target='_blank'><i class='bi bi-box-arrow-up-right'></i> Zobrazit</a>";
-            echo "<button class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
-            echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($file) . "' onclick=\"return confirm('Opravdu smazat stránku {$file}?');\"><i class='bi bi-trash'></i> Smazat</a>";
+            echo "<button type='button' class='btn-action btn-copy' onclick=\"navigator.clipboard.writeText(window.location.origin + '/" . htmlspecialchars($relPath) . "'); alert('Odkaz pro reklamu byl zkopírován!');\"><i class='bi bi-link-45deg'></i> Zkopírovat odkaz</button>";
+            echo "<a class='btn-action btn-delete' href='landing_pages.php?delete=" . urlencode($slug) . "' onclick=\"return confirm('Opravdu smazat stránku {$slug}?');\"><i class='bi bi-trash'></i> Smazat</a>";
             echo "</div>";
             echo "</td>";
             echo "</tr>";
