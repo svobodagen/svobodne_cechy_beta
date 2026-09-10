@@ -487,22 +487,90 @@ HTML;
     </section>
 HTML;
 
-    foreach (($data['testimonials']['items'] ?? []) as $item) {
-    }
     // 6. Portfolio
     $p_eyebrow = htmlspecialchars($data['portfolio']['eyebrow'] ?? 'Ukázka z prostředí');
     $p_title = htmlspecialchars($data['portfolio']['title'] ?? 'CO VZNIKÁ V DÍLNĚ');
     $p_sub = htmlspecialchars($data['portfolio']['subtitle'] ?? 'Nahlédni do živého procesu sklářského umění.');
+    
+    $rawPortfolioItems = $data['portfolio']['items'] ?? [];
+    $portfolioRowMode = $data['portfolio']['row_mode'] ?? 'auto';
+
+    // Helper to calculate max items per row
+    $getPortfolioMaxPerRow = function($ratio, $mode, $remainingInGroup) {
+        if ($mode === 'max2') return 2;
+        if ($mode === 'max3') return 3;
+        if ($mode === 'max4') return 4;
+        // 'auto' balanced mode:
+        if ($ratio === '16/9') {
+            return ($remainingInGroup === 4) ? 2 : 3;
+        }
+        if ($remainingInGroup === 4) return 2; // 4 items split into 2 + 2 for balance
+        if ($remainingInGroup === 5) return 3; // 5 items split into 3 + 2
+        return 3;
+    };
+
+    // First group contiguous items that share identical aspect ratio (break row if ratio changes or new_row is set)
+    $contiguousGroups = [];
+    $tempGroup = [];
+    foreach ($rawPortfolioItems as $item) {
+        $ratio = $item['aspect_ratio'] ?? '4/3';
+        $forceNew = !empty($item['new_row']);
+        if (empty($tempGroup)) {
+            $tempGroup[] = $item;
+        } else {
+            $prevRatio = $tempGroup[0]['aspect_ratio'] ?? '4/3';
+            if ($forceNew || $ratio !== $prevRatio) {
+                $contiguousGroups[] = $tempGroup;
+                $tempGroup = [$item];
+            } else {
+                $tempGroup[] = $item;
+            }
+        }
+    }
+    if (!empty($tempGroup)) {
+        $contiguousGroups[] = $tempGroup;
+    }
+
+    // Next, partition each group into balanced rows with identical aspect ratio and uniform dimensions
+    $finalRows = [];
+    foreach ($contiguousGroups as $group) {
+        $ratio = $group[0]['aspect_ratio'] ?? '4/3';
+        $totalInGroup = count($group);
+        $offset = 0;
+        while ($offset < $totalInGroup) {
+            $remaining = $totalInGroup - $offset;
+            $maxPerThisRow = $getPortfolioMaxPerRow($ratio, $portfolioRowMode, $remaining);
+            $take = min($maxPerThisRow, $remaining);
+            if ($remaining === 4 && $take === 3) {
+                $take = 2; // balanced 2 + 2
+            }
+            $rowSlice = array_slice($group, $offset, $take);
+            $finalRows[] = [
+                'ratio' => $ratio,
+                'items' => $rowSlice
+            ];
+            $offset += $take;
+        }
+    }
+
     $portfolio_html = "";
-    foreach (($data['portfolio']['items'] ?? []) as $item) {
-        $pimg = htmlspecialchars(fixImgUrl($item['image'] ?? ''));
-        $pcap = htmlspecialchars($item['caption'] ?? '');
-        $pitem_ratio = htmlspecialchars($item['aspect_ratio'] ?? '4/3');
-        $pitem_fit = htmlspecialchars($item['object_fit'] ?? 'cover');
-        $pitem_pos = htmlspecialchars($item['object_position'] ?? 'center');
-        $ratio_css = ($pitem_ratio === 'auto') ? 'auto' : $pitem_ratio;
-        $img_style = "width:100%; height:auto; aspect-ratio:{$ratio_css}; object-fit:{$pitem_fit}; object-position:{$pitem_pos}; display:block;";
-        $portfolio_html .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' style='{$img_style}' /><div class='portfolio-caption'>{$pcap}</div></div>";
+    foreach ($finalRows as $rData) {
+        $rowRatio = $rData['ratio'];
+        $rowItems = $rData['items'];
+        $itemsCount = count($rowItems);
+        $ratioCss = ($rowRatio === 'auto') ? 'auto' : $rowRatio;
+
+        $rowInnerHtml = "";
+        foreach ($rowItems as $item) {
+            $pimg = htmlspecialchars(fixImgUrl($item['image'] ?? ''));
+            $pcap = htmlspecialchars($item['caption'] ?? '');
+            $pitem_fit = htmlspecialchars($item['object_fit'] ?? 'cover');
+            $pitem_pos = htmlspecialchars($item['object_position'] ?? 'center');
+            $img_style = "width:100%; height:100%; aspect-ratio:{$ratioCss}; object-fit:{$pitem_fit}; object-position:{$pitem_pos}; display:block;";
+            $capHtml = ($pcap !== '') ? "<div class='portfolio-caption'>{$pcap}</div>" : "";
+            $rowInnerHtml .= "<div class='portfolio-item'><img src='{$pimg}' alt='{$pcap}' style='{$img_style}' />{$capHtml}</div>";
+        }
+        $portfolio_html .= "<div class='portfolio-row portfolio-row--count-{$itemsCount}' data-count='{$itemsCount}' data-ratio='{$rowRatio}'>{$rowInnerHtml}</div>";
     }
     $portfolioCtaHtml = $getSecCtaHtml('portfolio');
 
@@ -513,7 +581,7 @@ HTML;
         <h2>{$p_title}</h2>
         <p class="subtitle">{$p_sub}</p>
       </div>
-      <div class="portfolio-grid">{$portfolio_html}</div>
+      <div class="portfolio-gallery portfolio-grid">{$portfolio_html}</div>
       {$portfolioCtaHtml}
     </section>
 HTML;
@@ -805,10 +873,30 @@ HTML;
     .step-number { font-family: var(--font-heading); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: var(--color-accent); text-align: center; }
     .disclaimer-box { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 1.5rem; font-style: italic; overflow-wrap: anywhere; word-break: break-word; }
 
-    .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
-    .portfolio-item { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--color-glass-border); min-width: 0; }
-    .portfolio-item img { width: 100%; height: auto; object-fit: cover; display: block; }
-    .portfolio-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 1rem 0.8rem 0.6rem; color: var(--color-white); font-weight: 600; font-size: 0.85rem; overflow-wrap: anywhere; word-break: break-word; }
+    .portfolio-gallery { display: flex; flex-direction: column; gap: 1.25rem; width: 100%; max-width: 1140px; margin: 0 auto; }
+    .portfolio-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 1.25rem; width: 100%; margin: 0 auto; }
+    .portfolio-item { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--color-glass-border); background: var(--color-glass); box-shadow: 0 4px 20px rgba(0,0,0,0.25); transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; min-width: 0; display: flex; flex-direction: column; }
+    .portfolio-item:hover { transform: translateY(-3px); border-color: var(--color-accent); box-shadow: 0 8px 30px rgba(232, 117, 22, 0.15); }
+    .portfolio-item img { width: 100%; height: 100%; display: block; transition: transform 0.4s ease; }
+    .portfolio-item:hover img { transform: scale(1.02); }
+    .portfolio-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 60%, transparent 100%); padding: 1.2rem 1rem 0.75rem; color: var(--color-white); font-weight: 600; font-size: 0.88rem; line-height: 1.35; overflow-wrap: anywhere; word-break: break-word; pointer-events: none; }
+
+    /* Centered row sizes by item count */
+    .portfolio-row--count-1 .portfolio-item { flex: 0 1 720px; max-width: 720px; width: 100%; }
+    .portfolio-row--count-2 .portfolio-item { flex: 0 1 calc(50% - 0.65rem); max-width: 520px; width: 100%; }
+    .portfolio-row--count-2[data-ratio="3/4"] .portfolio-item { max-width: 360px; }
+    .portfolio-row--count-3 .portfolio-item { flex: 0 1 calc(33.333% - 0.85rem); max-width: 360px; width: 100%; }
+    .portfolio-row--count-4 .portfolio-item { flex: 0 1 calc(25% - 0.95rem); max-width: 270px; width: 100%; }
+
+    @media (max-width: 860px) {
+      .portfolio-row--count-3 .portfolio-item,
+      .portfolio-row--count-4 .portfolio-item { flex: 0 1 calc(50% - 0.65rem); max-width: 420px; }
+    }
+    @media (max-width: 600px) {
+      .portfolio-row { gap: 0.9rem; }
+      .portfolio-row .portfolio-item { flex: 0 1 100% !important; max-width: 440px !important; }
+      .portfolio-caption { font-size: 0.8rem; padding: 0.9rem 0.75rem 0.5rem; }
+    }
 
     .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
     .testimonial-card { 
@@ -2567,6 +2655,16 @@ if ($editingSlug) {
               <!-- TAB 6: GALERIE -->
               <div id="tab-portfolio" class="tab-content">
                 <h3 style="color:#fff; margin-bottom:1rem;">🖼️ Sekce 6: Galerie a Fotky z huti</h3>
+                
+                <div style="background:rgba(232, 117, 22, 0.08); border:1px solid rgba(232, 117, 22, 0.35); border-left:4px solid var(--accent); border-radius:8px; padding:0.9rem 1.1rem; margin-bottom:1.2rem;">
+                  <div style="display:flex; align-items:center; gap:0.5rem; color:var(--accent); font-weight:700; font-size:0.92rem;">
+                    <span>🛡️ Automatický systém řazení a centrování fotek</span>
+                  </div>
+                  <p style="color:#d1d5db; font-size:0.82rem; margin:0.35rem 0 0; line-height:1.45;">
+                    Systém automaticky hlídá, aby na jednom řádku byly <strong>pouze fotky se stejnou velikostí a poměrem stran</strong>. Pokud změníte poměr stran nebo zaškrtnete „Začít nový řádek“, fotka automaticky zahájí další řádek. Každý řádek je na monitoru <strong>vždy vycentrován na střed</strong>.
+                  </p>
+                </div>
+
                 <div class="form-group">
                   <label>Eyebrow (malý text) <span class="badge-typo eyebrow">🏷️ Štítek</span></label>
                   <input type="text" class="form-control" id="p_eyebrow" value="<?= htmlspecialchars($editingData['portfolio']['eyebrow'] ?? 'Ukázka z prostředí') ?>" />
@@ -2579,10 +2677,22 @@ if ($editingSlug) {
                   <label>Podtitul sekce <span class="badge-typo body">📝 Běžný text</span></label>
                   <input type="text" class="form-control" id="p_sub" value="<?= htmlspecialchars($editingData['portfolio']['subtitle'] ?? 'Nahlédni do živého procesu sklářského umění.') ?>" />
                 </div>
+
+                <div class="form-group" style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:8px; padding:0.8rem 1rem;">
+                  <label style="color:#fff; font-weight:600;">Rozvržení řádků galerie</label>
+                  <?php $curRowMode = $editingData['portfolio']['row_mode'] ?? 'auto'; ?>
+                  <select class="form-control" id="p_row_mode" onchange="liveUpdatePortfolio()" style="margin-top:0.3rem;">
+                    <option value="auto" <?= $curRowMode === 'auto' ? 'selected' : '' ?>>✨ Chytré automatické vyvážení (2–3 fotky na řádek)</option>
+                    <option value="max2" <?= $curRowMode === 'max2' ? 'selected' : '' ?>>👥 Maximálně 2 fotky na řádek</option>
+                    <option value="max3" <?= $curRowMode === 'max3' ? 'selected' : '' ?>>🖼️ Maximálně 3 fotky na řádek</option>
+                    <option value="max4" <?= $curRowMode === 'max4' ? 'selected' : '' ?>>🔲 Maximálně 4 fotky na řádek</option>
+                  </select>
+                </div>
                 
                 <div id="portfolio_container">
                   <?php foreach (($editingData['portfolio']['items'] ?? []) as $idx => $item): ?>
                     <div class="item-card portfolio-item-box">
+                      <div class="portfolio-row-badge-slot" style="margin-bottom:0.6rem;"></div>
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="margin:0;">Fotka #<?= $idx+1 ?></h4>
                         <div style="display:flex; gap:0.3rem;">
@@ -2635,6 +2745,12 @@ if ($editingSlug) {
                             <option value="right" <?= $itemPos === 'right' ? 'selected' : '' ?>>➡️ Pravá</option>
                           </select>
                         </div>
+                      </div>
+                      <div class="form-group" style="margin-top:0.7rem; margin-bottom:0.2rem;">
+                        <label style="display:inline-flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.85rem; color:#f3f4f6; font-weight:500;">
+                          <input type="checkbox" class="p-new-row" <?= !empty($item['new_row']) ? 'checked' : '' ?> onchange="liveUpdatePortfolio()" style="width:16px; height:16px; accent-color:var(--accent);" />
+                          <span>Začít nový řádek od této fotky</span>
+                        </label>
                       </div>
                     </div>
                   <?php endforeach; ?>
@@ -3172,39 +3288,150 @@ if ($editingSlug) {
           });
         }
 
-        // Real-Time Live Portfolio Updates on iframe (aspect ratio, object fit, position)
+        // Helper to get max items per row matching the PHP algorithm
+        function getPortfolioMaxPerRowJs(ratio, mode, remainingInGroup) {
+          if (mode === 'max2') return 2;
+          if (mode === 'max3') return 3;
+          if (mode === 'max4') return 4;
+          if (ratio === '16/9') {
+            return (remainingInGroup === 4) ? 2 : 3;
+          }
+          if (remainingInGroup === 4) return 2;
+          if (remainingInGroup === 5) return 3;
+          return 3;
+        }
+
+        // Real-Time Live Portfolio Updates: groups items into uniform rows,
+        // updates admin badges, and re-renders the live preview iframe.
         function liveUpdatePortfolio() {
+          const itemBoxes = Array.from(document.querySelectorAll('.portfolio-item-box'));
+          const rowMode = document.getElementById('p_row_mode')?.value || 'auto';
+
+          // 1. Gather item metadata
+          const itemsData = itemBoxes.map((box, idx) => {
+            const pRatio = box.querySelector('.p-ratio')?.value || '4/3';
+            const pFit = box.querySelector('.p-fit')?.value || 'cover';
+            const pPos = box.querySelector('.p-pos')?.value || 'center';
+            const pImg = box.querySelector('.p-img')?.value || '';
+            const pCap = box.querySelector('.p-cap')?.value || '';
+            const pNewRow = box.querySelector('.p-new-row')?.checked || false;
+            return {
+              idx,
+              box,
+              image: pImg,
+              caption: pCap,
+              aspect_ratio: pRatio,
+              object_fit: pFit,
+              object_position: pPos,
+              new_row: pNewRow
+            };
+          });
+
+          // 2. Contiguous grouping by aspect ratio and explicit new_row
+          const contiguousGroups = [];
+          let tempGroup = [];
+          itemsData.forEach(item => {
+            if (tempGroup.length === 0) {
+              tempGroup.push(item);
+            } else {
+              const prevRatio = tempGroup[0].aspect_ratio;
+              if (item.new_row || item.aspect_ratio !== prevRatio) {
+                contiguousGroups.push(tempGroup);
+                tempGroup = [item];
+              } else {
+                tempGroup.push(item);
+              }
+            }
+          });
+          if (tempGroup.length > 0) contiguousGroups.push(tempGroup);
+
+          // 3. Partition into rows with identical aspect ratio and uniform dimensions
+          const finalRows = [];
+          contiguousGroups.forEach(group => {
+            const ratio = group[0].aspect_ratio;
+            const total = group.length;
+            let offset = 0;
+            while (offset < total) {
+              const remaining = total - offset;
+              let take = Math.min(getPortfolioMaxPerRowJs(ratio, rowMode, remaining), remaining);
+              if (remaining === 4 && take === 3) take = 2; // balanced 2+2
+              finalRows.push({
+                ratio: ratio,
+                items: group.slice(offset, offset + take)
+              });
+              offset += take;
+            }
+          });
+
+          // 4. Update row badges in Admin UI
+          const ratioLabels = {
+            '4/3': '🖼️ 4:3',
+            '16/9': '📺 16:9',
+            '1/1': '🔲 1:1',
+            '3/2': '📷 3:2',
+            '3/4': '📱 3:4',
+            'auto': '↔️ Auto'
+          };
+
+          finalRows.forEach((r, rIdx) => {
+            const rowNum = rIdx + 1;
+            const rRatio = r.ratio;
+            const rCount = r.items.length;
+            const countLabel = (rCount === 1) ? '1 fotka' : ((rCount >= 2 && rCount <= 4) ? `${rCount} fotky` : `${rCount} fotek`);
+            const ratioLabel = ratioLabels[rRatio] || rRatio;
+
+            r.items.forEach((item, itemInRowIdx) => {
+              const badgeSlot = item.box.querySelector('.portfolio-row-badge-slot');
+              if (badgeSlot) {
+                let noteHtml = '';
+                if (itemInRowIdx === 0 && item.idx > 0) {
+                  const prevItem = itemsData[item.idx - 1];
+                  if (item.new_row) {
+                    noteHtml = `<div style="color:var(--accent); font-size:0.75rem; margin-top:0.25rem;">✨ Vynucený nový řádek</div>`;
+                  } else if (prevItem && prevItem.aspect_ratio !== item.aspect_ratio) {
+                    noteHtml = `<div style="color:#f59e0b; font-size:0.75rem; margin-top:0.25rem;">⚡ Automatický nový řádek (jiný poměr stran než u fotky #${prevItem.idx + 1})</div>`;
+                  }
+                }
+
+                badgeSlot.innerHTML = `
+                  <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:6px; padding:0.35rem 0.65rem; font-size:0.75rem; color:#fed7aa; display:flex; justify-content:space-between; align-items:center;">
+                    <span>🏷️ <strong>Řádek ${rowNum}</strong> • Formát <strong>${ratioLabel}</strong> (${countLabel})</span>
+                    <span style="color:#4ade80; font-weight:600; font-size:0.72rem;">🎯 Centrováno</span>
+                  </div>
+                  ${noteHtml}
+                `;
+              }
+            });
+          });
+
+          // 5. Update iframe live preview
           const iframe = document.getElementById('livePreviewFrame');
           if (!iframe || !iframe.contentDocument) return;
           const doc = iframe.contentDocument;
 
-          const itemBoxes = document.querySelectorAll('.portfolio-item-box');
-          const iframeItems = doc.querySelectorAll('#realizace .portfolio-item');
+          const galleryContainer = doc.querySelector('#realizace .portfolio-gallery, #realizace .portfolio-grid');
+          if (!galleryContainer) return;
 
-          itemBoxes.forEach((box, idx) => {
-            if (iframeItems[idx]) {
-              const img = iframeItems[idx].querySelector('img');
-              const cap = iframeItems[idx].querySelector('.portfolio-caption');
-              const itemRatio = box.querySelector('.p-ratio')?.value || '4/3';
-              const itemFit = box.querySelector('.p-fit')?.value || 'cover';
-              const itemPos = box.querySelector('.p-pos')?.value || 'center';
-              const pImgVal = box.querySelector('.p-img')?.value;
-              const pCapVal = box.querySelector('.p-cap')?.value;
+          let galleryHtml = '';
+          finalRows.forEach(r => {
+            const rRatio = r.ratio;
+            const itemsCount = r.items.length;
+            const ratioCss = (rRatio === 'auto') ? 'auto' : rRatio;
 
-              if (img) {
-                img.style.height = 'auto';
-                img.style.aspectRatio = (itemRatio === 'auto') ? 'auto' : itemRatio;
-                img.style.objectFit = itemFit;
-                img.style.objectPosition = itemPos;
-                if (pImgVal !== undefined && pImgVal !== '') {
-                  img.src = pImgVal;
-                }
-              }
-              if (cap && pCapVal !== undefined) {
-                cap.textContent = pCapVal;
-              }
-            }
+            let rowInnerHtml = '';
+            r.items.forEach(item => {
+              const pImg = item.image;
+              const pCap = item.caption;
+              const pFit = item.object_fit;
+              const pPos = item.object_position;
+              const imgStyle = `width:100%; height:100%; aspect-ratio:${ratioCss}; object-fit:${pFit}; object-position:${pPos}; display:block;`;
+              const capHtml = pCap ? `<div class="portfolio-caption">${pCap}</div>` : '';
+              rowInnerHtml += `<div class="portfolio-item"><img src="${pImg}" alt="${pCap}" style="${imgStyle}" />${capHtml}</div>`;
+            });
+            galleryHtml += `<div class="portfolio-row portfolio-row--count-${itemsCount}" data-count="${itemsCount}" data-ratio="${rRatio}">${rowInnerHtml}</div>`;
           });
+
+          galleryContainer.innerHTML = galleryHtml;
         }
 
         // Real-Time Live Reordering of dynamic items in iframe DOM across sections
@@ -3621,6 +3848,7 @@ if ($editingSlug) {
           const n = container.querySelectorAll('.portfolio-item-box').length + 1;
           const uid = 'new_' + Date.now();
           container.appendChild(makeItemBox('portfolio-item-box', `Fotka #${n}`, `
+            <div class="portfolio-row-badge-slot" style="margin-bottom:0.6rem;"></div>
             <div class="form-group">
               <label>Fotka v galerii</label>
               <div class="upload-row">
@@ -3632,7 +3860,7 @@ if ($editingSlug) {
                 </label>
               </div>
             </div>
-            <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap" value="" /></div>
+            <div class="form-group"><label>Popisek pod fotkou</label><input type="text" class="form-control p-cap" value="" oninput="liveUpdatePortfolio()" /></div>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-bottom:0;">
               <div class="form-group" style="margin-bottom:0;">
                 <label>Poměr stran</label>
@@ -3663,7 +3891,14 @@ if ($editingSlug) {
                 </select>
               </div>
             </div>
+            <div class="form-group" style="margin-top:0.7rem; margin-bottom:0.2rem;">
+              <label style="display:inline-flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.85rem; color:#f3f4f6; font-weight:500;">
+                <input type="checkbox" class="p-new-row" onchange="liveUpdatePortfolio()" style="width:16px; height:16px; accent-color:var(--accent);" />
+                <span>Začít nový řádek od této fotky</span>
+              </label>
+            </div>
           `));
+          liveUpdatePortfolio();
         }
 
         function addTestimonialItem() {
@@ -3699,6 +3934,7 @@ if ($editingSlug) {
 
         document.addEventListener('DOMContentLoaded', () => {
           renderOrderList();
+          liveUpdatePortfolio();
 
           // Restore saved active tab after save or page reload
           const savedActiveTab = document.getElementById('active_tab')?.value || 'tab-order';
@@ -4044,12 +4280,14 @@ if ($editingSlug) {
               eyebrow: document.getElementById('p_eyebrow').value,
               title: document.getElementById('p_title').value,
               subtitle: document.getElementById('p_sub').value,
+              row_mode: document.getElementById('p_row_mode') ? document.getElementById('p_row_mode').value : 'auto',
               items: Array.from(document.querySelectorAll('.portfolio-item-box')).map(box => ({
                 image: box.querySelector('.p-img').value,
                 caption: box.querySelector('.p-cap').value,
                 aspect_ratio: box.querySelector('.p-ratio') ? box.querySelector('.p-ratio').value : '4/3',
                 object_fit: box.querySelector('.p-fit') ? box.querySelector('.p-fit').value : 'cover',
-                object_position: box.querySelector('.p-pos') ? box.querySelector('.p-pos').value : 'center'
+                object_position: box.querySelector('.p-pos') ? box.querySelector('.p-pos').value : 'center',
+                new_row: box.querySelector('.p-new-row') ? box.querySelector('.p-new-row').checked : false
               }))
             },
             testimonials: {
