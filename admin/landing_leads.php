@@ -23,12 +23,21 @@ try {
         phone VARCHAR(50) DEFAULT NULL,
         user_role VARCHAR(50) DEFAULT NULL,
         message TEXT DEFAULT NULL,
+        newsletter TINYINT(1) DEFAULT 0,
         status VARCHAR(50) DEFAULT 'novy',
+        session_id VARCHAR(64) DEFAULT NULL,
+        source VARCHAR(100) DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX (landing_slug),
-        INDEX (email)
+        INDEX (email),
+        INDEX (session_id),
+        INDEX (source)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    try { $pdo->exec("ALTER TABLE landing_leads ADD COLUMN newsletter TINYINT(1) DEFAULT 0"); } catch(\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE landing_leads ADD COLUMN session_id VARCHAR(64) DEFAULT NULL"); } catch(\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE landing_leads ADD COLUMN source VARCHAR(100) DEFAULT NULL"); } catch(\PDOException $e) {}
 } catch (\PDOException $e) {}
 
 // Actions: Delete or Change status
@@ -154,9 +163,13 @@ $resolvedLeadsCount = $pdo->query("SELECT COUNT(*) FROM landing_leads WHERE stat
   </style>
 </head>
 <body>
-  <div class="container">
     <div class="header-bar">
       <a href="../admin.html" class="btn-back"><i class="bi bi-arrow-left"></i> Zpět do Rozcestníku administrace</a>
+      <div style="display:flex; gap:0.8rem; align-items:center;">
+        <a href="landing_stats.php" class="btn-action" style="background:var(--accent); color:#000; font-weight:700; text-decoration:none; padding:0.6rem 1.2rem; border-radius:8px;">
+          <i class="bi bi-bar-chart-steps"></i> Analytika & Generátor odkazů →
+        </a>
+      </div>
     </div>
 
     <h1>Zprávy a Kontakty z Landing Pages</h1>
@@ -235,6 +248,7 @@ $resolvedLeadsCount = $pdo->query("SELECT COUNT(*) FROM landing_leads WHERE stat
           <tr>
             <th>Datum a Čas</th>
             <th>Landing Page (Mistr)</th>
+            <th>Zdroj (Kampaň)</th>
             <th>E-mail</th>
             <th>Jméno / Telefon / Role</th>
             <th>Zpráva</th>
@@ -244,7 +258,7 @@ $resolvedLeadsCount = $pdo->query("SELECT COUNT(*) FROM landing_leads WHERE stat
         </thead>
         <tbody>
           <?php if (empty($leads)): ?>
-            <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:2.5rem;">Zatím nebyly zaznamenány žádné zprávy ani e-maily.</td></tr>
+            <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:2.5rem;">Zatím nebyly zaznamenány žádné zprávy ani e-maily.</td></tr>
           <?php else: ?>
             <?php foreach ($leads as $lead): ?>
               <?php 
@@ -261,6 +275,18 @@ $resolvedLeadsCount = $pdo->query("SELECT COUNT(*) FROM landing_leads WHERE stat
                 <td>
                   <strong><?= htmlspecialchars($lead['master_name'] ?: $lead['landing_slug']) ?></strong>
                   <div style="font-family:monospace; font-size:0.75rem; color:var(--text-muted);"><?= htmlspecialchars($lead['landing_slug']) ?></div>
+                </td>
+                <td>
+                  <span class="badge" style="background:rgba(245, 158, 11, 0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.5); font-size:0.75rem; font-weight:700; padding:0.2rem 0.5rem; border-radius:4px; font-family:monospace;">
+                    <?= htmlspecialchars($lead['source'] ?: 'přímý') ?>
+                  </span>
+                  <?php if (!empty($lead['session_id'])): ?>
+                    <div style="margin-top:0.35rem;">
+                      <a href="landing_stats.php?session=<?= urlencode($lead['session_id']) ?>" style="color:#60a5fa; font-size:0.75rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.2rem; font-weight:600;">
+                        <i class="bi bi-clock-history"></i> Časová osa
+                      </a>
+                    </div>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <a href="mailto:<?= htmlspecialchars($lead['email']) ?>" style="color:var(--accent); font-weight:600; text-decoration:none;">

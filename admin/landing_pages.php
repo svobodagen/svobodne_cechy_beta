@@ -1184,9 +1184,98 @@ HTML;
   </div>
 
   <script>
+    /* ---- Analytics & Tracking Engine ---- */
     let currentLeadId = null;
     let _modalScrollY = 0;
     let _modalTouchStartY = 0;
+    let _lastClickedBtn = 'Chci být učedníkem';
+    let _lastClickedSec = 'hero';
+    const _pageLoadTime = Date.now();
+    const _observedSections = new Set();
+
+    function _getDurationSec() {
+      return Math.floor((Date.now() - _pageLoadTime) / 1000);
+    }
+
+    // 1. Session ID (stored in sessionStorage)
+    let scSessionId = sessionStorage.getItem('sc_landing_session_id');
+    if (!scSessionId) {
+      scSessionId = 's_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
+      sessionStorage.setItem('sc_landing_session_id', scSessionId);
+    }
+
+    // 2. Source extraction
+    const urlParams = new URLSearchParams(window.location.search);
+    let scSource = urlParams.get('zdroj') || urlParams.get('src') || urlParams.get('utm_source') || urlParams.get('ref');
+    if (scSource) {
+      sessionStorage.setItem('sc_landing_source', scSource);
+    } else {
+      scSource = sessionStorage.getItem('sc_landing_source');
+      if (!scSource) {
+        const ref = document.referrer || '';
+        if (ref.indexOf('facebook.com') !== -1 || ref.indexOf('fb.com') !== -1) scSource = 'facebook';
+        else if (ref.indexOf('instagram.com') !== -1) scSource = 'instagram';
+        else if (ref.indexOf('seznam.cz') !== -1) scSource = 'seznam';
+        else if (ref.indexOf('google.') !== -1) scSource = 'google';
+        else if (ref) {
+          try { scSource = new URL(ref).hostname; } catch(e) { scSource = 'referrer'; }
+        } else {
+          scSource = 'direct';
+        }
+        sessionStorage.setItem('sc_landing_source', scSource);
+      }
+    }
+
+    // 3. Device detection
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTabletDevice = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch)))/i.test(navigator.userAgent);
+    const scDevice = isTabletDevice ? 'tablet' : (isMobileDevice ? 'mobile' : 'desktop');
+
+    // 4. Send Event Helper (sendBeacon / fetch keepalive)
+    function trackEvent(eventType, eventLabel, eventSection, eventData) {
+      try {
+        const payload = JSON.stringify({
+          session_id: scSessionId,
+          landing_slug: '{$slug}',
+          event_type: eventType,
+          event_label: eventLabel || '',
+          event_section: eventSection || '',
+          event_data: eventData || '',
+          duration_seconds: _getDurationSec()
+        });
+        const trackUrl = '../api_landing_leads.php?action=track_event';
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(trackUrl, new Blob([payload], { type: 'application/json' }));
+        } else {
+          fetch(trackUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(function(){});
+        }
+      } catch (err) {}
+    }
+
+    // 5. Initial Session Registration
+    try {
+      fetch('../api_landing_leads.php?action=track_session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: scSessionId,
+          landing_slug: '{$slug}',
+          source: scSource,
+          referrer: document.referrer || '',
+          utm_source: urlParams.get('utm_source') || '',
+          utm_medium: urlParams.get('utm_medium') || '',
+          utm_campaign: urlParams.get('utm_campaign') || '',
+          device_type: scDevice
+        })
+      }).catch(function(){});
+    } catch (e) {}
+
+    // Periodic heartbeat / page duration update on page unload or visibility change
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'hidden') {
+        trackEvent('heartbeat', 'Čas na stránce: ' + _getDurationSec() + 's', _lastClickedSec || 'page');
+      }
+    });
 
     /* ---- Prevent body scroll while modal is open (iOS/Android) ---- */
     function _onOverlayTouchStart(e) {
@@ -1225,6 +1314,30 @@ HTML;
       if (e && e.preventDefault) e.preventDefault();
       const modal = document.getElementById('leadModal');
       if (!modal) return;
+
+      // Identify button label and section
+      let btnLabel = 'Chci být učedníkem';
+      let secName = 'hero';
+      const trigger = e ? (e.currentTarget || (e.target ? e.target.closest('a, button') : null)) : null;
+      if (trigger) {
+        btnLabel = (trigger.innerText || trigger.textContent || '').trim().replace(/\s+/g, ' ');
+        const parentSec = trigger.closest('section');
+        if (parentSec && parentSec.id) {
+          secName = parentSec.id;
+        } else if (trigger.closest('.mobile-sticky-cta')) {
+          secName = 'mobile_sticky_bar';
+        } else if (trigger.closest('.site-header') || trigger.closest('nav')) {
+          secName = 'navigation';
+        } else {
+          secName = 'content';
+        }
+      }
+
+      _lastClickedBtn = btnLabel || 'Chci být učedníkem';
+      _lastClickedSec = secName || 'hero';
+
+      trackEvent('btn_click', _lastClickedBtn, _lastClickedSec);
+      trackEvent('modal_open', 'Otevření formuláře', _lastClickedSec);
 
       /* Body-scroll-lock: save position, freeze body */
       _modalScrollY = window.scrollY || document.documentElement.scrollTop;
@@ -1298,7 +1411,11 @@ HTML;
         body: JSON.stringify({
           email: email,
           landing_slug: '{$slug}',
-          master_name: '{$masterName}'
+          master_name: '{$masterName}',
+          session_id: scSessionId,
+          source: scSource,
+          button_name: _lastClickedBtn,
+          button_section: _lastClickedSec
         })
       })
       .then(res => res.json())
@@ -1333,15 +1450,19 @@ HTML;
           phone: document.getElementById('m_phone').value,
           user_role: document.getElementById('m_role').value,
           message: document.getElementById('m_msg').value,
-          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0,
+          session_id: scSessionId,
+          is_whatsapp: 0
         })
       })
       .then(res => res.json())
       .then(data => {
+        trackEvent('form_step3', 'Děkovná obrazovka zobrazena', 'modal');
         document.getElementById('modalStep2').style.display = 'none';
         document.getElementById('modalStep3').style.display = 'block';
       })
       .catch(err => {
+        trackEvent('form_step3', 'Děkovná obrazovka zobrazena', 'modal');
         document.getElementById('modalStep2').style.display = 'none';
         document.getElementById('modalStep3').style.display = 'block';
       });
@@ -1367,23 +1488,59 @@ HTML;
           phone: document.getElementById('m_phone').value,
           user_role: document.getElementById('m_role').value,
           message: msgVal,
-          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0
+          newsletter: document.getElementById('m_newsletter')?.checked ? 1 : 0,
+          session_id: scSessionId,
+          is_whatsapp: 1
         })
       })
       .then(res => res.json())
       .then(data => {
         if (waWin) waWin.location.href = waUrl;
+        trackEvent('form_whatsapp', 'Klik na WhatsApp: ' + nameVal, 'modal');
+        trackEvent('form_step3', 'Děkovná obrazovka zobrazena', 'modal');
         document.getElementById('modalStep2').style.display = 'none';
         document.getElementById('modalStep3').style.display = 'block';
       })
       .catch(err => {
         if (waWin) waWin.location.href = waUrl;
+        trackEvent('form_whatsapp', 'Klik na WhatsApp: ' + nameVal, 'modal');
+        trackEvent('form_step3', 'Děkovná obrazovka zobrazena', 'modal');
         document.getElementById('modalStep2').style.display = 'none';
         document.getElementById('modalStep3').style.display = 'block';
       });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Step 3: Track external website button click
+      const webLink = document.getElementById('m_s3_web_link_el');
+      if (webLink) {
+        webLink.addEventListener('click', function(e) {
+          const targetUrl = webLink.getAttribute('href') || '';
+          trackEvent('step3_web_click', targetUrl, 'modal_step3');
+        });
+      }
+
+      // Scroll Section Observer (IntersectionObserver)
+      if ('IntersectionObserver' in window) {
+        const secObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              const secId = entry.target.id || entry.target.className || 'section';
+              if (!_observedSections.has(secId)) {
+                _observedSections.add(secId);
+                const hEl = entry.target.querySelector('h1, h2, h3');
+                const secTitle = hEl ? (hEl.innerText || '').trim().substring(0, 50) : secId;
+                trackEvent('scroll_section', secTitle, secId);
+              }
+            }
+          });
+        }, { threshold: 0.25 });
+
+        document.querySelectorAll('section, header.hero, footer').forEach(function(s) {
+          secObserver.observe(s);
+        });
+      }
+
       const cta = document.querySelector('.mobile-sticky-cta');
       if (cta) {
         const hideInHero = {$hideInHeroJson};
