@@ -145,6 +145,14 @@ if (!empty($initialSession)) {
 
     /* Toast notification */
     #toast { position: fixed; bottom: 24px; right: 24px; background: #22c55e; color: #000; padding: 0.8rem 1.4rem; border-radius: 8px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 8px 20px rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; gap: 0.5rem; }
+
+    /* Visitor checkboxes & bulk toolbar */
+    .vis-checkbox { width: 17px; height: 17px; cursor: pointer; accent-color: var(--accent); }
+    #vis-bulk-bar { display: none; align-items: center; gap: 1rem; margin-bottom: 1rem; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); border-radius: 8px; padding: 0.7rem 1.2rem; }
+    #vis-bulk-bar.show { display: flex; }
+    #vis-bulk-count { font-weight: 700; color: #f87171; font-size: 0.95rem; }
+    .btn-danger { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+    .btn-danger:hover { background: #ef4444; color: #fff; }
   </style>
 </head>
 <body>
@@ -310,11 +318,26 @@ if (!empty($initialSession)) {
           <button class="btn btn-secondary btn-sm" onclick="loadVisitors()"><i class="bi bi-arrow-clockwise"></i> Obnovit</button>
         </div>
 
+        <!-- BULK DELETE TOOLBAR -->
+        <div id="vis-bulk-bar">
+          <i class="bi bi-trash3" style="color:#ef4444; font-size:1.1rem;"></i>
+          <span id="vis-bulk-count">0 vybráno</span>
+          <button class="btn btn-danger btn-sm" onclick="bulkDeleteVisitors()">
+            <i class="bi bi-trash-fill"></i> Smazat vybrané
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="clearVisitorSelection()">
+            <i class="bi bi-x"></i> Zrušit výběr
+          </button>
+        </div>
+
         <!-- TABLE -->
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
+                <th style="width:38px; text-align:center;">
+                  <input type="checkbox" class="vis-checkbox" id="vis-check-all" title="Vybrat vše" onchange="toggleAllVisitors(this)">
+                </th>
                 <th>Čas návštěvy</th>
                 <th>Zdroj (Kampaň)</th>
                 <th>Zařízení</th>
@@ -322,11 +345,11 @@ if (!empty($initialSession)) {
                 <th>Stisknuté tlačítko</th>
                 <th>Stav formuláře</th>
                 <th>Doba</th>
-                <th style="text-align:right;">Časová osa</th>
+                <th style="text-align:right;">Akce</th>
               </tr>
             </thead>
             <tbody id="visitors-tbody">
-              <tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--text-muted);">Načítám návštěvníky...</td></tr>
+              <tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">Načítám návštěvníky...</td></tr>
             </tbody>
           </table>
         </div>
@@ -615,14 +638,16 @@ if (!empty($initialSession)) {
       .then(data => {
         const tbody = document.getElementById('visitors-tbody');
         if (!data.visitors || data.visitors.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:2.5rem; color:var(--text-muted);">Žádní návštěvníci neodpovídají zadanému filtru.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:2.5rem; color:var(--text-muted);">Žádní návštěvníci neodpovídají zadanému filtru.</td></tr>';
           document.getElementById('vis_count_info').innerText = '0 návštěv';
+          clearVisitorSelection();
           return;
         }
 
         document.getElementById('vis_count_info').innerText = `Zobrazeno ${data.visitors.length} z celkem ${data.total} návštěv`;
         document.getElementById('btn_prev').disabled = (data.page <= 1);
         document.getElementById('btn_next').disabled = (data.page * data.limit >= data.total);
+        clearVisitorSelection();
 
         let html = '';
         data.visitors.forEach(v => {
@@ -637,8 +662,12 @@ if (!empty($initialSession)) {
           else if (v.form_status === 'step1_email') statusBadge = '<span class="badge badge-step1">⚠️ Pouze e-mail (Krok 1)</span>';
 
           const devIcon = v.device_type === 'mobile' ? '<i class="bi bi-phone"></i> Mobil' : (v.device_type === 'tablet' ? '<i class="bi bi-tablet"></i> Tablet' : '<i class="bi bi-laptop"></i> PC');
+          const safeSession = escapeHtml(v.session_id);
 
           html += `<tr>
+            <td style="text-align:center;">
+              <input type="checkbox" class="vis-checkbox vis-row-check" data-session="${safeSession}" onchange="updateVisitorSelection()">
+            </td>
             <td style="color:#cbd5e1; font-size:0.82rem; font-family:monospace;">${dateStr}</td>
             <td><span class="badge badge-source">${escapeHtml(v.source || 'direct')}</span></td>
             <td><span class="badge badge-device">${devIcon}</span></td>
@@ -648,9 +677,12 @@ if (!empty($initialSession)) {
             </td>
             <td>${statusBadge}</td>
             <td style="font-size:0.85rem; color:#cbd5e1;">${durStr}</td>
-            <td style="text-align:right;">
-              <button class="btn btn-secondary btn-sm" onclick="openTimelineModal('${v.session_id}')">
-                <i class="bi bi-clock-history"></i> Časová osa
+            <td style="text-align:right; white-space:nowrap;">
+              <button class="btn btn-secondary btn-sm" onclick="openTimelineModal('${safeSession}')" style="margin-right:0.3rem;">
+                <i class="bi bi-clock-history"></i> Osa
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="deleteVisitor('${safeSession}')" title="Smazat tohoto návštěvníka">
+                <i class="bi bi-trash"></i>
               </button>
             </td>
           </tr>`;
@@ -663,6 +695,57 @@ if (!empty($initialSession)) {
       visitorPage += delta;
       if (visitorPage < 1) visitorPage = 1;
       loadVisitors();
+    }
+
+    /* ---- VISITOR DELETE (single & bulk) ---- */
+    function deleteVisitor(sessionId) {
+      if (!confirm('Opravdu chcete smazat tohoto návštěvníka a jeho celou časovou osu?')) return;
+      fetch(`api_landing_leads.php?action=delete_visitor&session_id=${encodeURIComponent(sessionId)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) { showToast('Návštěvník byl smazán.'); loadVisitors(); }
+          else alert(d.message || 'Chyba při mazání');
+        });
+    }
+
+    function bulkDeleteVisitors() {
+      const checked = [...document.querySelectorAll('.vis-row-check:checked')];
+      if (!checked.length) return;
+      if (!confirm(`Opravdu smazat ${checked.length} vybraných návštěvníků a jejich časové osy?`)) return;
+      const ids = checked.map(cb => cb.dataset.session);
+      fetch('api_landing_leads.php?action=bulk_delete_visitors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_ids: ids })
+      })
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) { showToast(`Smazáno ${d.deleted} návštěvníků.`); loadVisitors(); }
+          else alert(d.message || 'Chyba při hromadném mazání');
+        });
+    }
+
+    function toggleAllVisitors(masterCb) {
+      document.querySelectorAll('.vis-row-check').forEach(cb => cb.checked = masterCb.checked);
+      updateVisitorSelection();
+    }
+
+    function updateVisitorSelection() {
+      const checked = document.querySelectorAll('.vis-row-check:checked').length;
+      const all = document.querySelectorAll('.vis-row-check').length;
+      const bar = document.getElementById('vis-bulk-bar');
+      document.getElementById('vis-bulk-count').innerText = `${checked} vybráno`;
+      bar.classList.toggle('show', checked > 0);
+      const masterCb = document.getElementById('vis-check-all');
+      if (masterCb) { masterCb.checked = checked === all && all > 0; masterCb.indeterminate = checked > 0 && checked < all; }
+    }
+
+    function clearVisitorSelection() {
+      document.querySelectorAll('.vis-row-check').forEach(cb => cb.checked = false);
+      const masterCb = document.getElementById('vis-check-all');
+      if (masterCb) { masterCb.checked = false; masterCb.indeterminate = false; }
+      document.getElementById('vis-bulk-bar').classList.remove('show');
+      document.getElementById('vis-bulk-count').innerText = '0 vybráno';
     }
 
     function openTimelineModal(sessionId) {

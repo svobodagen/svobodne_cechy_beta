@@ -692,6 +692,51 @@ if ($action === 'delete_link') {
 }
 
 // -------------------------------------------------------------
+// 9. ACTION: delete_visitor (Delete single session + events)
+// -------------------------------------------------------------
+if ($action === 'delete_visitor') {
+    $sessionId = trim($_GET['session_id'] ?? $input['session_id'] ?? '');
+    if (empty($sessionId)) {
+        echo json_encode(['success' => false, 'message' => 'Chybí session_id']);
+        exit;
+    }
+    try {
+        $pdo->prepare("DELETE FROM landing_events WHERE session_id = ?")->execute([$sessionId]);
+        $pdo->prepare("DELETE FROM landing_sessions WHERE session_id = ?")->execute([$sessionId]);
+        echo json_encode(['success' => true]);
+    } catch (\Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// -------------------------------------------------------------
+// 10. ACTION: bulk_delete_visitors (Delete multiple sessions)
+// -------------------------------------------------------------
+if ($action === 'bulk_delete_visitors') {
+    $ids = $input['session_ids'] ?? [];
+    if (empty($ids) || !is_array($ids)) {
+        echo json_encode(['success' => false, 'message' => 'Žádné session_id nebyly odeslány']);
+        exit;
+    }
+    // Sanitize: keep only valid hex session IDs
+    $ids = array_values(array_filter($ids, fn($id) => preg_match('/^[a-f0-9]{1,64}$/i', $id)));
+    if (empty($ids)) {
+        echo json_encode(['success' => false, 'message' => 'Neplatné session_id']);
+        exit;
+    }
+    try {
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $pdo->prepare("DELETE FROM landing_events WHERE session_id IN ({$placeholders})")->execute($ids);
+        $pdo->prepare("DELETE FROM landing_sessions WHERE session_id IN ({$placeholders})")->execute($ids);
+        echo json_encode(['success' => true, 'deleted' => count($ids)]);
+    } catch (\Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+// -------------------------------------------------------------
 // Legacy Actions for Leads list compatibility
 // -------------------------------------------------------------
 if ($action === 'delete' && isset($_GET['id'])) {
