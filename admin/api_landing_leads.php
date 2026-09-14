@@ -719,8 +719,11 @@ if ($action === 'bulk_delete_visitors') {
         echo json_encode(['success' => false, 'message' => 'Žádné session_id nebyly odeslány']);
         exit;
     }
-    // Sanitize: keep only valid hex session IDs
-    $ids = array_values(array_filter($ids, fn($id) => preg_match('/^[a-f0-9]{1,64}$/i', $id)));
+    // Sanitize: allow valid session IDs (alphanumeric, underscore, hyphen, max 64 chars)
+    $ids = array_values(array_filter(
+        array_map('trim', $ids),
+        fn($id) => is_string($id) && strlen($id) > 0 && strlen($id) <= 64 && preg_match('/^[a-zA-Z0-9_\-]+$/', $id)
+    ));
     if (empty($ids)) {
         echo json_encode(['success' => false, 'message' => 'Neplatné session_id']);
         exit;
