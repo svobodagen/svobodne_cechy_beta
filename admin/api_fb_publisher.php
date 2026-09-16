@@ -279,7 +279,7 @@ if ($action === 'update_task_status') {
     $status = trim($input['status'] ?? $_GET['status'] ?? '');
     $logMessage = trim($input['log_message'] ?? '');
 
-    $allowedStatuses = ['naplanovano', 'zpracovava_se', 'publikovano', 'chyba', 'zruseno'];
+    $allowedStatuses = ['naplanovano', 'naplanovano_rucne', 'zpracovava_se', 'publikovano', 'chyba', 'zruseno'];
     if (!$id || !in_array($status, $allowedStatuses)) {
         echo json_encode(['success' => false, 'message' => 'Neplatné parametry stavu']);
         exit;

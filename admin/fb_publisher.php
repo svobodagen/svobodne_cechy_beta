@@ -79,6 +79,7 @@ require_once __DIR__ . '/../db.php';
     /* Status Badges */
     .badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .badge-naplanovano { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+    .badge-naplanovano_rucne { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
     .badge-publikovano { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
     .badge-chyba { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
     .badge-zruseno { background: rgba(255,255,255,0.1); color: var(--text-muted); border: 1px solid var(--border); }
@@ -116,6 +117,7 @@ require_once __DIR__ . '/../db.php';
     .cal-day-num { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.2rem; }
     .cal-task-pill { font-size: 0.72rem; padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
     .cal-task-pill.naplanovano { background: rgba(245,158,11,0.25); color: #fbbf24; border-left: 3px solid #f59e0b; }
+    .cal-task-pill.naplanovano_rucne { background: rgba(59,130,246,0.25); color: #60a5fa; border-left: 3px solid #3b82f6; }
     .cal-task-pill.publikovano { background: rgba(34,197,94,0.25); color: #4ade80; border-left: 3px solid #22c55e; }
 
     /* Modal */
@@ -212,7 +214,8 @@ require_once __DIR__ . '/../db.php';
             <span style="font-size:0.85rem; color:var(--text-muted); font-weight:700;">Filtr stavu:</span>
             <select id="filter-task-status" class="form-control" style="padding:0.4rem 0.8rem; font-size:0.85rem; width:auto;" onchange="renderScheduleList()">
               <option value="all">Všechny stavy</option>
-              <option value="naplanovano">Pouze Naplánováno (čeká)</option>
+              <option value="naplanovano">Naplánováno (agent)</option>
+              <option value="naplanovano_rucne">Naplánováno (ručně)</option>
               <option value="publikovano">Pouze Publikováno</option>
               <option value="chyba">Pouze Chyba</option>
             </select>
@@ -317,6 +320,7 @@ require_once __DIR__ . '/../db.php';
           <label>Stav úlohy</label>
           <select id="task-status" class="form-control">
             <option value="naplanovano">Naplánováno (čeká na agenta)</option>
+            <option value="naplanovano_rucne">Naplánováno (ručně)</option>
             <option value="publikovano">Publikováno</option>
             <option value="chyba">Chyba</option>
             <option value="zruseno">Zrušeno</option>
@@ -490,9 +494,11 @@ require_once __DIR__ . '/../db.php';
       document.getElementById('badge-templates-count').innerText = appData.templates.length;
       document.getElementById('badge-groups-count').innerText = appData.groups.length;
 
-      const now = new Date().toISOString();
       const pendingCount = appData.tasks.filter(t => t.status === 'naplanovano').length;
-      document.getElementById('pending-count-label').innerText = `${pendingCount} úloh čeká na agenta`;
+      const manualCount = appData.tasks.filter(t => t.status === 'naplanovano_rucne').length;
+      let label = `${pendingCount} úloh pro agenta`;
+      if (manualCount > 0) label += ` | ${manualCount} ručně`;
+      document.getElementById('pending-count-label').innerText = label;
     }
 
     function populateDropdowns() {
@@ -548,13 +554,21 @@ require_once __DIR__ . '/../db.php';
         const timeStr = dt.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
         const textSnippet = t.custom_text || (t.template_title ? 'Dle šablony: ' + t.template_title : 'Bez specifického textu');
         
+        const isPending = (t.status === 'naplanovano' || t.status === 'naplanovano_rucne');
+        let statusLabel = t.status;
+        if (t.status === 'naplanovano') statusLabel = '<i class="bi bi-robot"></i> Naplánováno (agent)';
+        else if (t.status === 'naplanovano_rucne') statusLabel = '<i class="bi bi-person-fill"></i> Naplánováno (ručně)';
+        else if (t.status === 'publikovano') statusLabel = '<i class="bi bi-check-circle-fill"></i> Publikováno';
+        else if (t.status === 'chyba') statusLabel = '<i class="bi bi-exclamation-triangle-fill"></i> Chyba';
+        else if (t.status === 'zruseno') statusLabel = '<i class="bi bi-slash-circle"></i> Zrušeno';
+        
         return `
           <div class="task-row">
             <div class="task-time-col">
               <div class="task-date"><i class="bi bi-clock"></i> ${timeStr}</div>
               <div class="task-time">${dateStr}</div>
               <div style="margin-top:0.4rem;">
-                <span class="badge badge-${t.status}">${t.status}</span>
+                <span class="badge badge-${t.status}">${statusLabel}</span>
               </div>
             </div>
             <div class="task-main-col">
@@ -567,7 +581,7 @@ require_once __DIR__ . '/../db.php';
               ${t.log_message ? `<div style="font-size:0.75rem; color:#4ade80; margin-top:0.25rem;"><i class="bi bi-check2-circle"></i> ${escapeHtml(t.log_message)}</div>` : ''}
             </div>
             <div class="task-actions-col">
-              ${t.status === 'naplanovano' ? `
+              ${isPending ? `
                 <button class="btn btn-sm btn-success" title="Označit jako publikováno" onclick="markTaskStatus(${t.id}, 'publikovano')">
                   <i class="bi bi-check-lg"></i> Hotovo
                 </button>
