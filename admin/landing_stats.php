@@ -669,7 +669,10 @@ if (!empty($initialSession)) {
               <input type="checkbox" class="vis-checkbox vis-row-check" data-session="${safeSession}" onchange="updateVisitorSelection()">
             </td>
             <td style="color:#cbd5e1; font-size:0.82rem; font-family:monospace;">${dateStr}</td>
-            <td><span class="badge badge-source">${escapeHtml(v.source || 'direct')}</span></td>
+            <td>
+              <span class="badge badge-source">${escapeHtml(v.source || 'direct')}</span>
+              ${v.utm_content ? `<div style="margin-top:0.3rem;"><span class="badge" style="background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.3);"><i class="bi bi-tag-fill"></i> ${escapeHtml(v.utm_content)}</span></div>` : ''}
+            </td>
             <td><span class="badge badge-device">${devIcon}</span></td>
             <td><strong>${escapeHtml(v.max_section || '-')}</strong></td>
             <td>
@@ -775,6 +778,7 @@ if (!empty($initialSession)) {
         metaEl.innerHTML = `
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
             <div><strong>Zdroj:</strong> <span class="badge badge-source">${escapeHtml(s.source || 'direct')}</span></div>
+            ${s.utm_content ? `<div><strong>Příspěvek (UTM):</strong> <span class="badge" style="background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.3);"><i class="bi bi-tag-fill"></i> ${escapeHtml(s.utm_content)}</span></div>` : ''}
             <div><strong>Zařízení:</strong> ${escapeHtml(s.device_type || 'desktop')}</div>
             <div><strong>Čas na webu:</strong> ${durStr}</div>
             <div><strong>Kampaň:</strong> ${escapeHtml(s.landing_slug || '')}</div>

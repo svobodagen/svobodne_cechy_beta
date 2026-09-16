@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS landing_sessions (
     utm_source VARCHAR(100) DEFAULT NULL,
     utm_medium VARCHAR(100) DEFAULT NULL,
     utm_campaign VARCHAR(100) DEFAULT NULL,
+    utm_content VARCHAR(100) DEFAULT NULL,
     device_type VARCHAR(20) DEFAULT 'desktop',
     max_section VARCHAR(100) DEFAULT 'hero',
     clicked_button VARCHAR(255) DEFAULT NULL,

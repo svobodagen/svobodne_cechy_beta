@@ -33,7 +33,8 @@ try {
     $alters = [
         "ALTER TABLE landing_leads ADD COLUMN newsletter TINYINT(1) DEFAULT 0",
         "ALTER TABLE landing_leads ADD COLUMN session_id VARCHAR(64) DEFAULT NULL",
-        "ALTER TABLE landing_leads ADD COLUMN source VARCHAR(100) DEFAULT NULL"
+        "ALTER TABLE landing_leads ADD COLUMN source VARCHAR(100) DEFAULT NULL",
+        "ALTER TABLE landing_sessions ADD COLUMN utm_content VARCHAR(100) DEFAULT NULL AFTER utm_campaign"
     ];
     foreach ($alters as $sql) {
         try { $pdo->exec($sql); } catch(\PDOException $e) {}
@@ -48,6 +49,7 @@ try {
         utm_source VARCHAR(100) DEFAULT NULL,
         utm_medium VARCHAR(100) DEFAULT NULL,
         utm_campaign VARCHAR(100) DEFAULT NULL,
+        utm_content VARCHAR(100) DEFAULT NULL,
         device_type VARCHAR(20) DEFAULT 'desktop',
         max_section VARCHAR(100) DEFAULT 'hero',
         clicked_button VARCHAR(255) DEFAULT NULL,
@@ -193,6 +195,7 @@ if ($action === 'track_session') {
     $utmSource = trim($input['utm_source'] ?? '');
     $utmMedium = trim($input['utm_medium'] ?? '');
     $utmCampaign = trim($input['utm_campaign'] ?? '');
+    $utmContent = trim($input['utm_content'] ?? '');
     $deviceType = trim($input['device_type'] ?? 'desktop');
 
     if (empty($sessionId)) {
@@ -201,10 +204,10 @@ if ($action === 'track_session') {
 
     try {
         $stmt = $pdo->prepare("INSERT INTO landing_sessions 
-            (session_id, landing_slug, source, referrer, utm_source, utm_medium, utm_campaign, device_type, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+            (session_id, landing_slug, source, referrer, utm_source, utm_medium, utm_campaign, utm_content, device_type, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
             ON DUPLICATE KEY UPDATE updated_at = NOW()");
-        $stmt->execute([$sessionId, $slug, $source, $referrer, $utmSource, $utmMedium, $utmCampaign, $deviceType]);
+        $stmt->execute([$sessionId, $slug, $source, $referrer, $utmSource, $utmMedium, $utmCampaign, $utmContent, $deviceType]);
 
         // Insert initial pageview event if not recorded
         $chk = $pdo->prepare("SELECT id FROM landing_events WHERE session_id = ? AND event_type = 'page_view' LIMIT 1");

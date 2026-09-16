@@ -30,7 +30,8 @@ try {
     $alters = [
         "ALTER TABLE landing_leads ADD COLUMN newsletter TINYINT(1) DEFAULT 0",
         "ALTER TABLE landing_leads ADD COLUMN session_id VARCHAR(64) DEFAULT NULL",
-        "ALTER TABLE landing_leads ADD COLUMN source VARCHAR(100) DEFAULT NULL"
+        "ALTER TABLE landing_leads ADD COLUMN source VARCHAR(100) DEFAULT NULL",
+        "ALTER TABLE landing_sessions ADD COLUMN utm_content VARCHAR(100) DEFAULT NULL AFTER utm_campaign"
     ];
     foreach ($alters as $sql) {
         try { 
@@ -50,6 +51,7 @@ try {
         utm_source VARCHAR(100) DEFAULT NULL,
         utm_medium VARCHAR(100) DEFAULT NULL,
         utm_campaign VARCHAR(100) DEFAULT NULL,
+        utm_content VARCHAR(100) DEFAULT NULL,
         device_type VARCHAR(20) DEFAULT 'desktop',
         max_section VARCHAR(100) DEFAULT 'hero',
         clicked_button VARCHAR(255) DEFAULT NULL,
