@@ -317,7 +317,7 @@ require_once __DIR__ . '/../db.php';
               <i class="bi bi-clipboard"></i> Kopírovat odkaz
             </button>
           </label>
-          <input type="url" id="task-target-url" class="form-control" placeholder="https://svobodnecechy.cz/landing_pages/...?zdroj=fb_gr_..." style="font-family:monospace; color:#60a5fa; font-size:0.88rem;" required>
+          <input type="url" id="task-target-url" class="form-control" placeholder="https://svobodnecechy.cz/admin/landing_pages/...?zdroj=fb_gr_..." style="font-family:monospace; color:#60a5fa; font-size:0.88rem;" required>
           <div class="form-hint">UTM parametry se automaticky generují pro danou skupinu a šablonu. Můžete je zde zkontrolovat nebo upravit.</div>
         </div>
 
@@ -367,7 +367,7 @@ require_once __DIR__ . '/../db.php';
 
         <div class="form-group">
           <label>Cílová URL adresa odkazu</label>
-          <input type="url" id="tpl-target-url" class="form-control" placeholder="https://svobodnecechy.cz/landing_pages/...">
+          <input type="url" id="tpl-target-url" class="form-control" placeholder="https://svobodnecechy.cz/admin/landing_pages/...">
         </div>
 
         <div class="form-group">
@@ -666,7 +666,7 @@ require_once __DIR__ . '/../db.php';
         campaign = tpl.landing_slug || 'post';
         baseTarget = tpl.target_url || '';
         if (!baseTarget && tpl.landing_slug) {
-          baseTarget = `${location.protocol}//${location.host}/landing_pages/${tpl.landing_slug}.html`;
+          baseTarget = `${location.protocol}//${location.host}/admin/landing_pages/${tpl.landing_slug}.html`;
         }
       } else {
         baseTarget = document.getElementById('task-target-url').value;
@@ -903,7 +903,7 @@ require_once __DIR__ . '/../db.php';
       if (slug) {
         const proto = location.protocol;
         const host = location.host;
-        document.getElementById('tpl-target-url').value = `${proto}//${host}/landing_pages/${slug}.html`;
+        document.getElementById('tpl-target-url').value = `${proto}//${host}/admin/landing_pages/${slug}.html`;
       }
     }
 

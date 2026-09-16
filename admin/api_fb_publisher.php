@@ -52,6 +52,10 @@ try {
         INDEX (template_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+    // Auto-fix existing URLs that missed /admin/ in the path
+    $pdo->exec("UPDATE fb_schedule_tasks SET target_url = REPLACE(target_url, '/landing_pages/', '/admin/landing_pages/') WHERE target_url LIKE '%/landing_pages/%' AND target_url NOT LIKE '%/admin/landing_pages/%'");
+    $pdo->exec("UPDATE fb_post_templates SET target_url = REPLACE(target_url, '/landing_pages/', '/admin/landing_pages/') WHERE target_url LIKE '%/landing_pages/%' AND target_url NOT LIKE '%/admin/landing_pages/%'");
+
 } catch (\PDOException $e) {
     // Database handled gracefully
 }
@@ -100,7 +104,7 @@ if ($action === 'get_all_data') {
             if (empty($row['target_url'])) {
                 $tUrl = $row['template_target_url'];
                 if (empty($tUrl) && !empty($row['landing_slug'])) {
-                    $tUrl = $baseUrl . '/landing_pages/' . $row['landing_slug'] . '.html';
+                    $tUrl = $baseUrl . '/admin/landing_pages/' . $row['landing_slug'] . '.html';
                 }
                 if (!empty($tUrl)) {
                     $sep = (strpos($tUrl, '?') !== false) ? '&' : '?';
@@ -256,7 +260,7 @@ if ($action === 'save_task') {
         if ($tplRow) {
             $targetUrl = $tplRow['target_url'];
             if (empty($targetUrl) && !empty($tplRow['landing_slug'])) {
-                $targetUrl = getBaseWebUrl() . '/landing_pages/' . $tplRow['landing_slug'] . '.html';
+                $targetUrl = getBaseWebUrl() . '/admin/landing_pages/' . $tplRow['landing_slug'] . '.html';
             }
         }
     }
@@ -382,7 +386,7 @@ if ($action === 'get_pending_tasks') {
         foreach ($tasks as $row) {
             $targetUrl = $row['base_target_url'];
             if (empty($targetUrl) && !empty($row['landing_slug'])) {
-                $targetUrl = $baseUrl . '/landing_pages/' . $row['landing_slug'] . '.html';
+                $targetUrl = $baseUrl . '/admin/landing_pages/' . $row['landing_slug'] . '.html';
             }
 
             // Append UTM params
