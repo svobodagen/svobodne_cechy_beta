@@ -1211,7 +1211,16 @@ HTML;
       sessionStorage.setItem('sc_landing_source', scSource);
     } else {
       scSource = sessionStorage.getItem('sc_landing_source');
-      if (!scSource) {
+    }
+
+    let scUtmContent = urlParams.get('utm_content') || '';
+    if (scUtmContent) {
+      sessionStorage.setItem('sc_landing_utm_content', scUtmContent);
+    } else {
+      scUtmContent = sessionStorage.getItem('sc_landing_utm_content') || '';
+    }
+
+    if (!scSource) {
         const ref = document.referrer || '';
         if (ref.indexOf('facebook.com') !== -1 || ref.indexOf('fb.com') !== -1) scSource = 'facebook';
         else if (ref.indexOf('instagram.com') !== -1) scSource = 'instagram';
@@ -1265,7 +1274,7 @@ HTML;
           utm_source: urlParams.get('utm_source') || '',
           utm_medium: urlParams.get('utm_medium') || '',
           utm_campaign: urlParams.get('utm_campaign') || '',
-          utm_content: urlParams.get('utm_content') || '',
+          utm_content: scUtmContent,
           device_type: scDevice
         })
       }).catch(function(){});

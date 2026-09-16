@@ -184,6 +184,117 @@ function build_analytics_email_block($sessionId, $slug) {
     }
 }
 
+function slugifyCz(string $str): string {
+    $trans = [
+        'á'=>'a','č'=>'c','ď'=>'d','é'=>'e','ě'=>'e','í'=>'i','ň'=>'n','ó'=>'o','ř'=>'r','š'=>'s','ť'=>'t','ú'=>'u','ů'=>'u','ý'=>'y','ž'=>'z',
+        'Á'=>'a','Č'=>'c','Ď'=>'d','É'=>'e','Ě'=>'e','Í'=>'i','Ň'=>'n','Ó'=>'o','Ř'=>'r','Š'=>'s','Ť'=>'t','Ú'=>'u','Ů'=>'u','Ý'=>'y','Ž'=>'z'
+    ];
+    $str = strtr($str, $trans);
+    $str = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $str));
+    return $str;
+}
+
+function makePostCode(string $scheduledAt, string $groupName): string {
+    $dt = new DateTime($scheduledAt);
+    $datePart = $dt->format('Ymd');
+    $timePart = $dt->format('Hi');
+    $groupSlug = substr(slugifyCz($groupName) ?: 'sk', 0, 12);
+    return 'KAL-' . $datePart . '-' . $timePart . '-' . $groupSlug;
+}
+
+// Helper: Resolve post details (group, time, template, code) for a given session / source / utm_content
+function resolvePostDetails($pdo, $utmContent, $source, $createdAt) {
+    if (!empty($utmContent) && strpos($utmContent, 'KAL-') === 0) {
+        // Code format: KAL-YYYYMMDD-HHmm-groupslug
+        $parts = explode('-', $utmContent);
+        if (count($parts) >= 4) {
+            $datePart = $parts[1]; // YYYYMMDD
+            $timePart = $parts[2]; // HHmm
+            $groupSlug = strtolower($parts[3]);
+            
+            // Try to find matching task
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT t.id, t.scheduled_at, g.name as group_name, pt.title as template_title
+                    FROM fb_schedule_tasks t
+                    JOIN fb_groups g ON t.group_id = g.id
+                    LEFT JOIN fb_post_templates pt ON t.template_id = pt.id
+                    WHERE t.target_url LIKE ? OR (DATE_FORMAT(t.scheduled_at, '%Y%m%d%H%i') = ? AND LOWER(REPLACE(g.name, ' ', '')) LIKE ?)
+                    ORDER BY t.id DESC
+                    LIMIT 1
+                ");
+                $stmt->execute(['%' . $utmContent . '%', $datePart . $timePart, '%' . $groupSlug . '%']);
+                $task = $stmt->fetch();
+                if ($task) {
+                    return [
+                        'post_code' => $utmContent,
+                        'group_name' => $task['group_name'],
+                        'scheduled_at' => $task['scheduled_at'],
+                        'template_title' => $task['template_title'] ?: 'Výchozí šablona',
+                        'matched' => true
+                    ];
+                }
+            } catch (\Exception $e) {}
+            
+            // Fallback: parse date/time from code directly
+            $formattedDate = substr($datePart, 6, 2) . '. ' . substr($datePart, 4, 2) . '. ' . substr($datePart, 0, 4);
+            $formattedTime = substr($timePart, 0, 2) . ':' . substr($timePart, 2, 2);
+            return [
+                'post_code' => $utmContent,
+                'group_name' => 'Skupina (' . $groupSlug . ')',
+                'scheduled_at' => $formattedDate . ' ' . $formattedTime,
+                'template_title' => 'Příspěvek z kalendáře',
+                'matched' => false
+            ];
+        }
+    }
+
+    // Fallback: If utm_content is empty, but source is fb_gr_... or FB_GR_...
+    if (!empty($source) && stripos($source, 'fb_gr_') === 0) {
+        $slug = preg_replace('/^fb_gr_/i', '', $source);
+        $cleanSlug = strtolower(preg_replace('/[^a-z0-9]/i', '', $slug));
+        
+        try {
+            // Find group by slug
+            $groups = $pdo->query("SELECT id, name FROM fb_groups")->fetchAll();
+            $matchedGroup = null;
+            foreach ($groups as $g) {
+                $gClean = strtolower(preg_replace('/[^a-z0-9]/i', '', slugifyCz($g['name'])));
+                if (!empty($gClean) && (strpos($cleanSlug, $gClean) !== false || strpos($gClean, $cleanSlug) !== false)) {
+                    $matchedGroup = $g;
+                    break;
+                }
+            }
+            
+            if ($matchedGroup) {
+                // Find task for this group closest to createdAt
+                $stmt = $pdo->prepare("
+                    SELECT t.id, t.scheduled_at, pt.title as template_title
+                    FROM fb_schedule_tasks t
+                    LEFT JOIN fb_post_templates pt ON t.template_id = pt.id
+                    WHERE t.group_id = ?
+                    ORDER BY ABS(TIMESTAMPDIFF(MINUTE, t.scheduled_at, ?)) ASC
+                    LIMIT 1
+                ");
+                $stmt->execute([$matchedGroup['id'], $createdAt]);
+                $task = $stmt->fetch();
+                if ($task) {
+                    $code = makePostCode($task['scheduled_at'], $matchedGroup['name']);
+                    return [
+                        'post_code' => $code,
+                        'group_name' => $matchedGroup['name'],
+                        'scheduled_at' => $task['scheduled_at'],
+                        'template_title' => $task['template_title'] ?: 'Výchozí šablona',
+                        'matched' => true
+                    ];
+                }
+            }
+        } catch (\Exception $e) {}
+    }
+
+    return null;
+}
+
 // -------------------------------------------------------------
 // 1. ACTION: track_session (Initial Pageview / Session init)
 // -------------------------------------------------------------
@@ -202,11 +313,24 @@ if ($action === 'track_session') {
         $sessionId = bin2hex(random_bytes(16));
     }
 
+    if (empty($utmContent) && !empty($source) && stripos($source, 'fb_gr_') === 0) {
+        $pInfo = resolvePostDetails($pdo, '', $source, date('Y-m-d H:i:s'));
+        if ($pInfo && !empty($pInfo['post_code'])) {
+            $utmContent = $pInfo['post_code'];
+        }
+    }
+
     try {
         $stmt = $pdo->prepare("INSERT INTO landing_sessions 
             (session_id, landing_slug, source, referrer, utm_source, utm_medium, utm_campaign, utm_content, device_type, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
-            ON DUPLICATE KEY UPDATE updated_at = NOW()");
+            ON DUPLICATE KEY UPDATE 
+                updated_at = NOW(),
+                utm_content = COALESCE(NULLIF(VALUES(utm_content), ''), utm_content),
+                utm_source = COALESCE(NULLIF(VALUES(utm_source), ''), utm_source),
+                utm_medium = COALESCE(NULLIF(VALUES(utm_medium), ''), utm_medium),
+                utm_campaign = COALESCE(NULLIF(VALUES(utm_campaign), ''), utm_campaign),
+                source = COALESCE(NULLIF(VALUES(source), ''), source)");
         $stmt->execute([$sessionId, $slug, $source, $referrer, $utmSource, $utmMedium, $utmCampaign, $utmContent, $deviceType]);
 
         // Insert initial pageview event if not recorded
@@ -551,7 +675,8 @@ if ($action === 'get_visitors') {
         }
 
         if (!empty($search)) {
-            $where .= " AND (s.source LIKE ? OR s.session_id LIKE ? OR l.email LIKE ? OR l.name LIKE ?)";
+            $where .= " AND (s.source LIKE ? OR s.utm_content LIKE ? OR s.session_id LIKE ? OR l.email LIKE ? OR l.name LIKE ?)";
+            $params[] = "%$search%";
             $params[] = "%$search%";
             $params[] = "%$search%";
             $params[] = "%$search%";
@@ -574,6 +699,23 @@ if ($action === 'get_visitors') {
         $stmtF = $pdo->prepare($sql);
         $stmtF->execute($params);
         $visitors = $stmtF->fetchAll();
+
+        // Enrich visitors with post_details (group, scheduled time, template, post_code)
+        foreach ($visitors as &$v) {
+            $postInfo = resolvePostDetails($pdo, $v['utm_content'] ?? '', $v['source'] ?? '', $v['created_at']);
+            if ($postInfo) {
+                $v['post_details'] = $postInfo;
+                if (empty($v['utm_content'])) {
+                    $v['utm_content'] = $postInfo['post_code'];
+                    try {
+                        $pdo->prepare("UPDATE landing_sessions SET utm_content = ? WHERE session_id = ?")->execute([$postInfo['post_code'], $v['session_id']]);
+                    } catch (\Exception $e) {}
+                }
+            } else {
+                $v['post_details'] = null;
+            }
+        }
+        unset($v);
 
         echo json_encode([
             'success' => true,
@@ -603,6 +745,13 @@ if ($action === 'get_timeline') {
         $stmtS = $pdo->prepare("SELECT s.*, l.email, l.name, l.phone, l.user_role, l.message FROM landing_sessions s LEFT JOIN landing_leads l ON s.lead_id = l.id WHERE s.session_id = ? LIMIT 1");
         $stmtS->execute([$sessionId]);
         $session = $stmtS->fetch();
+
+        if ($session) {
+            $session['post_details'] = resolvePostDetails($pdo, $session['utm_content'] ?? '', $session['source'] ?? '', $session['created_at']);
+            if ($session['post_details'] && empty($session['utm_content'])) {
+                $session['utm_content'] = $session['post_details']['post_code'];
+            }
+        }
 
         $stmtE = $pdo->prepare("SELECT * FROM landing_events WHERE session_id = ? ORDER BY created_at ASC");
         $stmtE->execute([$sessionId]);

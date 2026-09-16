@@ -313,7 +313,7 @@ if (!empty($initialSession)) {
             </select>
           </div>
           <div style="flex-grow:1;">
-            <input type="text" id="vis_search" class="form-control" placeholder="Hledat podle zdroje, e-mailu, jména..." oninput="debounce(loadVisitors, 300)()" />
+            <input type="text" id="vis_search" class="form-control" placeholder="Hledat podle zdroje, kódu příspěvku (KAL-...), e-mailu, jména..." oninput="debounce(loadVisitors, 300)()" />
           </div>
           <button class="btn btn-secondary btn-sm" onclick="loadVisitors()"><i class="bi bi-arrow-clockwise"></i> Obnovit</button>
         </div>
@@ -670,8 +670,27 @@ if (!empty($initialSession)) {
             </td>
             <td style="color:#cbd5e1; font-size:0.82rem; font-family:monospace;">${dateStr}</td>
             <td>
-              <span class="badge badge-source">${escapeHtml(v.source || 'direct')}</span>
-              ${v.utm_content ? `<div style="margin-top:0.3rem;"><span class="badge" style="background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.3);"><i class="bi bi-tag-fill"></i> ${escapeHtml(v.utm_content)}</span></div>` : ''}
+              <div style="display:flex; flex-direction:column; gap:0.4rem; align-items:flex-start;">
+                <span class="badge badge-source">${escapeHtml(v.source || 'direct')}</span>
+                
+                ${(v.utm_content || (v.post_details && v.post_details.post_code)) ? `
+                  <div style="display:inline-flex; align-items:center; gap:0.35rem; background:rgba(139,92,246,0.18); border:1px solid rgba(139,92,246,0.4); border-radius:6px; padding:0.25rem 0.55rem; font-family:monospace; font-size:0.78rem; color:#d8b4fe;">
+                    <i class="bi bi-calendar-event" style="color:#a855f7;"></i>
+                    <strong>${escapeHtml(v.utm_content || v.post_details.post_code)}</strong>
+                    <button type="button" onclick="navigator.clipboard.writeText('${escapeHtml(v.utm_content || v.post_details.post_code)}'); showToast('Kód zkopírován!'); event.stopPropagation();" title="Kopírovat kód" style="background:none; border:none; color:#c4b5fd; cursor:pointer; padding:0 0.2rem; font-size:0.85rem; display:inline-flex; align-items:center;">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </div>
+                ` : ''}
+
+                ${v.post_details ? `
+                  <div style="font-size:0.75rem; color:#cbd5e1; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:0.35rem 0.6rem; line-height:1.45; max-width:320px;">
+                    <div><i class="bi bi-people-fill" style="color:#60a5fa;"></i> <strong>Skupina:</strong> ${escapeHtml(v.post_details.group_name)}</div>
+                    <div><i class="bi bi-clock-fill" style="color:#eab308;"></i> <strong>Plánováno:</strong> ${formatDateTime(v.post_details.scheduled_at)}</div>
+                    ${v.post_details.template_title ? `<div><i class="bi bi-file-earmark-text-fill" style="color:#34d399;"></i> <strong>Šablona:</strong> ${escapeHtml(v.post_details.template_title)}</div>` : ''}
+                  </div>
+                ` : ''}
+              </div>
             </td>
             <td><span class="badge badge-device">${devIcon}</span></td>
             <td><strong>${escapeHtml(v.max_section || '-')}</strong></td>
@@ -778,11 +797,21 @@ if (!empty($initialSession)) {
         metaEl.innerHTML = `
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
             <div><strong>Zdroj:</strong> <span class="badge badge-source">${escapeHtml(s.source || 'direct')}</span></div>
-            ${s.utm_content ? `<div><strong>Příspěvek (UTM):</strong> <span class="badge" style="background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.3);"><i class="bi bi-tag-fill"></i> ${escapeHtml(s.utm_content)}</span></div>` : ''}
+            ${(s.utm_content || (s.post_details && s.post_details.post_code)) ? `
+              <div><strong>Kód příspěvku:</strong> <span class="badge" style="background:rgba(139,92,246,0.2); color:#d8b4fe; border:1px solid rgba(139,92,246,0.4);"><i class="bi bi-tag-fill"></i> ${escapeHtml(s.utm_content || s.post_details.post_code)}</span></div>
+            ` : ''}
             <div><strong>Zařízení:</strong> ${escapeHtml(s.device_type || 'desktop')}</div>
             <div><strong>Čas na webu:</strong> ${durStr}</div>
             <div><strong>Kampaň:</strong> ${escapeHtml(s.landing_slug || '')}</div>
           </div>
+          ${s.post_details ? `
+            <div style="margin-top:0.75rem; padding:0.6rem 0.85rem; background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.3); border-radius:6px; font-size:0.82rem; color:#cbd5e1; line-height:1.5;">
+              <div style="font-weight:700; color:#d8b4fe; margin-bottom:0.25rem;"><i class="bi bi-info-circle-fill"></i> Podrobnosti z Facebook kalendáře:</div>
+              <div>👥 <strong>Skupina:</strong> ${escapeHtml(s.post_details.group_name)}</div>
+              <div>📅 <strong>Plánovaný čas:</strong> ${formatDateTime(s.post_details.scheduled_at)}</div>
+              ${s.post_details.template_title ? `<div>📝 <strong>Šablona:</strong> ${escapeHtml(s.post_details.template_title)}</div>` : ''}
+            </div>
+          ` : ''}
           ${contactBox}
         `;
 

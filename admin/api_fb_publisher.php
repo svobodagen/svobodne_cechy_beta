@@ -56,6 +56,22 @@ try {
     $pdo->exec("UPDATE fb_schedule_tasks SET target_url = REPLACE(target_url, '/landing_pages/', '/admin/landing_pages/') WHERE target_url LIKE '%/landing_pages/%' AND target_url NOT LIKE '%/admin/landing_pages/%'");
     $pdo->exec("UPDATE fb_post_templates SET target_url = REPLACE(target_url, '/landing_pages/', '/admin/landing_pages/') WHERE target_url LIKE '%/landing_pages/%' AND target_url NOT LIKE '%/admin/landing_pages/%'");
 
+    // Auto-add utm_content to existing tasks in fb_schedule_tasks if missing
+    try {
+        $tasksToFix = $pdo->query("
+            SELECT t.id, t.target_url, t.scheduled_at, g.name as group_name
+            FROM fb_schedule_tasks t
+            JOIN fb_groups g ON t.group_id = g.id
+            WHERE t.target_url IS NOT NULL AND t.target_url != '' AND t.target_url NOT LIKE '%utm_content=%'
+        ")->fetchAll();
+        $upStmt = $pdo->prepare("UPDATE fb_schedule_tasks SET target_url = ? WHERE id = ?");
+        foreach ($tasksToFix as $tf) {
+            $code = makePostCode($tf['scheduled_at'], $tf['group_name']);
+            $sep = (strpos($tf['target_url'], '?') !== false) ? '&' : '?';
+            $newUrl = $tf['target_url'] . $sep . 'utm_content=' . urlencode($code);
+            $upStmt->execute([$newUrl, $tf['id']]);
+        }
+    } catch (\Exception $e) {}
 } catch (\PDOException $e) {
     // Database handled gracefully
 }
@@ -73,14 +89,23 @@ function getBaseWebUrl() {
     return $proto . '://' . $host;
 }
 
+function slugifyCz(string $str): string {
+    $trans = [
+        'á'=>'a','č'=>'c','ď'=>'d','é'=>'e','ě'=>'e','í'=>'i','ň'=>'n','ó'=>'o','ř'=>'r','š'=>'s','ť'=>'t','ú'=>'u','ů'=>'u','ý'=>'y','ž'=>'z',
+        'Á'=>'a','Č'=>'c','Ď'=>'d','É'=>'e','Ě'=>'e','Í'=>'i','Ň'=>'n','Ó'=>'o','Ř'=>'r','Š'=>'s','Ť'=>'t','Ú'=>'u','Ů'=>'u','Ý'=>'y','Ž'=>'z'
+    ];
+    $str = strtr($str, $trans);
+    $str = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $str));
+    return $str;
+}
+
 // Generuje viditelný kód příspěvku pro utm_content a zobrazení v kalendáři
 // Formát: KAL-YYYYMMDD-HHmm-skupinaslug  → vyhledatelný v analytice
 function makePostCode(string $scheduledAt, string $groupName): string {
     $dt = new DateTime($scheduledAt);
     $datePart = $dt->format('Ymd');
     $timePart = $dt->format('Hi');
-    $groupSlug = strtolower(preg_replace('/[^a-z0-9]/i', '', iconv('UTF-8', 'ASCII//TRANSLIT', $groupName)));
-    $groupSlug = substr($groupSlug ?: 'sk', 0, 12);
+    $groupSlug = substr(slugifyCz($groupName) ?: 'sk', 0, 12);
     return 'KAL-' . $datePart . '-' . $timePart . '-' . $groupSlug;
 }
 
@@ -418,9 +443,14 @@ if ($action === 'get_pending_tasks') {
 
             // Append UTM params
             if (!empty($targetUrl)) {
+                $postCode = makePostCode($row['scheduled_at'], $row['group_name']);
                 $sep = (strpos($targetUrl, '?') !== false) ? '&' : '?';
                 $groupTag = 'fb_gr_' . preg_replace('/[^a-z0-9]/', '', strtolower($row['group_name']));
-                $targetUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=' . urlencode($row['landing_slug'] ?: 'post');
+                if (strpos($targetUrl, 'utm_source=') === false) {
+                    $targetUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=' . urlencode($row['landing_slug'] ?: 'post') . '&utm_content=' . urlencode($postCode);
+                } elseif (strpos($targetUrl, 'utm_content=') === false) {
+                    $targetUrl .= $sep . 'utm_content=' . urlencode($postCode);
+                }
             }
 
             $result[] = [
