@@ -559,6 +559,9 @@ require_once __DIR__ . '/../db.php';
         const timeStr = dt.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
         const textSnippet = t.custom_text || (t.template_title ? 'Dle šablony: ' + t.template_title : 'Bez specifického textu');
         
+        // Post kód (z API nebo vygenerovaný lokálně)
+        const postCode = t.post_code || makePostCode(t.scheduled_at, t.group_name || 'skupina');
+
         const isPending = (t.status === 'naplanovano' || t.status === 'naplanovano_rucne');
         let statusLabel = t.status;
         if (t.status === 'naplanovano') statusLabel = '<i class="bi bi-robot"></i> Naplánováno (agent)';
@@ -574,6 +577,13 @@ require_once __DIR__ . '/../db.php';
               <div class="task-time">${dateStr}</div>
               <div style="margin-top:0.4rem;">
                 <span class="badge badge-${t.status}">${statusLabel}</span>
+              </div>
+              <div style="margin-top:0.5rem;">
+                <code
+                  title="Kód příspěvku — použijte v analytice pro vyhledání"
+                  onclick="navigator.clipboard.writeText('${escapeHtml(postCode)}'); showToast('Kód ${escapeHtml(postCode)} zkopírován!');" 
+                  style="cursor:pointer; font-size:0.72rem; background:rgba(99,102,241,0.18); color:#a5b4fc; border:1px solid rgba(99,102,241,0.4); padding:0.2rem 0.45rem; border-radius:4px; display:inline-block; letter-spacing:0.03em; user-select:all;"
+                ><i class="bi bi-qr-code" style="margin-right:3px;"></i>${escapeHtml(postCode)}</code>
               </div>
             </div>
             <div class="task-main-col">
@@ -677,7 +687,20 @@ require_once __DIR__ . '/../db.php';
       }
     }
 
-    function buildUtmUrl(rawUrl, groupName, campaignSlug) {
+    // Helper: vygeneruje stejný kód jako PHP makePostCode()
+    function makePostCode(scheduledAt, groupName) {
+      if (!scheduledAt) return 'KAL-novy';
+      const dt = new Date(scheduledAt.includes('T') ? scheduledAt : scheduledAt.replace(' ', 'T'));
+      const pad = n => String(n).padStart(2, '0');
+      const datePart = `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}`;
+      const timePart = `${pad(dt.getHours())}${pad(dt.getMinutes())}`;
+      const groupSlug = (groupName || 'sk')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 12) || 'sk';
+      return `KAL-${datePart}-${timePart}-${groupSlug}`;
+    }
+
+    function buildUtmUrl(rawUrl, groupName, campaignSlug, scheduledAt) {
       if (!rawUrl) return '';
       try {
         let cleanUrl = rawUrl.split('?')[0];
@@ -695,11 +718,14 @@ require_once __DIR__ . '/../db.php';
           .replace(/[^a-z0-9]/g, '_')
           .replace(/^_|_$/g, '');
 
+        let postCode = makePostCode(scheduledAt || document.getElementById('task-scheduled-at')?.value || '', groupName);
+
         let urlObj = new URL(cleanUrl, window.location.origin);
         urlObj.searchParams.set('zdroj', groupTag);
         urlObj.searchParams.set('utm_source', 'facebook');
         urlObj.searchParams.set('utm_medium', 'group');
         urlObj.searchParams.set('utm_campaign', campaign || 'post');
+        urlObj.searchParams.set('utm_content', postCode);
 
         return urlObj.toString();
       } catch(e) {
@@ -818,8 +844,10 @@ require_once __DIR__ . '/../db.php';
 
         let tasksHtml = dayTasks.map(t => {
           const time = t.scheduled_at.substring(11, 16);
-          return `<div class="cal-task-pill ${t.status}" title="${escapeHtml(t.group_name)}: ${escapeHtml(t.template_title || '')}" onclick="editScheduleTask(${t.id})">
+          const postCode = t.post_code || makePostCode(t.scheduled_at, t.group_name || 'skupina');
+          return `<div class="cal-task-pill ${t.status}" title="${escapeHtml(postCode)}&#10;${escapeHtml(t.group_name)}: ${escapeHtml(t.template_title || '')}" onclick="editScheduleTask(${t.id})">
             ${time} ${escapeHtml(t.group_name || 'FB')}
+            <span style="display:block; font-size:0.62rem; opacity:0.8; font-family:monospace; letter-spacing:0.02em; margin-top:1px;">${escapeHtml(postCode)}</span>
           </div>`;
         }).join('');
 

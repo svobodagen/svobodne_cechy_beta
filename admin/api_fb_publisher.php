@@ -73,6 +73,17 @@ function getBaseWebUrl() {
     return $proto . '://' . $host;
 }
 
+// Generuje viditelný kód příspěvku pro utm_content a zobrazení v kalendáři
+// Formát: KAL-YYYYMMDD-HHmm-skupinaslug  → vyhledatelný v analytice
+function makePostCode(string $scheduledAt, string $groupName): string {
+    $dt = new DateTime($scheduledAt);
+    $datePart = $dt->format('Ymd');
+    $timePart = $dt->format('Hi');
+    $groupSlug = strtolower(preg_replace('/[^a-z0-9]/i', '', iconv('UTF-8', 'ASCII//TRANSLIT', $groupName)));
+    $groupSlug = substr($groupSlug ?: 'sk', 0, 12);
+    return 'KAL-' . $datePart . '-' . $timePart . '-' . $groupSlug;
+}
+
 // -------------------------------------------------------------
 // 1. ACTION: get_all_data (Groups, Templates, Tasks, Landing Pages)
 // -------------------------------------------------------------
@@ -101,6 +112,9 @@ if ($action === 'get_all_data') {
 
         $baseUrl = getBaseWebUrl();
         foreach ($tasks as &$row) {
+            // Vždy generujeme post_code (identifikátor viditelný v UI i analytice)
+            $row['post_code'] = makePostCode($row['scheduled_at'], $row['group_name'] ?? 'skupina');
+
             if (empty($row['target_url'])) {
                 $tUrl = $row['template_target_url'];
                 if (empty($tUrl) && !empty($row['landing_slug'])) {
@@ -110,8 +124,15 @@ if ($action === 'get_all_data') {
                     $sep = (strpos($tUrl, '?') !== false) ? '&' : '?';
                     $cleanGrName = preg_replace('/[^a-z0-9]/', '', strtolower($row['group_name'] ?? 'skupina'));
                     $groupTag = 'fb_gr_' . ($cleanGrName ?: 'skupina');
-                    $tUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=' . urlencode($row['landing_slug'] ?: 'post');
+                    $postCode = $row['post_code'];
+                    $tUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=' . urlencode($row['landing_slug'] ?: 'post') . '&utm_content=' . urlencode($postCode);
                     $row['target_url'] = $tUrl;
+                }
+            } else {
+                // URL již uložená — doplníme utm_content pokud chybí
+                if (strpos($row['target_url'], 'utm_content=') === false) {
+                    $sep = (strpos($row['target_url'], '?') !== false) ? '&' : '?';
+                    $row['target_url'] .= $sep . 'utm_content=' . urlencode($row['post_code']);
                 }
             }
         }
@@ -265,15 +286,21 @@ if ($action === 'save_task') {
         }
     }
 
-    // Auto-append UTM if target_url exists but doesn't have UTM parameters yet
+    // Auto-append UTM pokud chybí (vždy přidáme i utm_content = identifikátor)
+    $grpStmt2 = $pdo->prepare("SELECT name FROM fb_groups WHERE id = ?");
+    $grpStmt2->execute([$groupId]);
+    $grpName2 = $grpStmt2->fetchColumn() ?: 'skupina';
+    $postCode = makePostCode($scheduledAt, $grpName2);
+
     if (!empty($targetUrl) && strpos($targetUrl, 'utm_source=') === false) {
-        $grpStmt = $pdo->prepare("SELECT name FROM fb_groups WHERE id = ?");
-        $grpStmt->execute([$groupId]);
-        $grpName = $grpStmt->fetchColumn() ?: 'skupina';
-        $cleanGrName = preg_replace('/[^a-z0-9]/', '', strtolower($grpName));
+        $cleanGrName = preg_replace('/[^a-z0-9]/', '', strtolower($grpName2));
         $groupTag = 'fb_gr_' . ($cleanGrName ?: 'skupina');
         $sep = (strpos($targetUrl, '?') !== false) ? '&' : '?';
-        $targetUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=post';
+        $targetUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=post&utm_content=' . urlencode($postCode);
+    } elseif (!empty($targetUrl) && strpos($targetUrl, 'utm_content=') === false) {
+        // URL má UTM, ale chybí utm_content — doplníme
+        $sep = (strpos($targetUrl, '?') !== false) ? '&' : '?';
+        $targetUrl .= $sep . 'utm_content=' . urlencode($postCode);
     }
 
     try {
