@@ -86,7 +86,7 @@ if ($action === 'get_all_data') {
         $tasksStmt = $pdo->query("
             SELECT t.*, 
                    g.name as group_name, g.group_url, g.category as group_category,
-                   pt.title as template_title, pt.landing_slug, pt.image_url as template_image_url
+                   pt.title as template_title, pt.landing_slug, pt.target_url as template_target_url, pt.image_url as template_image_url
             FROM fb_schedule_tasks t
             LEFT JOIN fb_groups g ON t.group_id = g.id
             LEFT JOIN fb_post_templates pt ON t.template_id = pt.id
@@ -94,6 +94,24 @@ if ($action === 'get_all_data') {
             LIMIT 300
         ");
         $tasks = $tasksStmt ? $tasksStmt->fetchAll() : [];
+
+        $baseUrl = getBaseWebUrl();
+        foreach ($tasks as &$row) {
+            if (empty($row['target_url'])) {
+                $tUrl = $row['template_target_url'];
+                if (empty($tUrl) && !empty($row['landing_slug'])) {
+                    $tUrl = $baseUrl . '/landing_pages/' . $row['landing_slug'] . '.html';
+                }
+                if (!empty($tUrl)) {
+                    $sep = (strpos($tUrl, '?') !== false) ? '&' : '?';
+                    $cleanGrName = preg_replace('/[^a-z0-9]/', '', strtolower($row['group_name'] ?? 'skupina'));
+                    $groupTag = 'fb_gr_' . ($cleanGrName ?: 'skupina');
+                    $tUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=' . urlencode($row['landing_slug'] ?: 'post');
+                    $row['target_url'] = $tUrl;
+                }
+            }
+        }
+        unset($row);
 
         // Landing pages list
         $lpStmt = $pdo->query("SELECT slug, master_name FROM landing_pages ORDER BY master_name ASC");
@@ -228,6 +246,30 @@ if ($action === 'save_task') {
     if (!$groupId || empty($scheduledAt)) {
         echo json_encode(['success' => false, 'message' => 'Vyberte skupinu a termín vložení.']);
         exit;
+    }
+
+    // Auto-resolve base target URL if empty and template provided
+    if (empty($targetUrl) && $templateId) {
+        $tplStmt = $pdo->prepare("SELECT landing_slug, target_url FROM fb_post_templates WHERE id = ?");
+        $tplStmt->execute([$templateId]);
+        $tplRow = $tplStmt->fetch();
+        if ($tplRow) {
+            $targetUrl = $tplRow['target_url'];
+            if (empty($targetUrl) && !empty($tplRow['landing_slug'])) {
+                $targetUrl = getBaseWebUrl() . '/landing_pages/' . $tplRow['landing_slug'] . '.html';
+            }
+        }
+    }
+
+    // Auto-append UTM if target_url exists but doesn't have UTM parameters yet
+    if (!empty($targetUrl) && strpos($targetUrl, 'utm_source=') === false) {
+        $grpStmt = $pdo->prepare("SELECT name FROM fb_groups WHERE id = ?");
+        $grpStmt->execute([$groupId]);
+        $grpName = $grpStmt->fetchColumn() ?: 'skupina';
+        $cleanGrName = preg_replace('/[^a-z0-9]/', '', strtolower($grpName));
+        $groupTag = 'fb_gr_' . ($cleanGrName ?: 'skupina');
+        $sep = (strpos($targetUrl, '?') !== false) ? '&' : '?';
+        $targetUrl .= $sep . 'zdroj=' . urlencode($groupTag) . '&utm_source=facebook&utm_medium=group&utm_campaign=post';
     }
 
     try {

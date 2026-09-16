@@ -287,14 +287,14 @@ require_once __DIR__ . '/../db.php';
         
         <div class="form-group">
           <label>Facebook Skupina *</label>
-          <select id="task-group-id" class="form-control" required>
+          <select id="task-group-id" class="form-control" required onchange="onScheduleGroupOrTemplateChange()">
             <option value="">-- Vyberte cílovou FB skupinu --</option>
           </select>
         </div>
 
         <div class="form-group">
           <label>Standardní příspěvek (šablona)</label>
-          <select id="task-template-id" class="form-control" onchange="onScheduleTemplateChange()">
+          <select id="task-template-id" class="form-control" onchange="onScheduleGroupOrTemplateChange()">
             <option value="">-- Vlastní text (nebo vyberte šablonu) --</option>
           </select>
           <div class="form-hint">Výběrem šablony se automaticky předvyplní text, landing page a obrázek níže.</div>
@@ -311,9 +311,14 @@ require_once __DIR__ . '/../db.php';
         </div>
 
         <div class="form-group">
-          <label>Vlastní cílové URL / Odkaz (nepovinné)</label>
-          <input type="url" id="task-target-url" class="form-control" placeholder="https://svobodnecechy.cz/...">
-          <div class="form-hint">Pokud necháte prázdné, použije se odkaz ze šablony. UTM parametry se doplní automaticky.</div>
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Cílová URL adresa s UTM parametry *</span>
+            <button type="button" class="btn btn-sm btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem;" onclick="copyScheduleTargetUrl()">
+              <i class="bi bi-clipboard"></i> Kopírovat odkaz
+            </button>
+          </label>
+          <input type="url" id="task-target-url" class="form-control" placeholder="https://svobodnecechy.cz/landing_pages/...?zdroj=fb_gr_..." style="font-family:monospace; color:#60a5fa; font-size:0.88rem;" required>
+          <div class="form-hint">UTM parametry se automaticky generují pro danou skupinu a šablonu. Můžete je zde zkontrolovat nebo upravit.</div>
         </div>
 
         <div class="form-group">
@@ -578,6 +583,17 @@ require_once __DIR__ . '/../db.php';
               </a>
               <div class="task-post-name"><strong>Příspěvek:</strong> ${escapeHtml(t.template_title || 'Vlastní příspěvek')}</div>
               <div class="task-snippet">${escapeHtml(textSnippet)}</div>
+              ${t.target_url ? `
+                <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+                  <span style="font-size:0.75rem; color:var(--accent); font-weight:700;"><i class="bi bi-link-45deg"></i> ODKAZ S UTM:</span>
+                  <a href="${escapeHtml(t.target_url)}" target="_blank" style="font-family:monospace; font-size:0.75rem; color:#60a5fa; text-decoration:none; word-break:break-all; background:rgba(0,0,0,0.4); padding:0.2rem 0.5rem; border-radius:4px; border:1px solid rgba(96,165,250,0.3);">
+                    ${escapeHtml(t.target_url)}
+                  </a>
+                  <button class="btn btn-sm btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.72rem;" onclick="navigator.clipboard.writeText('${escapeHtml(t.target_url)}'); showToast('Odkaz s UTM zkopírován!');" title="Kopírovat odkaz s UTM">
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                </div>
+              ` : ''}
               ${t.log_message ? `<div style="font-size:0.75rem; color:#4ade80; margin-top:0.25rem;"><i class="bi bi-check2-circle"></i> ${escapeHtml(t.log_message)}</div>` : ''}
             </div>
             <div class="task-actions-col">
@@ -610,8 +626,8 @@ require_once __DIR__ . '/../db.php';
       if (prefillGroupId) document.getElementById('task-group-id').value = prefillGroupId;
       if (prefillTemplateId) {
         document.getElementById('task-template-id').value = prefillTemplateId;
-        onScheduleTemplateChange();
       }
+      onScheduleGroupOrTemplateChange();
 
       openModal('modal-schedule');
     }
@@ -630,18 +646,76 @@ require_once __DIR__ . '/../db.php';
       openModal('modal-schedule');
     }
 
-    function onScheduleTemplateChange() {
+    function onScheduleGroupOrTemplateChange() {
       const tplId = document.getElementById('task-template-id').value;
-      if (!tplId) return;
+      const grpId = document.getElementById('task-group-id').value;
       const tpl = appData.templates.find(x => x.id == tplId);
-      if (tpl) {
-        if (!document.getElementById('task-custom-text').value) {
-          document.getElementById('task-custom-text').value = tpl.post_text || '';
-        }
-        if (!document.getElementById('task-target-url').value && tpl.target_url) {
-          document.getElementById('task-target-url').value = tpl.target_url;
-        }
+      const grp = appData.groups.find(x => x.id == grpId);
+
+      // Prefill text if empty or previously prefilled
+      const textEl = document.getElementById('task-custom-text');
+      if (tpl && (!textEl.value || textEl.dataset.autoPrefilled === '1')) {
+        textEl.value = tpl.post_text || '';
+        textEl.dataset.autoPrefilled = '1';
       }
+
+      // Determine base URL
+      let baseTarget = '';
+      let campaign = 'post';
+      if (tpl) {
+        campaign = tpl.landing_slug || 'post';
+        baseTarget = tpl.target_url || '';
+        if (!baseTarget && tpl.landing_slug) {
+          baseTarget = `${location.protocol}//${location.host}/landing_pages/${tpl.landing_slug}.html`;
+        }
+      } else {
+        baseTarget = document.getElementById('task-target-url').value;
+      }
+
+      if (baseTarget) {
+        document.getElementById('task-target-url').value = buildUtmUrl(baseTarget, grp ? grp.name : '', campaign);
+      }
+    }
+
+    function buildUtmUrl(rawUrl, groupName, campaignSlug) {
+      if (!rawUrl) return '';
+      try {
+        let cleanUrl = rawUrl.split('?')[0];
+        let cleanGroupName = (groupName || 'skupina')
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_|_$/g, '');
+        
+        let groupTag = 'fb_gr_' + (cleanGroupName || 'skupina');
+        let campaign = (campaignSlug || 'post')
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '_')
+          .replace(/^_|_$/g, '');
+
+        let urlObj = new URL(cleanUrl, window.location.origin);
+        urlObj.searchParams.set('zdroj', groupTag);
+        urlObj.searchParams.set('utm_source', 'facebook');
+        urlObj.searchParams.set('utm_medium', 'group');
+        urlObj.searchParams.set('utm_campaign', campaign || 'post');
+
+        return urlObj.toString();
+      } catch(e) {
+        const sep = rawUrl.includes('?') ? '&' : '?';
+        return rawUrl + sep + 'zdroj=fb_gr_skupina&utm_source=facebook&utm_medium=group&utm_campaign=post';
+      }
+    }
+
+    function copyScheduleTargetUrl() {
+      const input = document.getElementById('task-target-url');
+      if (!input || !input.value) {
+        showToast('Nejprve vyberte šablonu nebo zadejte URL.', true);
+        return;
+      }
+      navigator.clipboard.writeText(input.value);
+      showToast('Odkaz s UTM parametry zkopírován!');
     }
 
     function submitSchedule(e) {
