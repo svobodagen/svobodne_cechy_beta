@@ -1233,7 +1233,6 @@ HTML;
         }
         sessionStorage.setItem('sc_landing_source', scSource);
       }
-    }
 
     // 3. Device detection
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
