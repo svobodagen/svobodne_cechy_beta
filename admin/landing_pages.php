@@ -1579,10 +1579,7 @@ HTML;
         updateCtaVisibility();
       }
 
-      // Attach openLeadModal handler to all CTA links & buttons
-      document.querySelectorAll('a[href="#kontakt"], .cta-nav').forEach(el => {
-        el.addEventListener('click', openLeadModal);
-      });
+      // CTA buttons already have onclick="openLeadModal(event)" inline handlers
 
       // FAQ Exclusive Accordion
       const isFaqExclusive = {$f_exclusive_json};
