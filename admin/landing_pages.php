@@ -358,7 +358,7 @@ function renderLandingPageHtml($data) {
         <div class="hero-image"><img src="{$h_img}" alt="Fotografie z huti" /></div>
       </div>
       <div class="container hero-buttons-row">
-        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">{$h_btn1}</a>
+        <a href="javascript:void(0)" class="btn btn-primary" onclick="openLeadModal(event); return false;">{$h_btn1}</a>
         {$h_btn2_html}
       </div>
     </section>
@@ -373,7 +373,7 @@ HTML;
         $txtHtml = htmlspecialchars($txt);
         return <<<HTML
       <div class="section-cta-wrap"{$dispStyle}>
-        <a href="#kontakt" class="btn btn-primary" onclick="openLeadModal(event)">{$txtHtml}</a>
+        <a href="javascript:void(0)" class="btn btn-primary" onclick="openLeadModal(event); return false;">{$txtHtml}</a>
       </div>
 HTML;
     };
@@ -1097,7 +1097,7 @@ HTML;
         <li><a href="#realizace">Realizace</a></li>
         <li><a href="#reference">Reference</a></li>
         <li><a href="#faq">FAQ</a></li>
-        <li><a href="#kontakt" class="cta-nav" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
+        <li><a href="javascript:void(0)" class="cta-nav" onclick="openLeadModal(event); return false;">ZJISTIT, JESTLI JE TO PRO MĚ</a></li>
       </ul>
     </div>
   </header>
@@ -1106,7 +1106,7 @@ HTML;
     {$renderedMain}
   </main>
 
-  <div class="mobile-sticky-cta"><a href="#kontakt" class="btn btn-primary" style="width:100%;" onclick="openLeadModal(event)">ZJISTIT, JESTLI JE TO PRO MĚ</a></div>
+  <div class="mobile-sticky-cta"><a href="javascript:void(0)" class="btn btn-primary" style="width:100%;" onclick="openLeadModal(event); return false;">ZJISTIT, JESTLI JE TO PRO MĚ</a></div>
   <footer><div class="container"><p>© 2026 Svobodné Cechy. Všechna práva vyhrazena.</p></div></footer>
 
   <!-- LEAD CAPTURE POPUP MODAL (3 PHASES) -->
